@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#!/usr/bin/env python3
 
 from benchmark_helpers import get_args, print_, randomNums
 
