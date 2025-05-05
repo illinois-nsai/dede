@@ -571,9 +571,6 @@ class GandivaPolicy(PolicyWithPacking):
                                      scale_factors,
                                      cluster_spec)
 
-        # --------------
-        zhiying = time.time() - start
-
         job_ids = sorted(list(unflattened_throughputs.keys()))
         if len(job_ids) == 0:
             return None, None
@@ -623,8 +620,6 @@ class GandivaPolicy(PolicyWithPacking):
                 scale_factors_array),
             x).sum(1)
         results = results[x.sum(1) > 0].min()
-        print(f'{x.shape}, {zhiying:.4f}, {results:.4f}')
-        # ----------------
 
         x = super().unflatten(x, index)
         return x

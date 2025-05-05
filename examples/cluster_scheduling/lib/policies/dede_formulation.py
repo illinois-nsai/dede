@@ -249,7 +249,7 @@ class DeDeFormulation:
                 if debug:
                     print(f'Fix constraint violation at iter {i}: {(stop - start):.4f} s, obj {obj:.4f}')
 
-        var_clip = self.fix_sol_r.clip(max=1.0)  # x.T.value.clip(max=1.0) #
+        var_clip = self.sol_mat
         d = {}
         for i, job_id in enumerate(self._job_ids):
             d[job_id] = {worker_type: var_clip[i][j] for j, worker_type in enumerate(self._worker_types)}
