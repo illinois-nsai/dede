@@ -1,6 +1,9 @@
 # DeDe: An Optimization Framework for Large-Scale Resource Allocation
 
-DeDe is a general, scalable, and theoretically grounded optimization framework that accelerates large-scale resource allocation problems through a “decouple and decompose” approach.
+![PyPI - version](https://img.shields.io/pypi/v/dede?label=PyPI%20package)
+![PyPI - downloads](https://img.shields.io/pypi/dm/dede?label=PyPI%20downloads)
+
+DeDe is a general, scalable, and theoretically grounded optimization framework that accelerates large-scale resource allocation problems through a *decouple-and-decompose* approach.
 
 ## Getting started
 
@@ -27,7 +30,7 @@ pip install dede
 ├── dede/                       # core source code
 ├── tests/                      # test suite
 │     └── test_dede.py
-└── examples/                   # example applications
+└── examples/                   # example use cases
       ├── traffic_engineering/
       ├── cluster_scheduling/
       └── load_balancing/
