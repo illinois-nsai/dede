@@ -1,5 +1,5 @@
-# DeDe: An Optimization Framework for Large-Scale Resource Allocation
-
+![dede logo](assets/dede_logo.svg)
+======
 ![PyPI - version](https://img.shields.io/pypi/v/dede?label=PyPI%20package)
 ![PyPI - downloads](https://img.shields.io/pypi/dm/dede?label=PyPI%20downloads)
 
