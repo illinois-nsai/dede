@@ -20,7 +20,7 @@ def test_dede():
     # Construct the problem
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    # Solve the problem with DeDe on a 4-core CPU
+    # Solve the problem with DeDe on 4 CPU cores
     result_dede = prob.solve(num_cpus=4, solver=dd.ECOS)
 
     # Solve the problem with cvxpy
@@ -50,7 +50,7 @@ def test_dede_with_param():
     # Construct the problem
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    # Solve the problem with DeDe on a 4-core CPU
+    # Solve the problem with DeDe on 4 CPU cores
     result_dede = prob.solve(num_cpus=4, solver=dd.ECOS)
 
     # Solve the problem with cvxpy
@@ -62,7 +62,7 @@ def test_dede_with_param():
     # Change parameter value and re-solve
     param.value += 1
 
-    # Solve the problem with DeDe on a 4-core CPU
+    # Solve the problem with DeDe on 4 CPU cores
     result_dede = prob.solve(num_cpus=4, solver=dd.ECOS)
 
     # Solve the problem with cvxpy

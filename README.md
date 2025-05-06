@@ -66,11 +66,8 @@ objective = dd.Minimize(x.sum())
 # Construct the problem
 prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-# Solve the problem with DeDe on a 4-core CPU
+# Solve the problem with DeDe on 4 CPU cores
 print(prob.solve(num_cpus=4, solver=dd.ECOS))
-
-# Solve the problem with cvxpy
-print(prob.solve(enable_dede=False))
 ```
 
 Another toy example is provided in `tests/test_dede.py`. To test these examples quickly, from the project root directory, run
