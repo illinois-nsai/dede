@@ -1,7 +1,7 @@
 # Example Use Cases of DeDe
 This README provides instructions for running DeDe on three use cases — traffic engineering, cluster scheduling, and load balancing. We provide only toy and synthesized datasets here.
 
-For optimal performance results, we use the lower-level APIs of DeDe to achieve these examples. People can implement them using the high-level APIs as well, except that the convenience comes at the performance cost.
+For optimal performance results in the paper, we use the lower-level APIs of DeDe to implement these examples. They can be implemented using the high-level APIs as well, except that the convenience will come at some performance cost in these cases.
 
 ## Getting started
 
