@@ -31,7 +31,7 @@ HEADERS = [
 ]
 PLACEHOLDER = ",".join("{}" for _ in HEADERS)
 
-OUTPUT_CSV_TEMPLATE = "path-form-{}-{}.csv"
+OUTPUT_CSV_TEMPLATE = "path-form-{}.csv"
 
 # Sweep topos and traffic matrices for that topo. For each combo, record the
 # runtime and total flow for each algorithm
