@@ -92,7 +92,7 @@ Please refer to [examples/README.md](examples/README.md) for details.
 If you use DeDe in your research, please cite our paper:
 ```
 @inproceedings{dede,
-    title={Decouple and Decompose: Scaling Resource Allocation with DeDe},
+    title={{Decouple and Decompose: Scaling Resource Allocation with DeDe}},
     author={Xu, Zhiying and Yu, Minlan and Yan, Francis Y.},
     booktitle={Proceedings of the USENIX OSDI 2025 Conference},
     month=jul,
