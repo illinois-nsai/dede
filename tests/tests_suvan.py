@@ -16,8 +16,9 @@ def test_sample():
 def test_failing_sample():
     x = cp.Variable((4,4))
     constr = x.sum(1) == 1
-    with pytest.raises(TypeError):
-        func(constr)
+    out = func(constr)
+    expected = [str(x[i, :] == 1) for i in range(4)]
+    assert tester(out) == expected
 
 def test_hard1():
     x = cp.Variable((4,4))
@@ -37,10 +38,11 @@ def test_extra1():
 def test_failing_extra1():
     x = cp.Variable()
     constr = x == 5
-    with pytest.raises(TypeError):
-        func(constr)
+    out = func(constr)
+    expected = [str(x == 5)]
+    assert tester(out) == expected
 
-def test_extra2():
+def test_extra2(): # Haven't configured
     x = cp.Variable((4,4))
     constr = x[0,:] >= np.arange(4)
     out = func(constr)

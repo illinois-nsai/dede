@@ -26,13 +26,14 @@ def func(constr):
     print("Type of left value:", type(left.value))
     print("right value:", right.value)
     print("Type of right value:", type(right.value))
-    if type(constr) == Inequality:
+    if type(constr) == Inequality or type(constr) == Equality:
         if type(left) == Sum:
             for i in range(left.shape[0]):
                 left_list.append(left.args[0][i])
         elif type(left) == Variable:
             left_list.append(left)
         elif type(left.value) == np.ndarray:
+            print("Left shape", left.shape)
             for idx in np.ndindex(left.shape):
                 left_list.append(left[idx])
         elif left.value != None and type(float(left.value)) == float:
@@ -63,14 +64,23 @@ def func(constr):
         else:
             raise TypeError(f"Right side of the constraint is not a valid type: {type(right)}")
     else:
-        raise TypeError("Only Inequality based Testing.")
-    if len(left_list) < len(right_list):
+        raise TypeError("Only Inequality or Equality based Testing.")
+    if len(left_list) < len(right_list) and type(constr) == Inequality:
         for i in range(len(right_list)):
             constr_list.append(left_list[0] <= right_list[i])
-    elif len(left_list) > len(right_list):
+    elif len(left_list) > len(right_list) and type(constr) == Inequality:
         for i in range(len(left_list)):
             constr_list.append(left_list[i] <= right_list[0])
-    elif len(left_list) == len(right_list):
+    elif len(left_list) == len(right_list) and type(constr) == Inequality:
         for i in range(len(left_list)):
             constr_list.append(left_list[i] <= right_list[i])
+    elif len(left_list) < len(right_list) and type(constr) == Equality:
+        for i in range(len(right_list)):
+            constr_list.append(left_list[0] == right_list[i])
+    elif len(left_list) > len(right_list) and type(constr) == Equality:
+        for i in range(len(left_list)):
+            constr_list.append(left_list[i] == right_list[0])
+    elif len(left_list) == len(right_list) and type(constr) == Equality:
+        for i in range(len(left_list)):
+            constr_list.append(left_list[i] == right_list[i])
     return constr_list
