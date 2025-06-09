@@ -183,10 +183,11 @@ class DeDeFormulation:
             self.fix_sol_d = self.sol_d
             for i in range(self.fix_steps):
                 start = time.time()
-                self.fix_sol_r = np.vstack(ray.get([prob.fix_r.remote(self.fix_sol_d[param_idx])
+                # enlarge r
+                self.fix_sol_r = np.vstack(ray.get([prob.fix_r.remote(self.fix_sol_d[param_idx], i)
                                            for prob, param_idx in zip(self._subprob_cache.probs, self.param_idx_r)]))
                 self.fix_sol_r = self.fix_sol_r[self.param_idx_r_back, :].T
-                self.fix_sol_d = np.vstack(ray.get([prob.fix_d.remote(self.fix_sol_r[param_idx])
+                self.fix_sol_d = np.vstack(ray.get([prob.fix_d.remote(self.fix_sol_r[param_idx], i)
                                            for prob, param_idx in zip(self._subprob_cache.probs, self.param_idx_d)]))
                 self.fix_sol_d = self.fix_sol_d[self.param_idx_d_back, :].T
                 stop = time.time()
@@ -237,10 +238,11 @@ class DeDeFormulation:
             for i in range(self.fix_steps):
                 start = time.time()
                 self.fix_sol_r = np.hstack([self.fix_sol_r, obj * 1.01 * np.ones((self.sol_r.shape[0], 1))])
-                self.fix_sol_d = np.vstack(ray.get([prob.fix_d.remote(self.fix_sol_r[param_idx])
+                # enlarge d
+                self.fix_sol_d = np.vstack(ray.get([prob.fix_d.remote(self.fix_sol_r[param_idx], i)
                                            for prob, param_idx in zip(self._subprob_cache.probs, self.param_idx_d)]))
                 self.fix_sol_d = self.fix_sol_d[self.param_idx_d_back, :].T
-                self.fix_sol_r = np.vstack(ray.get([prob.fix_r.remote(self.fix_sol_d[param_idx])
+                self.fix_sol_r = np.vstack(ray.get([prob.fix_r.remote(self.fix_sol_d[param_idx], i)
                                            for prob, param_idx in zip(self._subprob_cache.probs, self.param_idx_r)]))
                 self.fix_sol_r = self.fix_sol_r[self.param_idx_r_back, :].T
                 obj = self.get_fix_obj()
@@ -248,8 +250,25 @@ class DeDeFormulation:
                 self._runtime += stop - start
                 if debug:
                     print(f'Fix constraint violation at iter {i}: {(stop - start):.4f} s, obj {obj:.4f}')
+            self.fix_sol_d = self.fix_sol_r.T
+            for i in range(10):
+                start = time.time()
+                # enlarge r
+                self.fix_sol_r = np.vstack(ray.get([prob.fix_r.remote(self.fix_sol_d[param_idx], -1)
+                                           for prob, param_idx in zip(self._subprob_cache.probs, self.param_idx_r)]))
+                self.fix_sol_r = self.fix_sol_r[self.param_idx_r_back, :].T
+                self.fix_sol_d = np.vstack(ray.get([prob.fix_d.remote(self.fix_sol_r[param_idx], -1)
+                                           for prob, param_idx in zip(self._subprob_cache.probs, self.param_idx_d)]))
+                self.fix_sol_d = self.fix_sol_d[self.param_idx_d_back, :].T
+                stop = time.time()
+                self.fix_sol_r = self.fix_sol_d.T
+                obj = self.get_fix_obj()
+                self._runtime += stop - start
+                if debug:
+                    print(f'After fix at iter {i}: {(stop - start):.4f} s, obj {obj:.4f}')
 
         var_clip = self.sol_mat
+        # print(var_clip.sum(1).max(), (self._scale_factors_list @ var_clip / self._num_workers).max())
         d = {}
         for i, job_id in enumerate(self._job_ids):
             d[job_id] = {worker_type: var_clip[i][j] for j, worker_type in enumerate(self._worker_types)}
@@ -303,7 +322,10 @@ class DeDeFormulation:
 
     @property
     def sol_mat(self):
-        return self.fix_sol_r[self.valid_idx_d]
+        if self._objective == Objective.TOTAL_UTIL:
+            return self.fix_sol_d.T[self.valid_idx_d]
+        elif self._objective == Objective.MAX_MIN_ALLOC:
+            return self.fix_sol_r[self.valid_idx_d]
 
     def get_t(self):
         r_t = ray.get([prob.get_r_t.remote() for prob in self._subprob_cache.probs])

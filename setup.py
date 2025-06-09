@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="dede",
-    version="0.1.5",
+    version="0.1.6",
     author="Zhiying Xu",
     author_email="xuzhiying9510@gmail.com",
     description="Decouple and Decompose: Scaling Resource Allocation through a Different Lens",
@@ -12,6 +12,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         "cvxpy==1.4.0",
+        "numpy==1.26.4",
         "ray",
     ],
     classifiers=[

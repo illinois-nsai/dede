@@ -65,17 +65,17 @@ class SubproblemsWrap():
         obj = [prob.get_obj() for prob in self.probs_d if prob.is_valid]
         return obj
 
-    def fix_r(self, param_values=None):
+    def fix_r(self, param_values=None, iter=None):
         '''Fix constraints violation of resource problems.'''
         if self.probs_r:
-            return np.vstack([prob.fix(param_value) for prob, param_value in zip(self.probs_r, param_values)])
+            return np.vstack([prob.fix(param_value, iter) for prob, param_value in zip(self.probs_r, param_values)])
         else:
             return np.empty((0, self.N))
 
-    def fix_d(self, param_values=None):
+    def fix_d(self, param_values=None, iter=None):
         '''Fix constraints violation of demand problems.'''
         if self.probs_d:
-            return np.vstack([prob.fix(param_value) for prob, param_value in zip(self.probs_d, param_values)])
+            return np.vstack([prob.fix(param_value, iter) for prob, param_value in zip(self.probs_d, param_values)])
         else:
             return np.empty((0, self.M))
 
@@ -150,11 +150,17 @@ class SubproblemR(CpProblem):
     def get_solution(self):
         return self.var.value
 
-    def fix(self, param_value=None):
+    def fix(self, param_value=None, iter=None):
         if self._objective_name == Objective.TOTAL_UTIL:
-            return param_value / (param_value @ self.scale_factors.value + EPS) * self.num_worker
+            if iter == 0:
+                return param_value / max(param_value @ self.scale_factors.value, EPS, self.num_worker) * self.num_worker
+            else:
+                return param_value / max(param_value @ self.scale_factors.value, EPS) * self.num_worker
         elif self._objective_name == Objective.MAX_MIN_ALLOC:
-            return param_value / max(param_value @ self.scale_factors.value + EPS, self.num_worker) * self.num_worker
+            if iter >= 0:
+                return param_value / max(param_value @ self.scale_factors.value, EPS, self.num_worker) * self.num_worker    
+            else:
+                return param_value / max(param_value @ self.scale_factors.value, EPS) * self.num_worker
 
     def solve(self, param_value, *args, **kwargs):
         start = time.time()
@@ -255,15 +261,24 @@ class SubproblemD(CpProblem):
         elif self._objective_name == Objective.MAX_MIN_ALLOC:
             return self.var[-1].value
 
-    def fix(self, param_value=None):
+    def fix(self, param_value=None, iter=None):
         if not self.is_valid:
             return np.zeros(self.M)
         if self._objective_name == Objective.TOTAL_UTIL:
-            self.var_fix = param_value / max(param_value.sum(), 1)
+            if iter == 0:
+                self.var_fix = param_value / max(param_value.sum(), 1)
+            elif param_value.sum() - self.var_fix.sum() > EPS:
+                delta = param_value - self.var_fix
+                self.var_fix += delta / max(delta.sum(), 1 - self.var_fix.sum(), EPS) * (1 - self.var_fix.sum())
             return self.var_fix
         elif self._objective_name == Objective.MAX_MIN_ALLOC:
-            self.var_fix = param_value[:-1] / (param_value[:-1].sum() + EPS)
-            self.var_fix = self.var_fix / max(self.throughput.value @ self.var_fix / (param_value[-1] * 1.01 + EPS), 1)
+            if iter >= 0:
+                self.var_fix = param_value[:-1] / (param_value[:-1].sum() + EPS)
+                self.var_fix = self.var_fix / max(
+                    self.throughput.value @ self.var_fix / (param_value[-1]*1.01 + EPS), 1)
+            elif param_value.sum() - self.var_fix.sum() > EPS:
+                delta = param_value - self.var_fix
+                self.var_fix += delta / max(delta.sum(), 1 - self.var_fix.sum(), EPS) * (1 - self.var_fix.sum())
             return self.var_fix
 
     def get_fix_obj(self, param_value=None):
@@ -272,8 +287,7 @@ class SubproblemD(CpProblem):
         if self._objective_name == Objective.TOTAL_UTIL:
             return - np.log(self.throughput.value @ self.var_fix + EPS)
         elif self._objective_name == Objective.MAX_MIN_ALLOC:
-            # return self.throughput.value @ param_value
-            return self.throughput.value @ self.var_fix
+            return self.throughput.value @ param_value
 
     def solve(self, param_value, *args, **kwargs):
         if not self.is_valid:
