@@ -1,6 +1,6 @@
 import numpy as np
 import cvxpy as cp
-from constraints_func import func
+from dede.constraints_utils import func
 
 
 def test_sample():
@@ -74,9 +74,16 @@ def test_hard3():
     out = []
     out.extend(func(c1))
     out.extend(func(c2))
-    print(tester(out))
     expected = [x[i, :] >= i for i in range(4)] + [x[0, 0] + x[0, 1] >= 0]
     assert tester(out) == tester(expected)
+
+
+def test_column():
+    x = cp.Variable((4, 4))
+    constr = x[:, 0] >= np.arange(4)
+    out = func(constr)
+    expected = [str(x[i, 0] >= i) for i in range(4)]
+    assert tester(out) == expected
 
 
 # def test_hard2(): #Not fully implemented
@@ -86,10 +93,22 @@ def test_hard3():
 #     out = []
 #     out.extend(func(c1))
 #     out.extend(func(c2))
-#     print(tester(out))
+#     print("GOT:", tester(out))
 #     expected = [x[0,2] + x[0,3] + x[2,3] >= 10, x[2,:] @ np.arange(5,9) >= 0, x[3,:] @ np.arange(5,9) >= 0]
 #     assert tester(out) == tester(expected)
 
 
 def tester(constr):
     return [str(c) for c in constr]
+
+if __name__ == '__main__':
+    test_sample()
+    test_sample_2()
+    test_failing_sample()
+    test_hard1()
+    test_extra1()
+    test_failing_extra1()
+    test_extra2()
+    test_failing_extra2()
+    test_hard3()
+    test_column()
