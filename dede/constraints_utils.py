@@ -15,6 +15,7 @@ def func(constr):
         for c in constr:
             out.extend(func(c))
         return out
+
     left, right = constr.args
     constr_list = []
     left_list = []
@@ -40,9 +41,11 @@ def func(constr):
         elif isinstance(left, Constant) and isinstance(left.value, np.ndarray):
             for i in np.ndindex(left.value.shape):
                 left_list.append(float(left.value[i]))
-        elif isinstance(left.value, np.ndarray) or isinstance(left, index):
+        elif isinstance(left.value, np.ndarray):
             for i in np.ndindex(left.shape):
                 left_list.append(left[i])  # Cast to Float if Needed
+        elif isinstance(left, index):
+            left_list = get_entries_from_index(left)
         elif left.value is not None and isinstance(float(left.value), float):
             left_list.append(float(left.value))
         elif isinstance(list(left.value), (list, np.ndarray)):
@@ -50,7 +53,7 @@ def func(constr):
                 left_list.append(float(v))
         else:
             raise TypeError(f"Left Expression Not Supported: {type(left)}")
-
+        
         if isinstance(right, Sum):
             for i in range(right.shape[0]):
                 right_list.append(right.args[0][i])
@@ -67,9 +70,11 @@ def func(constr):
         elif isinstance(right, Constant) and isinstance(right.value, np.ndarray):
             for i in np.ndindex(right.value.shape):
                 right_list.append(float(right.value[i]))
-        elif isinstance(right.value, np.ndarray) or isinstance(right, index):
+        elif isinstance(right.value, np.ndarray):
             for i in np.ndindex(right.shape):
                 right_list.append(right[i])  # Cast to Float if Needed
+        elif isinstance(right, index):
+            right_list = get_entries_from_index(right)
         elif right.value is not None and isinstance(float(right.value), float):
             right_list.append(float(right.value))
         elif isinstance(list(right.value), list):
@@ -103,6 +108,29 @@ def func(constr):
                 constr_list.append(left_list[i] == right_list[i])
 
     return constr_list
+
+
+def get_entries_from_index(index):
+    x = index.args[0]
+    key = index.get_data()[0]  # key = (start, stop, step)
+
+    # shape has the same dimensions as x
+    shape = []
+    for k in key:
+        shape.append((k.stop - k.start) // k.step)
+    shape = tuple(shape)
+
+    entries = []
+    for rel_idx in np.ndindex(shape):
+        abs_idx = []
+        for axis, k in enumerate(key):
+            if isinstance(k, slice):
+                abs_idx.append(k.start + rel_idx[axis] * k.step)
+            else:
+                abs_idx.append(k)
+        entries.append(x[tuple(abs_idx)])
+
+    return entries
 
 
 def breakdown_expression(expr):
