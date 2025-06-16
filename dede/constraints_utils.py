@@ -69,7 +69,7 @@ def breakdown_expression(expr):
     if isinstance(expr, Sum):
         if expr.axis == None: # sum over all elements
             terms.append(expr)
-        if expr.axis == 0: # 0 for summing over columns 
+        elif expr.axis == 0: # 0 for summing over columns 
             for i in range(expr.shape[0]):
                 terms.append(expr.args[0][:, i])
         elif expr.axis == 1: # 1 for summing over rows
