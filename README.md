@@ -13,6 +13,9 @@ DeDe is a general, scalable, and theoretically grounded optimization framework t
 
 ### Dependencies
 - Python >= 3.8
+- `cvxpy` == 1.4.0
+- `ray` (any version)
+- `numpy` == 1.26.4
 - `g++` (required by `cvxpy`)
 - (optional) install `pytest` with `pip install -U pytest`
 
