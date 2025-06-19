@@ -11,8 +11,8 @@ setup(
     url="https://github.com/illinois-nsai/dede",
     packages=find_packages(),
     install_requires=[
-        "cvxpy==1.4.0",
-        "numpy==1.26.4",
+        "cvxpy>=1.4.0, <=1.4.3",
+        "numpy>=1.26.0, <=1.26.4",
         "ray",
     ],
     classifiers=[
