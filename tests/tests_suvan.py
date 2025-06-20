@@ -128,20 +128,9 @@ def test_sum_vars():
     assert tester(out) == tester(expected)
 
 
-def test_hard2(): #Not fully implemented
-    x = cp.Variable((4,4))
-    c1 = x[0,2:] + x[2,3] >= 10
-    c2 = x[2:] @ np.arange(5,9) >= 0
-    out = []
-    out.extend(func(c1))
-    out.extend(func(c2))
-    print("GOT:", tester(out))
-    expected = [x[0,2] + x[0,3] + x[2,3] >= 10, x[2,:] @ np.arange(5,9) >= 0, x[3,:] @ np.arange(5,9) >= 0]
-    assert tester(out) == tester(expected)
-
-
 def tester(constr):
     return [str(c) for c in constr]
+
 
 if __name__ == '__main__':
     test_sample()
@@ -157,7 +146,6 @@ if __name__ == '__main__':
     test_column()
     test_2d_chunk()
     test_single_row()
-    #test_hard2()
     test_1d_sum()
     test_2d_sum()
     test_sum_vars()

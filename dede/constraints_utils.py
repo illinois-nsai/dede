@@ -8,6 +8,7 @@ from cvxpy.atoms.affine.add_expr import AddExpression
 from cvxpy.expressions.variable import Variable
 from cvxpy.atoms.affine.index import index
 from cvxpy.atoms.affine.promote import Promote
+from cvxpy.atoms.affine.binary_operators import MulExpression
 
 
 def func(constr):
@@ -81,10 +82,45 @@ def breakdown_expression(expr):
         for var in expr.args:
             expr_list.append(breakdown_expression(var))
         for j in range(len(expr_list[0])):
-            var = expr_list[0][j]
-            for i in range(1, len(expr_list)):
+            var = 0
+            for i in range(len(expr_list)):
                 var = var + expr_list[i][j]
             terms.append(var)
+    
+    elif isinstance(expr, MulExpression):
+        left, right = expr.args
+
+        left_list = breakdown_expression(left)
+        right_list = breakdown_expression(right)
+
+        # scalar multiplication
+        if isinstance(left, Promote) or isinstance(right, Promote):
+            for i in range(len(left_list)):
+                terms.append(left_list[i] * right_list[i])
+        # element by element
+        elif len(left.shape) <= 1 and left.shape == right.shape:
+            for i in range(len(left_list)):
+                terms.append(left_list[i] * right_list[i])
+        # matrix multiplication
+        else:
+            left_shape = left.shape # N x K
+            right_shape = right.shape # K x M
+
+            if len(left_shape) == 1:
+                left_shape = (1, left_shape[0])
+            elif len(right_shape) == 1:
+                if right_shape[0] == left_shape[1]:
+                    right_shape = (right_shape[0], 1)
+                else:
+                    right_shape = (1, right_shape[0])
+
+            N, M, K = left_shape[0], right_shape[1], left_shape[1]
+            for i in range(N):
+                for j in range(M):
+                    sum = 0
+                    for k in range(K):
+                        sum += left_list[i * K + k] * right_list[k * M + j]
+                    terms.append(sum) 
 
     elif isinstance(expr, Variable):
         if expr.shape == ():
