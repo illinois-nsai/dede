@@ -2,8 +2,7 @@
 
 import dede as dd
 import numpy as np
-from dede.constraints_utils import func
-
+import cvxpy as cp
 
 def opt():
     np.set_printoptions(precision=3, suppress=True)
@@ -11,17 +10,23 @@ def opt():
 
     # Create allocation variables
     x = dd.Variable((N, M), nonneg=True)
+    xc = cp.Variable((N, M), nonneg=True)
 
     # Create parameters
     param = dd.Parameter(N, value=[1.0, 0.5, 1.2])
+    paramc = np.array([1.0, 0.5, 1.2])
 
     # Create the constraints
     resource_constraints = [x[i, :].sum() <= param[i] for i in range(N)]
     demand_constraints = [x[:, j].sum() <= 1 for j in range(M)]
+    resource_constraintsc = [cp.sum(xc[i, :]) <= paramc[i] for i in range(N)]
+    demand_constraintsc = [cp.sum(xc[:, j]) <= 1 for j in range(M)]
+    constraints = resource_constraintsc + demand_constraintsc
 
     # Create an objective
     w = np.array([[2, 1, 0], [5, 10, 0], [10, 0, 10]])
     objective = dd.Maximize(dd.sum(dd.multiply(x, w)))
+    objectivec = cp.Maximize(cp.sum(cp.multiply(xc, w)))
 
     # Construct the problem
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
@@ -32,9 +37,11 @@ def opt():
     # print(f'dede solution:\n{x.value}')
 
     # Solve the problem with cvxpy
-    result_cvxpy = prob.solve(enable_dede=False)
+    prob2 = cp.Problem(objectivec, constraints)
+    result_cvxpy = prob2.solve(solver=cp.ECOS)
+    #result_cvxpy = prob.solve(enable_dede=False)
     print(f'cvxpy result: {result_cvxpy}')
-    print(f'cvxpy solution:\n{x.value}')
+    print(f'cvxpy solution:\n{xc.value}')
 
 
 if __name__ == '__main__':

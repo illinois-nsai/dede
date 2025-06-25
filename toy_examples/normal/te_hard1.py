@@ -7,7 +7,7 @@ from dede.constraints_utils import func
 
 def opt():
     np.set_printoptions(precision=3, suppress=True)
-    N, M = 3, 3
+    N, M = 15, 15
 
     # Create allocation variables
     x = dd.Variable((N, M), nonneg=True)
