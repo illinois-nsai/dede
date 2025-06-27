@@ -13,6 +13,9 @@ DeDe is a general, scalable, and theoretically grounded optimization framework t
 
 ### Dependencies
 - Python >= 3.8
+- 1.4.0 <= `cvxpy` <= 1.4.3
+- `ray` (any version)
+- 1.26.0 <= `numpy` <= 1.26.4
 - `g++` (required by `cvxpy`)
 - (optional) install `pytest` with `pip install -U pytest`
 
@@ -22,6 +25,14 @@ We have made DeDe available as a PyPI package! You can simply install it using p
 pip install dede
 ```
 - We recommend creating a Python virtual environment (e.g., venv or Conda) before installation.
+
+## Modifications
+If you want to modify DeDe's source code and use that as your package instead, first clone the repository, then navigate to the base directory with `setup.py` and `pyproject.toml` and run
+```
+pip install -e .
+```
+- After making modifications, there is no need to rerun this command, as the package was installed in editable (`-e`) mode.
+- Once again, we recommend creating a Python virtual environment beforehand.
 
 ## Code structure
 
