@@ -106,7 +106,9 @@ class Problem(CpProblem):
             super(Problem, self).solve(*args, **kwargs)
             end = time.time()
             self._total_time = end - start
-            return self.value
+
+            coeff = 1 if self._problem_type == Minimize else -1
+            return coeff * self.value
 
         # initialize num_cpus, rho
         if num_cpus is None:
