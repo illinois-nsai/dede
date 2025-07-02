@@ -56,6 +56,10 @@ Key differences in DeDe:
   - `rho`: ADMM parameter acting like a ``learning rate''.
   - `num_iter`: maximum number of iterations; if not specified, DeDe stops if the accuracy improvement falls below 1%.
 
+> ⚠️ **Work in progress:**
+>
+> This high-level interface is designed for ease of use, but it is still under active development. For optimal performance, lower-level APIs are currently recommended, as demonstrated in the [example use cases](examples/README.md).
+
 ### Toy examples
 A toy example for resource allocation with DeDe is as follows:
 ```python
@@ -90,12 +94,14 @@ pytest
 Example output screenshots are provided in the `assets` folder.
 
 ## Example use cases of DeDe
-We provide three example applications of DeDe:
+We provide three example applications of DeDe in the research paper:
 - **Traffic engineering**: a network flow optimization problem.
 - **Cluster scheduling**: a resource allocation problem in cluster computing.
 - **Load balancing**: a query balancing problem in distributed stores.
 
-Please refer to [examples/README.md](examples/README.md) for details.
+These examples are implemented using the lower-level APIs of DeDe, which
+currently offer greater efficiency than the high-level APIs.
+Please see [examples/README.md](examples/README.md) for more details.
 
 ## Citation
 If you use DeDe in your research, please cite our paper:
