@@ -6,7 +6,7 @@ For optimal performance results in the paper, we use the lower-level APIs of DeD
 ## Getting started
 
 ### Hardware requirements
-- Linux OS
+- Linux OS (e.g., Ubuntu 24.04)
 - A multi-core CPU instance
 
 ### Prerequisites
@@ -16,7 +16,6 @@ For optimal performance results in the paper, we use the lower-level APIs of DeD
     - [Miniconda](https://docs.anaconda.com/free/anaconda/install/index.html) or [Anaconda](https://docs.anaconda.com/free/anaconda/install/index.html) is required
 - Acquire a Gurobi license from [Gurobi](https://www.gurobi.com/solutions/licensing/) and activate it with `grbgetkey [gurobi-license]`
     - Run `gurobi_cl` to verify the activation
-- Python dependencies: `pip install networkx gurobipy`
 - Install DeDe: `pip install dede`
 
 ## Running examples of DeDe

@@ -8,14 +8,11 @@ DeDe is a general, scalable, and theoretically grounded optimization framework t
 ## Getting started
 
 ### Hardware requirements
-- Linux OS
+- Linux OS (e.g., Ubuntu 24.04)
 - A multi-core CPU instance
 
 ### Dependencies
 - Python >= 3.8
-- 1.4.0 <= `cvxpy` <= 1.4.3
-- `ray` (any version)
-- 1.26.0 <= `numpy` <= 1.26.4
 - `g++` (required by `cvxpy`)
 - (optional) install `pytest` with `pip install -U pytest`
 
@@ -27,7 +24,8 @@ pip install dede
 - We recommend creating a Python virtual environment (e.g., venv or Conda) before installation.
 
 ## Modifications
-If you want to modify DeDe's source code and use that as your package instead, first clone the repository, then navigate to the base directory with `setup.py` and `pyproject.toml` and run
+If you want to modify DeDe's source code and use that as your package instead, navigate
+to the project root directory and run:
 ```
 pip install -e .
 ```
@@ -55,7 +53,7 @@ Key differences in DeDe:
 - The `solve(.)` method includes additional parameters:
   - `enable_dede`: enables DeDe if `True`; defaults to `cvxpy` if `False`.
   - `num_cpus`: number of CPU cores (defaults to all available cores).
-  - `rho`: ADMM parameter.
+  - `rho`: ADMM parameter acting like a ``learning rate''.
   - `num_iter`: maximum number of iterations; if not specified, DeDe stops if the accuracy improvement falls below 1%.
 
 ### Toy examples

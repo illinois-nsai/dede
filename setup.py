@@ -5,7 +5,7 @@ setup(
     version="0.1.6",
     author="Zhiying Xu",
     author_email="xuzhiying9510@gmail.com",
-    description="Decouple and Decompose: Scaling Resource Allocation through a Different Lens",
+    description="Decouple and Decompose: Scaling Resource Allocation with DeDe",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     url="https://github.com/illinois-nsai/dede",
