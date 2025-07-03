@@ -20,11 +20,11 @@ def test(N, M, rho_vals, num_iter=20):
     param = dd.Parameter(N, value=list(np.arange(1, N + 1)))
 
     # Constraints
-    resource_constraints = [x[i, :].sum() >= param[i] for i in range(N)]
-    demand_constraints = [x[:, j].sum() >= 1 for j in range(M)]
+    resource_constraints = [x[i, :].sum() >= param[i] for i in range(N)]    # each resource must be used at least param[i] (to be worthwhile) 
+    demand_constraints = [x[:, j].sum() >= 1 for j in range(M)]             # each job must have at 1 unit total of resources to run
 
     # Objective
-    objective = dd.Minimize(dd.sum(x))
+    objective = dd.Minimize(dd.sum(x))                                      # minimize total resources used
 
     # Construct problem
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
