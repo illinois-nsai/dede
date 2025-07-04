@@ -58,7 +58,7 @@ Key differences in DeDe:
 
 > ⚠️ **Work in progress:**
 >
-> This high-level interface is designed for ease of use, but it is still under active development. For optimal performance, lower-level APIs are currently recommended, as demonstrated in the [example use cases](examples/README.md).
+> This high-level interface is designed for ease of use, but performance enhancements are still underway. For optimal performance, we currently recommend lower-level APIs, as demonstrated in the [example use cases](examples/README.md).
 
 ### Toy examples
 A toy example for resource allocation with DeDe is as follows:
