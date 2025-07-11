@@ -55,9 +55,12 @@ class Problem(CpProblem):
             self.convert_inequality(constr) for constr in demand_constraints]
         self._subprob_cache = SubprobCache()
 
+        # keep track of original problem type
+        self._problem_type = type(objective)        
+
         # Initialize original problem
         super(Problem, self).__init__(
-            objective if type(objective) == Minimize else Minimize(
+            objective if self._problem_type == Minimize else Minimize(
                 -objective.expr),
             self._constrs_r + self._constrs_d)
 
@@ -103,7 +106,9 @@ class Problem(CpProblem):
             super(Problem, self).solve(*args, **kwargs)
             end = time.time()
             self._total_time = end - start
-            return self.value
+
+            coeff = 1 if self._problem_type == Minimize else -1
+            return coeff * self.value
 
         # initialize num_cpus, rho
         if num_cpus is None:
@@ -181,7 +186,9 @@ class Problem(CpProblem):
 
             print('iter%d: end2end time %.4f, aug_lgr=%.4f' % (
                 i, time.time() - start, aug_lgr))
-        return sum(ray.get([
+
+        coeff = 1 if self._problem_type == Minimize else -1
+        return coeff * sum(ray.get([
             prob.get_obj.remote() for prob in self._subprob_cache.probs]))
 
     def get_constr_dict(self, constrs):
@@ -310,6 +317,9 @@ class Problem(CpProblem):
         obj_d = [cp.Constant(0) for _ in self.constrs_gps_d]
         for obj in expand_expr(self.objective.expr):
             var_id_pos_list = get_var_id_pos_list_from_cone(obj)
+            if not var_id_pos_list:
+                continue
+
             id_set = set(var_id_pos_to_idx[var_id_pos_list[0]])
             for var_id_pos in var_id_pos_list[1:]:
                 id_set = id_set & set(var_id_pos_to_idx[var_id_pos])
