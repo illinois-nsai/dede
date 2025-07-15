@@ -30,7 +30,7 @@ def add1():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
-    print('=== Passed ADD test #1 ===')
+    print('=== Passed LP ADD test #1 ===')
 
 
 def add2():
@@ -52,7 +52,7 @@ def add2():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
-    print('=== Passed ADD test #2 ===')
+    print('=== Passed LP ADD test #2 ===')
 
 
 def add_zero():
@@ -74,7 +74,7 @@ def add_zero():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
-    print('=== Passed ADD zero test ===') 
+    print('=== Passed LP ADD zero test ===') 
 
 
 def sum1():
@@ -94,7 +94,7 @@ def sum1():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
-    print('=== Passed SUM test #1 ===')
+    print('=== Passed LP SUM test #1 ===')
 
 
 def sum2():
@@ -114,7 +114,7 @@ def sum2():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
-    print('=== Passed SUM test #2 ===')
+    print('=== Passed LP SUM test #2 ===')
 
 
 def multiply1():
@@ -138,7 +138,7 @@ def multiply1():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01, abs_tol=0.1)
-    print('=== Passed MULTIPLY test #1 ===')
+    print('=== Passed LP MULTIPLY test #1 ===')
 
 
 def multiply2():
@@ -162,7 +162,7 @@ def multiply2():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01, abs_tol=0.1)
-    print('=== Passed MULTIPLY test #2 ===')
+    print('=== Passed LP MULTIPLY test #2 ===')
 
 
 def multiply_zero():
@@ -184,7 +184,7 @@ def multiply_zero():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01, abs_tol=0.1)
-    print('=== Passed MULTIPLY zero test ===')
+    print('=== Passed LP MULTIPLY zero test ===')
 
 
 def log():
@@ -209,7 +209,7 @@ def log():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
-    print('=== Passed LOG test ===') 
+    print('=== Passed LP LOG test ===') 
 
 
 def log_weighted():
@@ -238,7 +238,7 @@ def log_weighted():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
-    print('=== Passed LOG weighted test ===')  
+    print('=== Passed LP LOG weighted test ===')  
 
 
 def quadratic():
@@ -304,8 +304,7 @@ def quadratic():
     print("Objective value:", round(result.fun, 4))
 
     assert math.isclose(result_dede, result.fun, rel_tol=0.01)
-    print('=== Passed QUADRATIC test ===')
-
+    print('=== Passed LP QUADRATIC test ===')
 
 
 if __name__ == '__main__':

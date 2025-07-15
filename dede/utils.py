@@ -63,12 +63,13 @@ def replace_variables(expr, var_id_to_var):
         return type(expr)(*new_args)
 
 
-def get_var_id_pos_list_from_cone(expr):
+def get_var_id_pos_list_from_cone(expr, solver):
     '''Return a list of (var_id, pos).'''
-    # expr = cp.Variable(10, nonneg=True)
+    if not expr.variables():
+        return []
 
     data, _, _ = cp.Problem(
-        cp.Minimize(expr)).get_problem_data(solver=cp.ECOS)
+        cp.Minimize(expr)).get_problem_data(solver=solver)
 
     col_to_var_id = {
         col: var_id for var_id, col in data[
@@ -91,6 +92,9 @@ def get_var_id_pos_list_from_cone(expr):
             continue
         var_id_pos_list.append((var_id, col - start_col))
 
+    if data.get('G', None) is None:
+        return var_id_pos_list
+
     G = data['G'].tocoo()
     for col in sorted(G.col[G.row >= num_zeros_nonneg]):
         while col >= start_cols[start_col_i + 1]:
@@ -104,10 +108,13 @@ def get_var_id_pos_list_from_cone(expr):
     return var_id_pos_list
 
 
-def get_var_id_pos_list_from_linear(expr):
+def get_var_id_pos_list_from_linear(expr, solver):
     '''Return a list of (var_id, pos).'''
+    if not expr.variables():
+        return []
+
     data, _, _ = cp.Problem(
-        cp.Minimize(expr.sum())).get_problem_data(solver=cp.ECOS)
+        cp.Minimize(expr.sum())).get_problem_data(solver=solver)
     if data['dims'].zero or data['dims'].exp or data['dims'].soc \
             or data['dims'].psd or data['dims'].p3d:
         raise ValueError(f'Expression {expr} is not linear.')

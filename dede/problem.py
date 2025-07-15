@@ -58,6 +58,19 @@ class Problem(CpProblem):
         # keep track of original problem type
         self._problem_type = type(objective)        
 
+        # choose solver for depending on LP or ILP/MILP
+        has_int = False
+        for constr in resource_constraints + demand_constraints:
+            for v in constr.variables():
+                if v.attributes.get('integer', False) or v.attributes.get('boolean', False):
+                    has_int = True
+        
+        for v in objective.variables():
+            if v.attributes.get('integer', False) or v.attributes.get('boolean', False):
+                has_int = True
+        
+        self._solver = cp.ECOS_BB if has_int else cp.ECOS
+
         # Initialize original problem
         super(Problem, self).__init__(
             objective if self._problem_type == Minimize else Minimize(
@@ -196,7 +209,7 @@ class Problem(CpProblem):
         constr_to_var_id_pos_list = {}
         for constr in constrs:
             constr_to_var_id_pos_list[
-                constr] = get_var_id_pos_list_from_linear(constr.expr)
+                constr] = get_var_id_pos_list_from_linear(constr.expr, self._solver)
         return constr_to_var_id_pos_list
 
     def group_constrs(self, constrs, constr_dict):
@@ -316,8 +329,12 @@ class Problem(CpProblem):
         obj_r = [cp.Constant(0) for _ in self.constrs_gps_r]
         obj_d = [cp.Constant(0) for _ in self.constrs_gps_d]
         for obj in expand_expr(self.objective.expr):
-            var_id_pos_list = get_var_id_pos_list_from_cone(obj)
+            var_id_pos_list = get_var_id_pos_list_from_cone(obj, self._solver)
             if not var_id_pos_list:
+                if len(obj_r) > 0:
+                    obj_r[0] += obj
+                elif len(obj_d) > 0:
+                    obj_d[0] += obj
                 continue
 
             id_set = set(var_id_pos_to_idx[var_id_pos_list[0]])
