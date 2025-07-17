@@ -93,6 +93,94 @@ def constant2():
     print('=== Passed ILP CONSTANT test #2 ===')
 
 
+def sum1():
+    N, M = 5, 5
+    x = dd.Variable((N, M), integer=True)
+    resource_constraints = [x[i, :].sum() >= i for i in range(N)]
+    demand_constraints = [x[:, j].sum() <= j for j in range(M)]
+    objective = dd.Maximize(dd.sum(x))
+
+    prob = dd.Problem(objective, resource_constraints, demand_constraints)
+
+    result_dede = prob.solve(num_cpus=4, solver=dd.ECOS_BB, rho=0.1, num_iter=20)
+    print("DeDe:", result_dede)
+
+    cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
+    result_cvxpy = cvxpy_prob.solve()
+    print("CVXPY:", result_cvxpy)
+
+    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
+    print('=== Passed ILP SUM test #1 ===')
+
+
+def sum2():
+    N, M = 5, 5
+    x = dd.Variable((N, M), integer=True)
+    resource_constraints = [x[i, :].sum() <= i for i in range(N)]
+    demand_constraints = [x[:, j].sum() <= 1 for j in range(M)]
+    objective = dd.Maximize(dd.sum(x))
+
+    prob = dd.Problem(objective, resource_constraints, demand_constraints)
+
+    result_dede = prob.solve(num_cpus=4, solver=dd.ECOS_BB, rho=1, num_iter=10)
+    print("DeDe:", result_dede)
+
+    cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
+    result_cvxpy = cvxpy_prob.solve()
+    print("CVXPY:", result_cvxpy)
+
+    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
+    print('=== Passed ILP SUM test #2 ===')
+
+
+def multiply1():
+    N, M = 10, 10
+    x = dd.Variable((N, M), integer=True)
+    resource_constraints = [x[i, :] >= 0 for i in range(N)] + [x[i, :].sum() >= i for i in range(N)]
+    demand_constraints = [x[:, j].sum() <= j for j in range(M)]
+    w = np.empty((N, M))
+    for i in range(N):
+        for j in range(M):
+            w[i][j] = i - j
+    objective = dd.Maximize(dd.sum(dd.multiply(x, w)))
+
+    prob = dd.Problem(objective, resource_constraints, demand_constraints)
+
+    result_dede = prob.solve(num_cpus=4, solver=dd.ECOS_BB, rho=10, num_iter=50)
+    print("DeDe:", result_dede)
+
+    cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
+    result_cvxpy = cvxpy_prob.solve()
+    print("CVXPY:", result_cvxpy)
+
+    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01, abs_tol=0.1)
+    print('=== Passed ILP MULTIPLY test #1 ===')
+
+
+def multiply2():
+    N, M = 10, 10
+    x = dd.Variable((N, M), integer=True)
+    resource_constraints = [x[i, :] >= 0 for i in range(N)] + [x[i, :].sum() >= i for i in range(N)]
+    demand_constraints = [x[:, j].sum() <= j for j in range(M)]
+    w = np.empty((N, M))
+    for i in range(N):
+        for j in range(M):
+            w[i][j] = i * j / (i + j + 1)
+    objective = dd.Maximize(dd.sum(dd.multiply(x, w)))
+
+    prob = dd.Problem(objective, resource_constraints, demand_constraints)
+
+    result_dede = prob.solve(num_cpus=4, solver=dd.ECOS_BB, rho=10, num_iter=30)
+    print("DeDe:", result_dede)
+
+    cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
+    result_cvxpy = cvxpy_prob.solve()
+    print("CVXPY:", result_cvxpy)
+
+    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01, abs_tol=0.1)
+    print('=== Passed ILP MULTIPLY test #2 ===')
+
+
 def quadratic():
     N, M = 10, 10
     x = dd.Variable((N, M), integer=True)
@@ -115,10 +203,18 @@ def quadratic():
 
 
 if __name__ == '__main__':
+    '''
     add1()
     add2()
 
     constant1()
     constant2()
 
-    quadratic()
+    sum1()
+    sum2()
+    '''
+
+    #multiply1()
+    multiply2()
+
+    #quadratic()
