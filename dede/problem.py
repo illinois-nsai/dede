@@ -170,6 +170,7 @@ class Problem(CpProblem):
         # use num_iter if specifed
         # otherwise, stop under < 1% improvement or reach 10000 upper limit
         i, aug_lgr, aug_lgr_old = 0, 1, 2
+        z_old = self.sol_d.copy()
         while (num_iter is not None and i < num_iter) or \
             (num_iter is None and i < 10000 and (
                 i < 2 or abs((aug_lgr - aug_lgr_old)/aug_lgr_old) > 0.01)):
@@ -199,6 +200,13 @@ class Problem(CpProblem):
 
             print('iter%d: end2end time %.4f, aug_lgr=%.4f' % (
                 i, time.time() - start, aug_lgr))
+            obj_val = sum(ray.get([
+                prob.get_obj.remote() for prob in self._subprob_cache.probs]))
+            primal_res = np.linalg.norm(self.sol_r - self.sol_d)
+            dual_res = np.linalg.norm(rho * (self.sol_d - z_old))
+            print(f"    obj={obj_val:.4f}, ||x - z||={primal_res:.4e}, dual={dual_res:.4e}")
+
+            z_old = self.sol_d.copy()
 
         coeff = 1 if self._problem_type == Minimize else -1
         return coeff * sum(ray.get([
