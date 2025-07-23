@@ -202,6 +202,26 @@ def quadratic():
     print('=== Passed ILP QUADRATIC test ===')
 
 
+def boolean():
+    N, M = 20, 20
+    x = dd.Variable((N, M), boolean=True)
+
+    resource_constraints = [x[i, :].sum() >= i for i in range(N)]
+    demand_constraints = [x[:, j].sum() <= j for j in range(M)]
+    objective = dd.Maximize(dd.sum(x))
+    prob = dd.Problem(objective, resource_constraints, demand_constraints)
+
+    result_dede = prob.solve(num_cpus=4, solver=dd.GUROBI, rho=10, num_iter=35)
+    print("DeDe:", result_dede)
+
+    cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
+    result_cvxpy = cvxpy_prob.solve(solver=cp.ECOS_BB)
+    print("CVXPY:", result_cvxpy)
+
+    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
+    print('=== Passed BOOLEAN LP test ===')
+
+
 if __name__ == '__main__':
     add1()
     add2()
@@ -216,3 +236,5 @@ if __name__ == '__main__':
     multiply2()
 
     quadratic()
+
+    boolean()
