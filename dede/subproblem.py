@@ -140,6 +140,8 @@ class Subproblem(CpProblem):
 
     def get_solution(self):
         '''Return solution.'''
+        if self.var.value is None:
+            self.var.value = np.zeros(self.var.shape)
         return self.var.value[:self.x_z_num]
 
     def get_obj(self):
