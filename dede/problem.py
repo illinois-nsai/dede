@@ -14,7 +14,8 @@ from cvxpy.problems.objective import Maximize, Minimize
 from .utils import (
     expand_expr,
     get_var_id_pos_list_from_cone,
-    get_var_id_pos_list_from_linear)
+    get_var_id_pos_list_from_linear,
+    get_var_id_pos_list)
 from .subproblems_wrap import SubproblemsWrap
 
 
@@ -49,6 +50,7 @@ class Problem(CpProblem):
             resource_variables: list of resource constraints
             demand_variables: list of demand constraints
         '''
+        start = time.time()
         self._constrs_r = [
             self.convert_inequality(constr) for constr in resource_constraints]
         self._constrs_d = [
@@ -93,6 +95,8 @@ class Problem(CpProblem):
 
         # get objective groups
         self._obj_expr_r, self._obj_expr_d = self.group_objective()
+        end = time.time()
+        print("init time:", end - start)
 
     def convert_inequality(self, constr):
         if isinstance(constr, Zero) or isinstance(constr, Equality):
@@ -209,7 +213,8 @@ class Problem(CpProblem):
         constr_to_var_id_pos_list = {}
         for constr in constrs:
             constr_to_var_id_pos_list[
-                constr] = get_var_id_pos_list_from_linear(constr.expr, self._solver)
+                #constr] = get_var_id_pos_list_from_linear(constr.expr, self._solver)
+                constr] = get_var_id_pos_list(constr.expr)
         return constr_to_var_id_pos_list
 
     def group_constrs(self, constrs, constr_dict):
@@ -329,7 +334,9 @@ class Problem(CpProblem):
         obj_r = [cp.Constant(0) for _ in self.constrs_gps_r]
         obj_d = [cp.Constant(0) for _ in self.constrs_gps_d]
         for obj in expand_expr(self.objective.expr):
-            var_id_pos_list = get_var_id_pos_list_from_cone(obj, self._solver)
+            #var_id_pos_list = get_var_id_pos_list_from_cone(obj, self._solver)
+            var_id_pos_list = get_var_id_pos_list(obj)
+            #print(var_id_pos_list)
             if not var_id_pos_list:
                 if len(obj_r) > 0:
                     obj_r[0] += obj
@@ -342,6 +349,7 @@ class Problem(CpProblem):
                 id_set = id_set & set(var_id_pos_to_idx[var_id_pos])
             if not id_set:
                 raise ValueError('Objective not separable.')
+
             idx = list(id_set)[0]
             if idx[0] == 0:
                 obj_r[idx[1]] += obj
