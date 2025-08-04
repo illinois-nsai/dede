@@ -4,7 +4,6 @@ import dede as dd
 import cvxpy as cp
 import numpy as np
 import math
-import time
 
 
 def quadratic():
@@ -72,13 +71,7 @@ def boolean_quadratic():
 
 
 if __name__ == '__main__':
-    start = time.time()
-
     quadratic()
     quadratic_weighted()
 
     boolean_quadratic()
-
-
-    end = time.time()
-    print(end - start)
