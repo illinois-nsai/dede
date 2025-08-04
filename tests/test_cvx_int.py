@@ -6,7 +6,7 @@ import numpy as np
 import math
 
 
-def quadratic():
+def test_quadratic():
     N, M = 10, 10
     x = dd.Variable((N, M), integer=True)
 
@@ -26,7 +26,7 @@ def quadratic():
     print('=== Passed INTEGER QUADRATIC test ===')
 
 
-def quadratic_weighted():
+def test_quadratic_weighted():
     N, M = 5, 5
     x = dd.Variable((N, M), integer=True)
 
@@ -50,7 +50,7 @@ def quadratic_weighted():
     print('=== Passed CONTINUOUS QUADRATIC test ===')
 
 
-def boolean_quadratic():
+def test_boolean_quadratic():
     N, M = 5, 5
     x = dd.Variable((N, M), boolean=True)
 
@@ -71,7 +71,7 @@ def boolean_quadratic():
 
 
 if __name__ == '__main__':
-    quadratic()
-    quadratic_weighted()
+    test_quadratic()
+    test_quadratic_weighted()
 
-    boolean_quadratic()
+    test_boolean_quadratic()

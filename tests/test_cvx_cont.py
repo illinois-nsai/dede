@@ -7,7 +7,7 @@ from scipy.optimize import minimize
 import math
 
 
-def log():
+def test_log():
     N, M = 10, 10
     x = dd.Variable((N, M), nonneg=True)
 
@@ -32,7 +32,7 @@ def log():
     print('=== Passed CONTINUOUS LOG test ===') 
 
 
-def log_weighted():
+def test_log_weighted():
     N, M = 10, 10
     x = dd.Variable((N, M), nonneg=True)
 
@@ -61,7 +61,7 @@ def log_weighted():
     print('=== Passed CONTINUOUS LOG weighted test ===')  
 
 
-def quadratic():
+def test_quadratic():
     N, M = 10, 10
     x = dd.Variable((N, M), nonneg=True)
 
@@ -81,7 +81,7 @@ def quadratic():
     print('=== Passed CONTINUOUS QUADRATIC test ===')
 
 
-def quadratic_weighted():
+def test_quadratic_weighted():
     N, M = 10, 10
     x = dd.Variable((N, M), nonneg=True)
 
@@ -106,8 +106,8 @@ def quadratic_weighted():
 
 
 if __name__ == '__main__':
-    log()
-    log_weighted()
+    test_log()
+    test_log_weighted()
 
-    quadratic()
-    quadratic_weighted()
+    test_quadratic()
+    test_quadratic_weighted()

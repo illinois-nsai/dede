@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import numpy as np
 import cvxpy as cp
 from dede.constraints_utils import func

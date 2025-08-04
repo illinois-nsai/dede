@@ -6,7 +6,7 @@ import numpy as np
 import math
 
 
-def add1():
+def test_add1():
     N, M = 10, 10
     x = dd.Variable((N, M), integer=True)
     resource_constraints = [x[i, :] >= 0 for i in range(N)] + [x[i, :].sum() >= 2 * i for i in range(N)]
@@ -33,7 +33,7 @@ def add1():
     print('=== Passed ILP ADD test #1 ===')
 
 
-def add2():
+def test_add2():
     N, M = 10, 10
     x = dd.Variable((N, M), integer=True)
     resource_constraints = [x >= 0] + [x[i, :].sum() <= i for i in range(N)]
@@ -55,7 +55,7 @@ def add2():
     print('=== Passed ILP ADD test #2 ===')
 
 
-def constant1():
+def test_constant1():
     N, M = 5, 5
     x = dd.Variable((N, M), integer=True)
     resource_constraints = [x[i, :] >= 0 for i in range(N)] + [x[i, :].sum() <= i for i in range(N)]
@@ -72,7 +72,7 @@ def constant1():
     print('=== Passed ILP CONSTANT test #1 ===') 
 
 
-def constant2():
+def test_constant2():
     N, M = 10, 10
     x = dd.Variable((N, M), integer=True)
     resource_constraints = [x[i, :] >= 0 for i in range(N)] + [x[i, :].sum() <= i for i in range(N)]
@@ -93,7 +93,7 @@ def constant2():
     print('=== Passed ILP CONSTANT test #2 ===')
 
 
-def sum1():
+def test_sum1():
     N, M = 5, 5
     x = dd.Variable((N, M), integer=True)
     resource_constraints = [x[i, :].sum() >= i for i in range(N)]
@@ -113,7 +113,7 @@ def sum1():
     print('=== Passed ILP SUM test #1 ===')
 
 
-def sum2():
+def test_sum2():
     N, M = 5, 5
     x = dd.Variable((N, M), integer=True)
     resource_constraints = [x[i, :].sum() <= i for i in range(N)]
@@ -133,7 +133,7 @@ def sum2():
     print('=== Passed ILP SUM test #2 ===')
 
 
-def multiply1():
+def test_multiply1():
     N, M = 10, 10
     x = dd.Variable((N, M), integer=True)
     resource_constraints = [x[i, :] >= 0 for i in range(N)] + [x[i, :].sum() >= i for i in range(N)]
@@ -157,7 +157,7 @@ def multiply1():
     print('=== Passed ILP MULTIPLY test #1 ===')
 
 
-def multiply2():
+def test_multiply2():
     N, M = 10, 10
     x = dd.Variable((N, M), integer=True)
     resource_constraints = [x[i, :] >= 0 for i in range(N)] + [x[i, :].sum() >= i for i in range(N)]
@@ -181,7 +181,7 @@ def multiply2():
     print('=== Passed ILP MULTIPLY test #2 ===')
 
 
-def boolean():
+def test_boolean():
     N, M = 10, 10
     x = dd.Variable((N, M), boolean=True)
 
@@ -202,16 +202,16 @@ def boolean():
 
 
 if __name__ == '__main__':
-    add1()
-    add2()
+    test_add1()
+    test_add2()
 
-    constant1()
-    constant2()
+    test_constant1()
+    test_constant2()
 
-    sum1()
-    sum2()
+    test_sum1()
+    test_sum2()
 
-    multiply1()
-    multiply2()
+    test_multiply1()
+    test_multiply2()
 
-    boolean()
+    test_boolean()
