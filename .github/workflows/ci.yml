@@ -41,7 +41,7 @@ jobs:
     - name: Install DeDe and pytest
       run: |
         pip install pytest-xdist
-        pip install ./dede
+        pip install .
 
     - name: Run tests
       run: |
