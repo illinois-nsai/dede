@@ -19,6 +19,7 @@ jobs:
         echo "GUROBI_HOME=/opt/gurobi1203/linux64" >> $GITHUB_ENV
         echo "PATH=$GUROBI_HOME/bin:$PATH" >> $GITHUB_ENV
         echo "LD_LIBRARY_PATH=$GUROBI_HOME/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+        echo "GRB_LICENSE_FILE=$PWD/gurobi.lic" >> $GITHUB_ENV
     
     - name: Install Gurobi
       run: |
@@ -28,7 +29,6 @@ jobs:
         tar -xvf gurobi12.0.3_linux64.tar.gz
         rm gurobi12.0.3_linux64.tar.gz
         sudo mv gurobi1203 /opt/
-        pip install gurobipy
     
     - name: Create Gurobi license file
       run: |
@@ -38,8 +38,10 @@ jobs:
         LICENSEID=${{ secrets.LICENSEID }}
         EOF
 
-    - name: Install DeDe and pytest
+    - name: Install package and dependencies 
       run: |
+        pip install --upgrade pip
+        pip install gurobipy
         pip install pytest-xdist
         pip install .
 
