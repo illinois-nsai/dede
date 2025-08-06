@@ -10,6 +10,7 @@ from cvxpy.atoms.affine.index import index
 from cvxpy.atoms.affine.promote import Promote
 from cvxpy.atoms.affine.transpose import transpose
 
+
 def func(constr):
     if isinstance(constr, (list, tuple)):
         out = []
@@ -17,8 +18,10 @@ def func(constr):
             out.extend(func(c))
         return out
 
+
     if not isinstance(constr, (Equality, Inequality)):
         raise TypeError("Only Inequality or Equality based Testing.")
+
 
     left, right = constr.args
     if isinstance(constr, Inequality):
@@ -30,7 +33,9 @@ def func(constr):
         left_list = breakdown_expression(left)
         right_list = breakdown_expression(right)
 
+
         constr_list = []
+
 
         if len(left_list) < len(right_list):
             for i in range(len(right_list)):
@@ -42,7 +47,9 @@ def func(constr):
             for i in range(len(left_list)):
                 constr_list.append(left_list[i] == right_list[i])
 
+
         return constr_list
+
 
 # def func(constr):
 #     if isinstance(constr, (list, tuple)):
@@ -51,16 +58,20 @@ def func(constr):
 #             out.extend(func(c))
 #         return out
 
+
 #     left, right = constr.args
 #     constr_list = []
 
+
 #     if not isinstance(constr, (Equality, Inequality)):
 #         raise TypeError("Only Inequality or Equality based Testing.")
-    
+   
 #     left_list = breakdown_expression(left)
 #     right_list = breakdown_expression(right)
 
+
 #     op = (lambda a, b: a <= b) if isinstance(constr, Inequality) else (lambda a, b: a == b)
+
 
 #     if len(left_list) < len(right_list):
 #         for i in range(len(right_list)):
@@ -72,12 +83,16 @@ def func(constr):
 #         for i in range(len(left_list)):
 #             constr_list.append(op(left_list[i], right_list[i]))
 
+
 #     return constr_list
+
+
 
 
 def get_entries_from_index(index_obj):
     x = index_obj.args[0]
     key = index_obj.get_data()[0]  # key = (start, stop, step)
+
 
     # shape has the same dimensions as x
     shape = []
@@ -87,6 +102,7 @@ def get_entries_from_index(index_obj):
         shape.append(dim_size)
     shape = tuple(shape)
 
+
     entries = []
     for rel_idx in np.ndindex(shape):
         abs_idx = []
@@ -94,21 +110,26 @@ def get_entries_from_index(index_obj):
             abs_idx.append(k.start + rel_idx[axis] * k.step)
         entries.append(x[tuple(abs_idx)])
 
+
     return entries
+
+
 
 
 def breakdown_expression(expr):
     terms = []
 
+
     if isinstance(expr, Sum):
         if expr.axis == None: # sum over all elements
             terms.append(expr)
-        elif expr.axis == 0: # 0 for summing over columns 
+        elif expr.axis == 0: # 0 for summing over columns
             for i in range(expr.shape[0]):
                 terms.append(expr.args[0][:, i])
         elif expr.axis == 1: # 1 for summing over rows
             for i in range(expr.shape[0]):
                 terms.append(expr.args[0][i])
+
 
     elif isinstance(expr, AddExpression):
         expr_list = []
@@ -120,6 +141,7 @@ def breakdown_expression(expr):
                 var = var + expr_list[i][j]
             terms.append(var)
 
+
     elif isinstance(expr, Variable):
         if expr.shape == ():
             terms.append(expr)
@@ -128,17 +150,21 @@ def breakdown_expression(expr):
             index_obj = expr[tuple(slice(None) for _ in expr.shape)]
             terms = get_entries_from_index(index_obj)
 
+
     elif isinstance(expr, Constant):
         for i in np.ndindex(expr.value.shape):
             terms.append(float(expr.value[i]))
 
+
     elif isinstance(expr, index):
         terms = get_entries_from_index(expr)
+
 
     elif isinstance(expr, Promote): # Assuming promote is a constant (x + y + 1)
         inner_term = breakdown_expression(expr.args[0])[0]
         for rel_idx in np.ndindex(expr.shape):
             terms.append(inner_term)
+
 
     # elif isinstance(expr, cp.atoms.affine.transpose.transpose):
     #     inner = expr.args[0]
@@ -149,6 +175,7 @@ def breakdown_expression(expr):
     #     else:
     #         terms = inner_terms
 
+
     elif isinstance(expr, MulExpression):
         vars = []
         left_list = break_into_vars(expr.args[0])
@@ -157,7 +184,7 @@ def breakdown_expression(expr):
             if left is False or right is False:
                 vars.append(False)
                 continue
-            
+           
             if isinstance(left, bool) and isinstance(right, bool):
                 vars.append(True)
             elif isinstance(left, bool):
@@ -167,7 +194,11 @@ def breakdown_expression(expr):
             else:
                 vars.append(left + right)
 
+
     else:
         raise TypeError(f"Expression Not Supported: {type(expr)}")
-    
+   
     return terms
+
+
+

@@ -1,6 +1,10 @@
+#!/usr/bin/env python3
+
 import numpy as np
 import cvxpy as cp
 from dede.constraints_utils import func
+
+
 
 
 def test_sample():
@@ -11,12 +15,16 @@ def test_sample():
     assert tester(out) == expected
 
 
+
+
 def test_sample_2():
     x = cp.Variable((4, 4))
     constr = x.sum(0) <= 1
     out = func(constr)
     expected = [str(x[:, i] <= 1) for i in range(4)]
     assert tester(out) == expected
+
+
 
 
 def test_failing_sample():
@@ -27,12 +35,16 @@ def test_failing_sample():
     assert tester(out) == expected
 
 
+
+
 def test_hard1():
     x = cp.Variable((4, 4))
     constr = x.sum(1) >= np.arange(4)
     out = func(constr)
     expected = [str(x[i, :] >= i) for i in range(4)]
     assert tester(out) == expected
+
+
 
 
 def test_extra1():
@@ -43,12 +55,16 @@ def test_extra1():
     assert tester(out) == expected
 
 
+
+
 def test_failing_extra1():
     x = cp.Variable()
     constr = x == 5
     out = func(constr)
     expected = [str(x == 5)]
     assert tester(out) == expected
+
+
 
 
 def test_extra2():
@@ -59,12 +75,16 @@ def test_extra2():
     assert tester(out) == expected
 
 
+
+
 def test_failing_extra2():
     x = cp.Variable((4, 4))
     constr = x[:, 1] == np.arange(4)
     out = func(constr)
     expected = [str(x[i, 1] == i) for i in range(4)]
     assert tester(out) == expected
+
+
 
 
 def test_hard3():
@@ -78,12 +98,16 @@ def test_hard3():
     assert tester(out) == tester(expected)
 
 
+
+
 def test_column():
     x = cp.Variable((4, 4))
     constr = x[:, 0] >= np.arange(4)
     out = func(constr)
     expected = [str(x[i, 0] >= i) for i in range(4)]
     assert tester(out) == expected
+
+
 
 
 def test_2d_chunk():
@@ -97,12 +121,16 @@ def test_2d_chunk():
     assert tester(out) == expected
 
 
+
+
 def test_single_row():
     x = cp.Variable(4)
     constr = x[:] >= np.arange(4)
     out = func(constr)
     expected = [str(x[i] >= i) for i in range(4)]
     assert tester(out) == expected
+
+
 
 
 def test_1d_sum():
@@ -112,11 +140,15 @@ def test_1d_sum():
     assert str(out[0]) == str(constr)
 
 
+
+
 def test_2d_sum():
     x = cp.Variable((4, 4))
     constr = x.sum() >= 1
     out = func(constr)
     assert str(out[0]) == str(constr)
+
+
 
 
 def test_sum_vars():
@@ -126,6 +158,8 @@ def test_sum_vars():
     out = func(constr)
     expected = [x[tup] + y[tup] + 1 == 0 for tup in np.ndindex(x.shape)]
     assert tester(out) == tester(expected)
+
+
 
 
 def test_hard2(): #Not fully implemented
@@ -140,8 +174,12 @@ def test_hard2(): #Not fully implemented
     assert tester(out) == tester(expected)
 
 
+
+
 def tester(constr):
     return [str(c) for c in constr]
+
+
 
 
 def test_sum_rows():
@@ -151,12 +189,14 @@ def test_sum_rows():
     expected = [str(x[i, :] <= 5) for i in range(10)]
     assert tester(out) == expected
 
+
 def test_sum_cols():
     x = cp.Variable((10, 10))
     constr = x.sum(0) <= 3
     out = func(constr)
     expected = [str(x[:, i] <= 3) for i in range(10)]
     assert tester(out) == expected
+
 
 def test_sum_equal():
     x = cp.Variable((10, 10))
@@ -165,12 +205,14 @@ def test_sum_equal():
     expected = [str(x[i, :] == 4) for i in range(10)]
     assert tester(out) == expected
 
+
 def test_vector_rhs():
     x = cp.Variable((10, 10))
     constr = x.sum(1) >= np.arange(10)
     out = func(constr)
     expected = [str(x[i, :] >= i) for i in range(10)]
     assert tester(out) == expected
+
 
 def test_direct_row():
     x = cp.Variable((10, 10))
@@ -179,12 +221,14 @@ def test_direct_row():
     expected = [str(x[3, i] >= i) for i in range(10)]
     assert tester(out) == expected
 
+
 def test_direct_col():
     x = cp.Variable((10, 10))
     constr = x[:, 2] == np.arange(10)
     out = func(constr)
     expected = [str(x[i, 2] == i) for i in range(10)]
     assert tester(out) == expected
+
 
 def test_chunk():
     x = cp.Variable((10, 10))
@@ -195,6 +239,7 @@ def test_chunk():
     ]
     assert tester(out) == expected
 
+
 def test_single_row_var():
     x = cp.Variable(10)
     constr = x[:] >= np.arange(10)
@@ -202,11 +247,13 @@ def test_single_row_var():
     expected = [str(x[i] >= i) for i in range(10)]
     assert tester(out) == expected
 
+
 def test_full_sum():
     x = cp.Variable((10, 10))
     constr = x.sum() >= 5
     out = func(constr)
     assert str(out[0]) == str(constr)
+
 
 def test_add_expr():
     x = cp.Variable((10, 10))
@@ -220,11 +267,17 @@ def test_add_expr():
 
 
 
+
+
+
+
+
 def test_broadcast_scalar_rhs():
     x = cp.Variable((5, 5))
     constr = x + 1 <= 10
     out = func(constr)
     print("GOT:", tester(out))
+
 
 def test_sum_promote():
     x = cp.Variable((3, 3))
@@ -232,11 +285,13 @@ def test_sum_promote():
     out = func(constr)
     print("GOT:", tester(out))
 
+
 def test_constant_matrix_rhs():
     x = cp.Variable((3, 3))
     constr = x <= np.ones((3, 3))
     out = func(constr)
     print("GOT:", tester(out))
+
 
 def test_chain_addition():
     x = cp.Variable((2, 2))
@@ -246,17 +301,23 @@ def test_chain_addition():
     out = func(constr)
     print("GOT:", tester(out))
 
+
 def test_multiple_constraints_list():
     x = cp.Variable((3, 3))
     constr = [x[0, :] <= 1, x[1, :] >= 0, x[2, :] == -1]
     out = func(constr)
     print("GOT:", tester(out))
 
+
 def test_nested_index_and_sum():
     x = cp.Variable((5, 5))
     constr = x[:, 2].sum() >= 5
     out = func(constr)
     print("GOT:", tester(out))
+
+
+
+
 
 
 
@@ -277,6 +338,7 @@ if __name__ == '__main__':
 #     # test_extra2()
 #     # test_failing_extra2()
 #     # test_hard3()
+
 
 #     # test_column()
 #     # test_2d_chunk()
