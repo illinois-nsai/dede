@@ -18,6 +18,12 @@ jobs:
     - name: Check out code
       uses: actions/checkout@v4
     
+    - name: Debug PATH and tar
+      run: |
+        echo "PATH=$PATH"
+        which tar
+        tar --version
+    
     - name: Install Gurobi
       run: |
         apt-get update
