@@ -8,7 +8,7 @@ from cvxpy.atoms.affine.add_expr import AddExpression
 from cvxpy.expressions.variable import Variable
 from cvxpy.atoms.affine.index import index
 from cvxpy.atoms.affine.promote import Promote
-
+from cvxpy.atoms.affine.transpose import transpose
 
 def func(constr):
     if isinstance(constr, (list, tuple)):
@@ -17,28 +17,62 @@ def func(constr):
             out.extend(func(c))
         return out
 
-    left, right = constr.args
-    constr_list = []
-
     if not isinstance(constr, (Equality, Inequality)):
         raise TypeError("Only Inequality or Equality based Testing.")
+
+    left, right = constr.args
+    if isinstance(constr, Inequality):
+        expr = left - right
+        slack = cp.Variable(expr.shape, nonneg=True)
+        equality_constr = expr + slack == 0
+        return func(equality_constr)
+    else:
+        left_list = breakdown_expression(left)
+        right_list = breakdown_expression(right)
+
+        constr_list = []
+
+        if len(left_list) < len(right_list):
+            for i in range(len(right_list)):
+                constr_list.append(left_list[0] == right_list[i])
+        elif len(left_list) > len(right_list):
+            for i in range(len(left_list)):
+                constr_list.append(left_list[i] == right_list[0])
+        else:
+            for i in range(len(left_list)):
+                constr_list.append(left_list[i] == right_list[i])
+
+        return constr_list
+
+# def func(constr):
+#     if isinstance(constr, (list, tuple)):
+#         out = []
+#         for c in constr:
+#             out.extend(func(c))
+#         return out
+
+#     left, right = constr.args
+#     constr_list = []
+
+#     if not isinstance(constr, (Equality, Inequality)):
+#         raise TypeError("Only Inequality or Equality based Testing.")
     
-    left_list = breakdown_expression(left)
-    right_list = breakdown_expression(right)
+#     left_list = breakdown_expression(left)
+#     right_list = breakdown_expression(right)
 
-    op = (lambda a, b: a <= b) if isinstance(constr, Inequality) else (lambda a, b: a == b)
+#     op = (lambda a, b: a <= b) if isinstance(constr, Inequality) else (lambda a, b: a == b)
 
-    if len(left_list) < len(right_list):
-        for i in range(len(right_list)):
-            constr_list.append(op(left_list[0], right_list[i]))
-    elif len(left_list) > len(right_list):
-        for i in range(len(left_list)):
-            constr_list.append(op(left_list[i], right_list[0]))
-    elif len(left_list) == len(right_list):
-        for i in range(len(left_list)):
-            constr_list.append(op(left_list[i], right_list[i]))
+#     if len(left_list) < len(right_list):
+#         for i in range(len(right_list)):
+#             constr_list.append(op(left_list[0], right_list[i]))
+#     elif len(left_list) > len(right_list):
+#         for i in range(len(left_list)):
+#             constr_list.append(op(left_list[i], right_list[0]))
+#     elif len(left_list) == len(right_list):
+#         for i in range(len(left_list)):
+#             constr_list.append(op(left_list[i], right_list[i]))
 
-    return constr_list
+#     return constr_list
 
 
 def get_entries_from_index(index_obj):
@@ -105,6 +139,33 @@ def breakdown_expression(expr):
         inner_term = breakdown_expression(expr.args[0])[0]
         for rel_idx in np.ndindex(expr.shape):
             terms.append(inner_term)
+
+    # elif isinstance(expr, cp.atoms.affine.transpose.transpose):
+    #     inner = expr.args[0]
+    #     inner_terms = breakdown_expression(inner)
+    #     if hasattr(inner, "shape") and len(inner.shape) == 2:
+    #         arr = np.array(inner_terms, dtype=object).reshape(inner.shape)
+    #         terms = list(arr.T.flatten())
+    #     else:
+    #         terms = inner_terms
+
+    elif isinstance(expr, MulExpression):
+        vars = []
+        left_list = break_into_vars(expr.args[0])
+        right_list = break_into_vars(expr.args[1])
+        for left, right in zip(left_list, right_list):
+            if left is False or right is False:
+                vars.append(False)
+                continue
+            
+            if isinstance(left, bool) and isinstance(right, bool):
+                vars.append(True)
+            elif isinstance(left, bool):
+                vars.append(right)
+            elif isinstance(right, bool):
+                vars.append(left)
+            else:
+                vars.append(left + right)
 
     else:
         raise TypeError(f"Expression Not Supported: {type(expr)}")
