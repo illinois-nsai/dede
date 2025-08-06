@@ -22,7 +22,7 @@ def test_add1():
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=4, solver=dd.ECOS, rho=0.1, num_iter=15)
+    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=0.1, num_iter=15)
     print("DeDe:", result_dede)
 
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
@@ -44,7 +44,7 @@ def test_add2():
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=4, solver=dd.ECOS, rho=0.1, num_iter=10)
+    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=0.1, num_iter=10)
     print("DeDe:", result_dede)
 
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
@@ -66,7 +66,7 @@ def test_add_zero():
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=4, solver=dd.ECOS, rho=1, num_iter=5)
+    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=1, num_iter=5)
     print("DeDe:", result_dede)
 
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
@@ -86,7 +86,7 @@ def test_sum1():
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=4, solver=dd.ECOS, rho=1, num_iter=5)
+    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=1, num_iter=5)
     print("DeDe:", result_dede)
 
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
@@ -106,7 +106,7 @@ def test_sum2():
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=4, solver=dd.ECOS, rho=10, num_iter=7)
+    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=10, num_iter=7)
     print("DeDe:", result_dede)
 
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
@@ -130,7 +130,7 @@ def test_multiply1():
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=4, solver=dd.ECOS, rho=10, num_iter=15)
+    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=10, num_iter=15)
     print("DeDe:", result_dede)
 
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
@@ -154,7 +154,7 @@ def test_multiply2():
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=4, solver=dd.ECOS, rho=1, num_iter=20)
+    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=1, num_iter=20)
     print("DeDe:", result_dede)
 
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
@@ -176,7 +176,7 @@ def test_multiply_zero():
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=4, solver=dd.ECOS, rho=1, num_iter=10)
+    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=1, num_iter=10)
     print("DeDe:", result_dede)
 
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)

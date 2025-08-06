@@ -15,7 +15,7 @@ def test_quadratic():
     objective = dd.Minimize(dd.quad_over_lin(x, 1))
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=4, solver=dd.GUROBI, rho=0.5, num_iter=35)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=0.5, num_iter=35)
     print("DeDe:", result_dede)
 
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
@@ -39,7 +39,7 @@ def test_quadratic_weighted():
     objective = dd.Minimize(dd.quad_over_lin(dd.multiply(x, w), 1))
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=4, solver=dd.GUROBI, rho=50, num_iter=20)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=50, num_iter=20)
     print("DeDe:", result_dede)
     
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
@@ -47,7 +47,7 @@ def test_quadratic_weighted():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
-    print('=== Passed CONTINUOUS QUADRATIC test ===')
+    print('=== Passed INTEGER QUADRATIC weighted test ===')
 
 
 def test_boolean_quadratic():
@@ -59,7 +59,7 @@ def test_boolean_quadratic():
     objective = dd.Minimize(dd.quad_over_lin(x, 3))
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=4, solver=dd.GUROBI, rho=10, num_iter=15)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=10, num_iter=15)
     print("DeDe:", result_dede)
 
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)

@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, tests ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    env:
+      GUROBI_HOME: /opt/gurobi1203/linux64
+      PATH: ${{ env.GUROBI_HOME }}/bin:${{ env.PATH }}
+      LD_LIBRARY_PATH: ${{ env.GUROBI_HOME }}/lib:${{ env.LD_LIBRARY_PATH }}
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v4
+    
+    - name: Install Gurobi
+      run: |
+        apt-get update
+        apt-get install -y wget
+        wget https://packages.gurobi.com/12.0/gurobi12.0.3_linux64.tar.gz
+        tar -xvf gurobi12.0.3_linux64.tar.gz
+        rm gurobi12.0.3_linux64.tar.gz
+        mv gurobi1203 /opt/
+        pip install gurobipy
+    
+    - name: Create Gurobi license file
+      run: |
+        cat <<EOF > gurobi.lic
+        WLSACCESSID=${{ secrets.WLSACCESSID }}
+        WLSSECRET=${{ secrets.WLSSECRET }}
+        LICENSEID=${{ secrets.LICENSEID }}
+        EOF
+
+    - name: Install DeDe and pytest
+      run: |
+        pip install pytest-xdist
+        pip install ./dede
+
+    - name: Run tests
+      run: |
+        pytest -n auto --dist load

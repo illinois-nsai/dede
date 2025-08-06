@@ -21,7 +21,7 @@ def test_log():
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=4, solver=dd.ECOS, rho=0.08, num_iter=30)
+    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=0.08, num_iter=30)
     print("DeDe:", result_dede)
 
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
@@ -50,7 +50,7 @@ def test_log_weighted():
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=4, solver=dd.ECOS, rho=1, num_iter=50)
+    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=1, num_iter=50)
     print("DeDe:", result_dede)
 
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
@@ -70,7 +70,7 @@ def test_quadratic():
     objective = dd.Minimize(dd.quad_over_lin(x, 1))
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=4, solver=dd.ECOS, rho=12, num_iter=7)
+    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=12, num_iter=7)
     print("DeDe:", result_dede)
     
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
@@ -94,7 +94,7 @@ def test_quadratic_weighted():
     objective = dd.Minimize(dd.quad_over_lin(dd.multiply(x, w), 1))
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=4, solver=dd.ECOS, rho=20, num_iter=15)
+    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=20, num_iter=15)
     print("DeDe:", result_dede)
     
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
@@ -102,7 +102,7 @@ def test_quadratic_weighted():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
-    print('=== Passed CONTINUOUS QUADRATIC test ===')
+    print('=== Passed CONTINUOUS QUADRATIC weighted test ===')
 
 
 if __name__ == '__main__':
