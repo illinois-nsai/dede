@@ -11,8 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GUROBI_HOME: /opt/gurobi1203/linux64
-      PATH: $/opt/gurobi1203/linux64/bin:$PATH
-      LD_LIBRARY_PATH: $/opt/gurobi1203/linux64/lib:$LD_LIBRARY_PATH
+      PATH: /opt/gurobi1203/linux64/bin:$PATH
+      LD_LIBRARY_PATH: /opt/gurobi1203/linux64/lib:$LD_LIBRARY_PATH
 
     steps:
     - name: Debug PATH and tar
