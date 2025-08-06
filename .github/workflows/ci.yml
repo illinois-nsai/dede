@@ -9,20 +9,16 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    env:
-      GUROBI_HOME: /opt/gurobi1203/linux64
-      PATH: /opt/gurobi1203/linux64/bin:$PATH
-      LD_LIBRARY_PATH: /opt/gurobi1203/linux64/lib:$LD_LIBRARY_PATH
 
     steps:
-    - name: Debug PATH and tar
-      run: |
-        echo "PATH=$PATH"
-        which tar || echo "tar not found"
-        tar --version
-
     - name: Check out code
       uses: actions/checkout@v4
+    
+    - name: Set Gurobi environment variables
+      run: |
+        echo "GUROBI_HOME=/opt/gurobi1203/linux64" >> $GITHUB_ENV
+        echo "PATH=/opt/gurobi1203/linux64/bin:$PATH" >> $GITHUB_ENV
+        echo "LD_LIBRARY_PATH=/opt/gurobi1203/linux64/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
     
     - name: Install Gurobi
       run: |
