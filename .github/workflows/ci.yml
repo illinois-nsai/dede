@@ -15,14 +15,14 @@ jobs:
       LD_LIBRARY_PATH: $/opt/gurobi1203/linux64/lib:$LD_LIBRARY_PATH
 
     steps:
-    - name: Check out code
-      uses: actions/checkout@v4
-    
     - name: Debug PATH and tar
       run: |
         echo "PATH=$PATH"
-        which tar
+        which tar || echo "tar not found"
         tar --version
+
+    - name: Check out code
+      uses: actions/checkout@v4
     
     - name: Install Gurobi
       run: |
