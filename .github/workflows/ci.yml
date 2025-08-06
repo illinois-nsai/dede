@@ -17,17 +17,17 @@ jobs:
     - name: Set Gurobi environment variables
       run: |
         echo "GUROBI_HOME=/opt/gurobi1203/linux64" >> $GITHUB_ENV
-        echo "PATH=/opt/gurobi1203/linux64/bin:$PATH" >> $GITHUB_ENV
-        echo "LD_LIBRARY_PATH=/opt/gurobi1203/linux64/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+        echo "PATH=$GUROBI_HOME/bin:$PATH" >> $GITHUB_ENV
+        echo "LD_LIBRARY_PATH=$GUROBI_HOME/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
     
     - name: Install Gurobi
       run: |
-        apt-get update
-        apt-get install -y wget
+        sudo apt-get update
+        sudo apt-get install -y wget
         wget https://packages.gurobi.com/12.0/gurobi12.0.3_linux64.tar.gz
         tar -xvf gurobi12.0.3_linux64.tar.gz
         rm gurobi12.0.3_linux64.tar.gz
-        mv gurobi1203 /opt/
+        sudo mv gurobi1203 /opt/
         pip install gurobipy
     
     - name: Create Gurobi license file
