@@ -3,10 +3,21 @@ import numpy as np
 import os
 import pytest
 
-@pytest.fixture(autouse=True, scope="session")
+
+#SEED = 67 
+GUROBI_OPTS = {
+    "Threads": 1
+}
+
+
 def set_global_seed():
-    seed = 0
-    random.seed(seed)
-    np.random.seed(seed)
-    os.environ['PYTHONHASHSEED'] = str(seed)
-    print(f"[pytest] Seed set to {seed}")
+    random.seed(SEED)
+    np.random.seed(SEED)
+    os.environ['PYTHONHASHSEED'] = str(SEED)
+
+
+'''
+@pytest.fixture(autouse=True, scope="session")
+def set_global_seed_fixed():
+    set_global_seed()
+'''
