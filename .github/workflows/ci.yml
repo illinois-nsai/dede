@@ -43,7 +43,7 @@ jobs:
         pip install --upgrade pip
         pip install gurobipy
         pip install pytest-xdist
-        pip install .
+        pip install -e .
     
     - name: Print dependency versions
       run: |
@@ -58,7 +58,6 @@ jobs:
         print('numpy version:', np.__version__)
         print('gurobipy version:', gp.gurobi.version())
         "
-
 
     - name: Run tests
       run: |
