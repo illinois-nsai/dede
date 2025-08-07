@@ -44,22 +44,6 @@ jobs:
         pip install gurobipy
         pip install pytest-xdist
         pip install .
-    
-    - name: Print dependency versions
-      run: |
-        python -c "
-        import cvxpy as cp
-        import numpy as np
-        import gurobipy as gp
-        import sys
-        import ray
-
-        print('Python version:', sys.version)
-        print('cvxpy version:', cp.__version__)
-        print('numpy version:', np.__version__)
-        print('gurobipy version:', gp.gurobi.version())
-        print('ray version:', ray.__version__)
-        "
 
     - name: Run tests
       run: |
