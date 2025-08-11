@@ -200,9 +200,31 @@ class Problem(CpProblem):
             print('iter%d: end2end time %.4f, aug_lgr=%.4f' % (
                 i, time.time() - start, aug_lgr))
 
+        self.populate_vars_with_solution()
         coeff = 1 if self._problem_type == Minimize else -1
         return coeff * sum(ray.get([
             prob.get_obj.remote() for prob in self._subprob_cache.probs]))
+    
+    def populate_vars_with_solution(self):
+        var_id_to_var = {var.id: var for var in self.variables()}
+        for var in self.variables():
+            var.value = np.zeros(var.shape)
+        
+        sol_idx_r = ray.get([
+            prob.get_solution_idx_r.remote() for prob in self._subprob_cache.probs])
+        sol_idx_d = ray.get([
+            prob.get_solution_idx_d.remote() for prob in self._subprob_cache.probs])
+        flat_idx_r = [idx for arr in sol_idx_r for idx in arr]
+        flat_idx_d = [idx for arr in sol_idx_d for idx in arr]
+        
+        for sol_idx, sol in zip(
+            [flat_idx_r, flat_idx_d],
+            [self.sol_r, self.sol_d]
+        ):
+            for (var_id, pos), value in zip(sol_idx, sol):
+                var = var_id_to_var[var_id]
+                idx = np.unravel_index(pos, var.shape[::-1])[::-1] 
+                var.value[idx] = value
 
     def get_constr_dict(self, constrs):
         '''Get a mapping of constraint to its var_id_pos_list.'''
