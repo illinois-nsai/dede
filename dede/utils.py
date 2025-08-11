@@ -1,5 +1,6 @@
 import cvxpy as cp
 import numpy as np
+import time
 from heapq import heappush, heappop
 
 from cvxpy.atoms.affine.add_expr import AddExpression
@@ -66,7 +67,7 @@ def replace_variables(expr, var_id_to_var):
         return type(expr)(*new_args)
 
 
-def get_var_id_pos_list(expr):
+def get_var_id_pos_list_from_linear2(expr):
     '''Return a list of (var_id, pos).'''
     terms = break_into_vars(expr)
     vars = set()
@@ -90,7 +91,7 @@ def break_into_vars(expr):
         return [expr != 0]
     elif isinstance(expr, np.ndarray):
         return [bool(expr[idx] != 0) for idx in np.ndindex(expr.shape)]
-    if isinstance(expr, Constant):
+    elif isinstance(expr, Constant):
         return [bool(expr.value[idx] != 0) for idx in np.ndindex(expr.value.shape)]
     
     # Base case: variable reached

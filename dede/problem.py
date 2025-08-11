@@ -15,8 +15,9 @@ from .utils import (
     expand_expr,
     get_var_id_pos_list_from_cone,
     get_var_id_pos_list_from_linear,
-    get_var_id_pos_list)
+    get_var_id_pos_list_from_linear2)
 from .subproblems_wrap import SubproblemsWrap
+from .constraints_utils import breakdown_constr
 
 
 class SubprobCache:
@@ -51,10 +52,36 @@ class Problem(CpProblem):
             demand_variables: list of demand constraints
         '''
         start = time.time()
-        self._constrs_r = [
+        constrs_r_converted = [
             self.convert_inequality(constr) for constr in resource_constraints]
-        self._constrs_d = [
+        constrs_d_converted = [
             self.convert_inequality(constr) for constr in demand_constraints]
+        
+        '''
+        print("BEFORE R:")
+        for constr in constrs_r_converted:
+            print(constr)
+        print("BEFORE D:")
+        for constr in constrs_d_converted:
+            print(constr)
+        '''
+        
+        '''
+        self._constrs_r = breakdown_constr(constrs_r_converted)
+        self._constrs_d = breakdown_constr(constrs_d_converted)
+        '''
+        self._constrs_r = constrs_r_converted
+        self._constrs_d = constrs_d_converted
+
+        '''
+        print("AFTER R:")
+        for constr in self._constrs_r:
+            print(constr)
+        print("AFTER D:")
+        for constr in self._constrs_d:
+            print(constr)
+        '''
+
         self._subprob_cache = SubprobCache()
 
         # keep track of original problem type
@@ -214,7 +241,7 @@ class Problem(CpProblem):
         for constr in constrs:
             constr_to_var_id_pos_list[
                 #constr] = get_var_id_pos_list_from_linear(constr.expr, self._solver)
-                constr] = get_var_id_pos_list(constr.expr)
+                constr] = get_var_id_pos_list_from_linear2(constr.expr)
         return constr_to_var_id_pos_list
 
     def group_constrs(self, constrs, constr_dict):
@@ -334,8 +361,8 @@ class Problem(CpProblem):
         obj_r = [cp.Constant(0) for _ in self.constrs_gps_r]
         obj_d = [cp.Constant(0) for _ in self.constrs_gps_d]
         for obj in expand_expr(self.objective.expr):
-            #var_id_pos_list = get_var_id_pos_list_from_cone(obj, self._solver)
-            var_id_pos_list = get_var_id_pos_list(obj)
+            var_id_pos_list = get_var_id_pos_list_from_cone(obj, self._solver)
+            #var_id_pos_list = get_var_id_pos_list(obj)
             #print(var_id_pos_list)
             if not var_id_pos_list:
                 if len(obj_r) > 0:

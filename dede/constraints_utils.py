@@ -9,44 +9,29 @@ from cvxpy.expressions.variable import Variable
 from cvxpy.atoms.affine.index import index
 from cvxpy.atoms.affine.promote import Promote
 from cvxpy.atoms.affine.binary_operators import MulExpression
+from cvxpy.atoms.affine.unary_operators import NegExpression
 
 
-def func(constr):
+def breakdown_constr(constr):
     if isinstance(constr, (list, tuple)):
         out = []
         for c in constr:
-            out.extend(func(c))
+            out.extend(breakdown_constr(c))
         return out
 
-    left, right = constr.args
+    expr_list = breakdown_expression(constr.expr)
+
     constr_list = []
-
-    if not isinstance(constr, (Equality, Inequality)):
-        raise TypeError("Only Inequality or Equality based Testing.")
-    
-    left_list = breakdown_expression(left)
-    right_list = breakdown_expression(right)
-
-    op = (lambda a, b: a <= b) if isinstance(constr, Inequality) else (lambda a, b: a == b)
-
-    if len(left_list) < len(right_list):
-        for i in range(len(right_list)):
-            constr_list.append(op(left_list[0], right_list[i]))
-    elif len(left_list) > len(right_list):
-        for i in range(len(left_list)):
-            constr_list.append(op(left_list[i], right_list[0]))
-    elif len(left_list) == len(right_list):
-        for i in range(len(left_list)):
-            constr_list.append(op(left_list[i], right_list[i]))
+    for expr in expr_list:
+        constr_list.append(expr == 0)
 
     return constr_list
 
 
-def get_entries_from_index(index_obj):
-    x = index_obj.args[0]
+def get_indices_from_index(index_obj):
+    '''Returns all indices used in an index object.'''
     key = index_obj.get_data()[0]  # key = (start, stop, step)
 
-    # shape has the same dimensions as x
     shape = []
     for k in key:
         # number of 'rows' is ceil((k.stop - k.start) / k.step)
@@ -54,16 +39,71 @@ def get_entries_from_index(index_obj):
         shape.append(dim_size)
     shape = tuple(shape)
 
-    entries = []
+    indices = []
     for rel_idx in np.ndindex(shape):
         abs_idx = []
         for axis, k in enumerate(key):
             abs_idx.append(k.start + rel_idx[axis] * k.step)
-        entries.append(x[tuple(abs_idx)])
+        indices.append(tuple(abs_idx))
 
-    return entries
+    return indices
 
 
+def breakdown_expression(expr):
+    # Base cases
+    if isinstance(expr, Constant):
+        return [expr.value[idx] for idx in np.ndindex(expr.value.shape)]
+    
+    elif isinstance(expr, Variable):
+        return [expr[idx] for idx in np.ndindex(expr.shape)]
+
+    elif isinstance(expr, index) and isinstance(expr.args[0], Variable):
+        var = expr.args[0]
+        return [var[idx] for idx in get_indices_from_index(expr)]
+    
+    # Recursive cases
+    elif isinstance(expr, index):
+        all_terms = breakdown_expression(expr.args[0])
+        index_terms = []
+        for idx in get_indices_from_index(expr):
+            index_terms.append(all_terms[np.ravel_multi_index(idx, expr.args[0].shape)])
+        return index_terms
+
+    elif isinstance(expr, Promote):
+        return np.prod(expr.shape) * breakdown_expression(expr.args[0])
+
+    elif isinstance(expr, NegExpression):
+        return [NegExpression(subexpr) for subexpr in breakdown_expression(expr.args[0])]
+    elif isinstance(expr, Sum):
+        # TODO: add axis
+        '''
+        term = 0
+        for subexpr in breakdown_expression(expr.args[0]):
+            term += subexpr
+        return [term]
+        '''
+        return [expr]
+    elif isinstance(expr, AddExpression):
+        terms = []
+        expr_list = []
+        for arg in expr.args:
+            expr_list.append(breakdown_expression(arg))
+        for j in range(len(expr_list[0])):
+            term = 0
+            for i in range(len(expr_list)):
+                term += expr_list[i][j]
+            terms.append(term)
+        return terms
+    elif isinstance(expr, multiply):
+        left_list = breakdown_expression(expr.args[0])
+        right_list = breakdown_expression(expr.args[1])
+        return [left[i] * right[i] for i in range(len(left_list))]
+    
+    else:
+        raise TypeError(f"Expression Not Supported: {type(expr)}")
+
+
+'''
 def breakdown_expression(expr):
     terms = []
 
@@ -137,7 +177,7 @@ def breakdown_expression(expr):
     elif isinstance(expr, index):
         terms = get_entries_from_index(expr)
 
-    elif isinstance(expr, Promote): # Assuming promote is a constant (x + y + 1)
+    elif isinstance(expr, Promote):
         inner_term = breakdown_expression(expr.args[0])[0]
         for rel_idx in np.ndindex(expr.shape):
             terms.append(inner_term)
@@ -146,3 +186,4 @@ def breakdown_expression(expr):
         raise TypeError(f"Expression Not Supported: {type(expr)}")
     
     return terms
+'''
