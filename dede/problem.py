@@ -170,9 +170,31 @@ class Problem(CpProblem):
         # use num_iter if specifed
         # otherwise, stop under < 1% improvement or reach 10000 upper limit
         i, aug_lgr, aug_lgr_old = 0, 1, 2
+        self.sol_d_old = self.sol_d.copy()
         while (num_iter is not None and i < num_iter) or \
             (num_iter is None and i < 10000 and (
-                i < 2 or abs((aug_lgr - aug_lgr_old)/aug_lgr_old) > 0.01)):
+                i < 2 or abs((aug_lgr - aug_lgr_old)/aug_lgr_old) > 0.001)):
+            
+            if i > 0 and i % 10 == 0:
+                primal_res, dual_res = self.get_residuals(rho)
+                #primal_res = np.linalg.norm(self.sol_r - self.sol_d)
+                #dual_res = rho * np.linalg.norm(self.sol_d - self.sol_d_old)
+                if primal_res > 10 * dual_res:
+                    rho *= 2 
+                    for prob in self._subprob_cache.probs:
+                        prob.update_rho.remote(rho)
+                    print("updated rho up")
+                elif dual_res > 10 * primal_res:
+                    rho /= 2 
+                    for prob in self._subprob_cache.probs:
+                        prob.update_rho.remote(rho)
+                    print("updated rho down")
+                print("Primal:", primal_res, end=", ")
+                print("Dual:", dual_res, end=", ")
+                print("rho:", rho)
+            
+            print("obj:", sum(ray.get([prob.get_obj.remote() for prob in self._subprob_cache.probs])))
+            self.sol_d_old = self.sol_d.copy()
 
             # initialize start time, iteration, augmented Lagrangian
             start, i, aug_lgr_old, aug_lgr = time.time(), i + 1, aug_lgr, 0
@@ -203,6 +225,31 @@ class Problem(CpProblem):
         coeff = 1 if self._problem_type == Minimize else -1
         return coeff * sum(ray.get([
             prob.get_obj.remote() for prob in self._subprob_cache.probs]))
+    
+    def get_residuals(self, rho):
+        sol_idx_d = ray.get([
+            prob.get_solution_idx_d.remote() for prob in self._subprob_cache.probs])
+        sol_idx_r = ray.get([
+            prob.get_solution_idx_r.remote() for prob in self._subprob_cache.probs])
+        flat_idx_d = [idx for arr in sol_idx_d for idx in arr]
+        flat_idx_r = [idx for arr in sol_idx_r for idx in arr]
+
+        map_r = {k: float(v) for k, v in zip(flat_idx_r, self.sol_r)}
+        map_d = {k: float(v) for k, v in zip(flat_idx_d, self.sol_d)}
+
+        shared_pos = sorted(set(map_r.keys()) & set(map_d.keys()))
+        
+        shared_r = np.array([map_r[pos] for pos in shared_pos])
+        shared_d = np.array([map_d[pos] for pos in shared_pos])
+        primal_res = np.linalg.norm(shared_r - shared_d)
+        
+        dual_res = rho * np.linalg.norm(self.sol_d - self.sol_d_old)
+
+        print(self.sol_d)
+        print(self.sol_d_old)
+        print(dual_res)
+
+        return primal_res, dual_res
 
     def get_constr_dict(self, constrs):
         '''Get a mapping of constraint to its var_id_pos_list.'''

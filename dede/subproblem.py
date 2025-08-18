@@ -27,7 +27,8 @@ class Subproblem(CpProblem):
         '''
 
         self.id = idx
-        self.rho = rho
+        #self.rho = rho
+        self.rho = cp.Parameter(nonneg=True, value=rho)
 
         # create var for the subproblem
         var_id_pos_set1, var_id_pos_set2 = set(), set()
@@ -60,7 +61,7 @@ class Subproblem(CpProblem):
         self.param.value = np.zeros(self.param.shape)
 
         # replace inactive var with 0
-        var_id_to_new_var, constrs_var_attr = self.get_var_id_to_new_var(
+        var_id_to_new_var, self.constrs_var_attr = self.get_var_id_to_new_var(
             objective_expr, constrs_gp)
 
         # objective
@@ -79,9 +80,9 @@ class Subproblem(CpProblem):
         super(Subproblem, self).__init__(
             cp.Minimize(
                 self.obj_expr_old +
-                self.rho / 2 * cp.sum_squares(self.f1 + self.l1) +
-                self.rho / 2 * cp.sum_squares(self.f2 + self.l2)),
-            constrs_var_attr)
+                self.rho / 2 * cp.norm(self.f1 + self.l1, "fro") ** 2 +
+                self.rho / 2 * cp.norm(self.f2 + self.l2, "fro") ** 2),
+            self.constrs_var_attr)
 
     def get_var_id_to_new_var(self, objective_expr, constrs_gp):
         '''Replace inactive var in old var.'''
@@ -147,6 +148,9 @@ class Subproblem(CpProblem):
     def get_obj(self):
         '''Return value of the original objective function.'''
         return self.obj_expr_old.value
+    
+    def update_rho(self, rho):
+        self.rho.value = rho
 
     def solve(self, param_value, *args, **kwargs):
         '''Update lambda and solve the subproblem.
