@@ -83,6 +83,16 @@ class SubproblemsWrap():
             return np.hstack([prob.get_solution() for prob in self.probs_d])
         else:
             return np.array([])
+    
+    def get_local_solution_idx(self):
+        '''Get (var_id, position) of all local-only variables.'''
+        probs = self.probs_r + self.probs_d
+        return [idx for prob in probs for idx in prob.get_local_solution_idx()]
+    
+    def get_local_solution(self):
+        '''Get concatenated solution of all local-only variables.'''
+        probs = self.probs_r + self.probs_d
+        return [sol for prob in probs for sol in prob.get_local_solution()]
 
     def update_parameters(self, param_id_to_value):
         '''Update parameter value in the current actor.'''

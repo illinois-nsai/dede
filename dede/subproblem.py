@@ -143,6 +143,16 @@ class Subproblem(CpProblem):
         if self.var.value is None:
             self.var.value = np.zeros(self.var.shape)
         return self.var.value[:self.x_z_num]
+    
+    def get_local_solution_idx(self):
+        '''Record (var_id, position) of local-only variables.'''
+        return self.var_id_pos_list[self.x_z_num:]
+    
+    def get_local_solution(self):
+        '''Returns solution of local-only variables.'''
+        if self.var.value is None:
+            self.var.value = np.zeros(self.var.shape)
+        return self.var.value[self.x_z_num:]
 
     def get_obj(self):
         '''Return value of the original objective function.'''
