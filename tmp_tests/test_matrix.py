@@ -1,3 +1,6 @@
+'''
+#!/usr/bin/env python3
+
 import numpy as np
 import cvxpy as cp
 from dede.constraints_utils import func
@@ -78,3 +81,4 @@ if __name__ == '__main__':
     test_1d_matrix()
     test_2d_matrix()
     test_hard2()
+'''
