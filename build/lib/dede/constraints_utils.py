@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import numpy as np
 import cvxpy as cp
 from cvxpy.constraints.zero import Equality
@@ -14,14 +12,14 @@ from cvxpy.atoms.affine.binary_operators import MulExpression
 from cvxpy.atoms.affine.unary_operators import NegExpression
 
 
-def breakdown_constr(constr, dir):
+def breakdown_constr(constr):
     if isinstance(constr, (list, tuple)):
         out = []
         for c in constr:
-            out.extend(breakdown_constr(c, dir))
+            out.extend(breakdown_constr(c))
         return out
 
-    expr_list = breakdown_expression(constr.expr, dir)
+    expr_list = breakdown_expression(constr.expr)
 
     constr_list = []
     for expr in expr_list:
@@ -51,43 +49,31 @@ def get_indices_from_index(index_obj):
     return indices
 
 
-def breakdown_expression(expr, dir):
+def breakdown_expression(expr):
     # Base cases
     if isinstance(expr, Constant):
         return [expr.value[idx] for idx in np.ndindex(expr.value.shape)]
     
     elif isinstance(expr, Variable):
-        if len(expr.shape) == 2:
-            if dir == "row":
-                return [expr[i, :] for i in range(expr.shape[0])]
-            elif dir == "col":
-                return [expr[:, j] for j in range(expr.shape[1])]
-        # Scalar/1D: treat as a single group
-        return [expr]  # Don't break up 1D/Scalar into elements
+        return [expr[idx] for idx in np.ndindex(expr.shape)]
 
     elif isinstance(expr, index) and isinstance(expr.args[0], Variable):
         var = expr.args[0]
-        # Only group for 2D case
-        if len(var.shape) == 2:
-            if dir == "row":
-                return [var[i, :] for i in range(var.shape[0])]
-            elif dir == "col":
-                return [var[:, j] for j in range(var.shape[1])]
-        # 1D/Scalar, fallback to single group
-        return [var]
+        return [var[idx] for idx in get_indices_from_index(expr)]
+    
     # Recursive cases
     elif isinstance(expr, index):
-        all_terms = breakdown_expression(expr.args[0], dir)
+        all_terms = breakdown_expression(expr.args[0])
         index_terms = []
         for idx in get_indices_from_index(expr):
             index_terms.append(all_terms[np.ravel_multi_index(idx, expr.args[0].shape)])
         return index_terms
 
     elif isinstance(expr, Promote):
-        return np.prod(expr.shape) * breakdown_expression(expr.args[0], dir)
+        return np.prod(expr.shape) * breakdown_expression(expr.args[0])
 
     elif isinstance(expr, NegExpression):
-        return [NegExpression(subexpr) for subexpr in breakdown_expression(expr.args[0], dir)]
+        return [NegExpression(subexpr) for subexpr in breakdown_expression(expr.args[0])]
     elif isinstance(expr, Sum):
         # TODO: add axis
         '''
@@ -96,38 +82,12 @@ def breakdown_expression(expr, dir):
             term += subexpr
         return [term]
         '''
-        axis = expr.axis
-        inner = expr.args[0]
-
-        if dir == "row":
-            if axis is None:
-                return [expr]
-            elif axis == 1:
-                return [cp.sum(inner[i, :]) for i in range(inner.shape[0])]
-            elif axis == 0:
-                summed = cp.sum(inner, axis=0)
-                return [summed[i] for i in range(summed.shape[0])]
-
-        elif dir == "col":
-            if axis is None:
-                return [expr]
-            elif axis == 0:
-                return [cp.sum(inner[:, j]) for j in range(inner.shape[1])]
-            elif axis == 1:
-                summed = cp.sum(inner, axis=1)
-                return [summed[j] for j in range(summed.shape[0])]
-
-        else:
-            term = 0
-            for subexpr in breakdown_expression(inner, dir):
-                term += subexpr
-            return [term]
         return [expr]
     elif isinstance(expr, AddExpression):
         terms = []
         expr_list = []
         for arg in expr.args:
-            expr_list.append(breakdown_expression(arg, dir))
+            expr_list.append(breakdown_expression(arg))
         for j in range(len(expr_list[0])):
             term = 0
             for i in range(len(expr_list)):
@@ -135,8 +95,8 @@ def breakdown_expression(expr, dir):
             terms.append(term)
         return terms
     elif isinstance(expr, multiply):
-        left_list = breakdown_expression(expr.args[0], dir)
-        right_list = breakdown_expression(expr.args[1], dir)
+        left_list = breakdown_expression(expr.args[0])
+        right_list = breakdown_expression(expr.args[1])
         return [left[i] * right[i] for i in range(len(left_list))]
     
     else:
