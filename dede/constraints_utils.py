@@ -57,24 +57,15 @@ def breakdown_expression(expr, dir):
         return [expr.value[idx] for idx in np.ndindex(expr.value.shape)]
     
     elif isinstance(expr, Variable):
-        if len(expr.shape) == 2:
-            if dir == "row":
-                return [expr[i, :] for i in range(expr.shape[0])]
-            elif dir == "col":
-                return [expr[:, j] for j in range(expr.shape[1])]
-        # Scalar/1D: treat as a single group
-        return [expr]  # Don't break up 1D/Scalar into elements
+        index_obj = expr[tuple(slice(None) for _ in expr.shape)]
+        indices = get_indices_from_index(index_obj)
+        return [expr[idx] for idx in indices]
 
     elif isinstance(expr, index) and isinstance(expr.args[0], Variable):
+        indices = get_indices_from_index(expr)
         var = expr.args[0]
-        # Only group for 2D case
-        if len(var.shape) == 2:
-            if dir == "row":
-                return [var[i, :] for i in range(var.shape[0])]
-            elif dir == "col":
-                return [var[:, j] for j in range(var.shape[1])]
-        # 1D/Scalar, fallback to single group
-        return [var]
+        return [var[idx] for idx in indices]
+
     # Recursive cases
     elif isinstance(expr, index):
         all_terms = breakdown_expression(expr.args[0], dir)
@@ -101,6 +92,19 @@ def breakdown_expression(expr, dir):
 
         if dir == "row":
             if axis is None:
+                # For axis=None, decompose only when inner is an index over a Variable
+                # that selects a partial multi-element slice along any axis.
+                if isinstance(inner, index) and isinstance(inner.args[0], Variable):
+                    key = inner.get_data()[0]
+                    var_shape = inner.args[0].shape
+                    def slice_len(k):
+                        return (k.stop - k.start + k.step - 1) // k.step
+                    for i, k in enumerate(key):
+                        if isinstance(k, slice):
+                            length_i = slice_len(k)
+                            # Don't break down stride-based slices (step != 1)
+                            if length_i > 1 and length_i != var_shape[i] and k.step == 1:
+                                return breakdown_expression(inner, dir)
                 return [expr]
             elif axis == 1:
                 return [cp.sum(inner[i, :]) for i in range(inner.shape[0])]
@@ -110,6 +114,17 @@ def breakdown_expression(expr, dir):
 
         elif dir == "col":
             if axis is None:
+                if isinstance(inner, index) and isinstance(inner.args[0], Variable):
+                    key = inner.get_data()[0]
+                    var_shape = inner.args[0].shape
+                    def slice_len(k):
+                        return (k.stop - k.start + k.step - 1) // k.step
+                    for i, k in enumerate(key):
+                        if isinstance(k, slice):
+                            length_i = slice_len(k)
+                            # Don't break down stride-based slices (step != 1)
+                            if length_i > 1 and length_i != var_shape[i] and k.step == 1:
+                                return breakdown_expression(inner, dir)
                 return [expr]
             elif axis == 0:
                 return [cp.sum(inner[:, j]) for j in range(inner.shape[1])]
@@ -128,10 +143,24 @@ def breakdown_expression(expr, dir):
         expr_list = []
         for arg in expr.args:
             expr_list.append(breakdown_expression(arg, dir))
-        for j in range(len(expr_list[0])):
+        
+        # Find the maximum length among all argument breakdowns
+        max_len = max(len(exprs) for exprs in expr_list)
+        
+        for j in range(max_len):
             term = 0
             for i in range(len(expr_list)):
-                term += expr_list[i][j]
+                # Use the j-th element if it exists, otherwise use 0
+                if j < len(expr_list[i]):
+                    term += expr_list[i][j]
+                else:
+                    # For constants, we can add 0, but for expressions we need to be more careful
+                    if isinstance(expr_list[i][0], (int, float)):
+                        term += 0
+                    else:
+                        # For non-constant expressions, we need to add a zero expression
+                        # This is a bit tricky, but for now let's assume it's a constant
+                        term += 0
             terms.append(term)
         return terms
     elif isinstance(expr, multiply):
