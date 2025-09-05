@@ -28,7 +28,7 @@ def test_top_left_3x3():
     startd = time.time()
     result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=0.075, num_iter=10)
     endd = time.time() - startd
-    print("DeDe:", result_dede)
+    print("DeDe objective value:", result_dede)
     print("endd", endd)
 
     x_cp = cp.Variable((N, M), nonneg=True)
@@ -45,7 +45,7 @@ def test_top_left_3x3():
     startc = time.time()
     result_cvxpy = cvxpy_prob.solve()
     endc = time.time() - startc
-    print("CVXPY:", result_cvxpy)
+    print("CVXPY objective value:", result_cvxpy)
     print("endc", endc)
 
     # Note: DeDe and CVXPY results may differ due to different constraint handling
@@ -72,7 +72,7 @@ def test_top_right_3x3():
     startd = time.time()
     result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=0.075, num_iter=10)
     endd = time.time() - startd
-    print("DeDe:", result_dede)
+    print("DeDe objective value:", result_dede)
     print("endd", endd)
 
     x_cp = cp.Variable((N, M), nonneg=True)
@@ -89,7 +89,7 @@ def test_top_right_3x3():
     startc = time.time()
     result_cvxpy = cvxpy_prob.solve()
     endc = time.time() - startc
-    print("CVXPY:", result_cvxpy)
+    print("CVXPY objective value:", result_cvxpy)
     print("endc", endc)
 
     # Note: DeDe and CVXPY results may differ due to different constraint handling
@@ -116,7 +116,7 @@ def test_full_4x4():
     startd = time.time()
     result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=0.075, num_iter=10)
     endd = time.time() - startd
-    print("DeDe:", result_dede)
+    print("DeDe objective value:", result_dede)
     print("endd", endd)
 
     x_cp = cp.Variable((N, M), nonneg=True)
@@ -133,7 +133,7 @@ def test_full_4x4():
     startc = time.time()
     result_cvxpy = cvxpy_prob.solve()
     endc = time.time() - startc
-    print("CVXPY:", result_cvxpy)
+    print("CVXPY objective value:", result_cvxpy)
     print("endc", endc)
 
     #assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
@@ -160,7 +160,7 @@ def test_stride_based_slicing():
     startd = time.time()
     result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=0.075, num_iter=10)
     endd = time.time() - startd
-    print("DeDe:", result_dede)
+    print("DeDe objective value:", result_dede)
     print("endd", endd)
 
     x_cp = cp.Variable((N, M), nonneg=True)
@@ -178,7 +178,7 @@ def test_stride_based_slicing():
     startc = time.time()
     result_cvxpy = cvxpy_prob.solve()
     endc = time.time() - startc
-    print("CVXPY:", result_cvxpy)
+    print("CVXPY objective value:", result_cvxpy)
     print("endc", endc)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
