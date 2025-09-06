@@ -57,14 +57,26 @@ def breakdown_expression(expr, dir):
         return [expr.value[idx] for idx in np.ndindex(expr.value.shape)]
     
     elif isinstance(expr, Variable):
-        index_obj = expr[tuple(slice(None) for _ in expr.shape)]
-        indices = get_indices_from_index(index_obj)
-        return [expr[idx] for idx in indices]
+        if dir == "row":
+            return [expr[i, :] for i in range(expr.shape[0])]
+        elif dir == "col":
+            return [expr[:, j] for j in range(expr.shape[1])]
+        else:
+            index_obj = expr[tuple(slice(None) for _ in expr.shape)]
+            indices = get_indices_from_index(index_obj)
+            return [expr[idx] for idx in indices]
 
     elif isinstance(expr, index) and isinstance(expr.args[0], Variable):
-        indices = get_indices_from_index(expr)
-        var = expr.args[0]
-        return [var[idx] for idx in indices]
+        if dir == "row":
+            var = expr.args[0]
+            return [var[i, :] for i in range(var.shape[0])]
+        elif dir == "col":
+            var = expr.args[0]
+            return [var[:, j] for j in range(var.shape[1])]
+        else:
+            indices = get_indices_from_index(expr)
+            var = expr.args[0]
+            return [var[idx] for idx in indices]
 
     # Recursive cases
     elif isinstance(expr, index):
@@ -92,8 +104,6 @@ def breakdown_expression(expr, dir):
 
         if dir == "row":
             if axis is None:
-                # For axis=None, decompose only when inner is an index over a Variable
-                # that selects a partial multi-element slice along any axis.
                 if isinstance(inner, index) and isinstance(inner.args[0], Variable):
                     key = inner.get_data()[0]
                     var_shape = inner.args[0].shape
@@ -102,7 +112,6 @@ def breakdown_expression(expr, dir):
                     for i, k in enumerate(key):
                         if isinstance(k, slice):
                             length_i = slice_len(k)
-                            # Don't break down stride-based slices (step != 1)
                             if length_i > 1 and length_i != var_shape[i] and k.step == 1:
                                 return breakdown_expression(inner, dir)
                 return [expr]
@@ -122,7 +131,6 @@ def breakdown_expression(expr, dir):
                     for i, k in enumerate(key):
                         if isinstance(k, slice):
                             length_i = slice_len(k)
-                            # Don't break down stride-based slices (step != 1)
                             if length_i > 1 and length_i != var_shape[i] and k.step == 1:
                                 return breakdown_expression(inner, dir)
                 return [expr]
@@ -144,22 +152,17 @@ def breakdown_expression(expr, dir):
         for arg in expr.args:
             expr_list.append(breakdown_expression(arg, dir))
         
-        # Find the maximum length among all argument breakdowns
         max_len = max(len(exprs) for exprs in expr_list)
         
         for j in range(max_len):
             term = 0
             for i in range(len(expr_list)):
-                # Use the j-th element if it exists, otherwise use 0
                 if j < len(expr_list[i]):
                     term += expr_list[i][j]
                 else:
-                    # For constants, we can add 0, but for expressions we need to be more careful
                     if isinstance(expr_list[i][0], (int, float)):
                         term += 0
                     else:
-                        # For non-constant expressions, we need to add a zero expression
-                        # This is a bit tricky, but for now let's assume it's a constant
                         term += 0
             terms.append(term)
         return terms
