@@ -99,14 +99,10 @@ def breakdown_expression(expr, dir):
             term += subexpr
         return [term]
         '''
-        if expr.axis == None:
-            terms.append(expr)
-        elif expr.axis == 0:
-            for i in range(expr.shape[0]):
-                terms.append(expr.args[0][:, i])
-        elif expr.axis == 1:
-            for i in range(expr.shape[0]):
-                terms.append(expr.args[0][i])
+        term = 0
+        for subexpr in breakdown_expression(expr.args[0]):
+            term += subexpr
+        return [term]
     elif isinstance(expr, AddExpression):
         terms = []
         expr_list = []
