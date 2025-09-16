@@ -99,53 +99,14 @@ def breakdown_expression(expr, dir):
             term += subexpr
         return [term]
         '''
-        axis = expr.axis
-        inner = expr.args[0]
-
-        if dir == "row":
-            if axis is None:
-                if isinstance(inner, index) and isinstance(inner.args[0], Variable):
-                    key = inner.get_data()[0]
-                    var_shape = inner.args[0].shape
-                    def slice_len(k):
-                        return (k.stop - k.start + k.step - 1) // k.step
-                    for i, k in enumerate(key):
-                        if isinstance(k, slice):
-                            length_i = slice_len(k)
-                            if length_i > 1 and length_i != var_shape[i] and k.step == 1:
-                                return breakdown_expression(inner, dir)
-                return [expr]
-            elif axis == 1:
-                return [cp.sum(inner[i, :]) for i in range(inner.shape[0])]
-            elif axis == 0:
-                summed = cp.sum(inner, axis=0)
-                return [summed[i] for i in range(summed.shape[0])]
-
-        elif dir == "col":
-            if axis is None:
-                if isinstance(inner, index) and isinstance(inner.args[0], Variable):
-                    key = inner.get_data()[0]
-                    var_shape = inner.args[0].shape
-                    def slice_len(k):
-                        return (k.stop - k.start + k.step - 1) // k.step
-                    for i, k in enumerate(key):
-                        if isinstance(k, slice):
-                            length_i = slice_len(k)
-                            if length_i > 1 and length_i != var_shape[i] and k.step == 1:
-                                return breakdown_expression(inner, dir)
-                return [expr]
-            elif axis == 0:
-                return [cp.sum(inner[:, j]) for j in range(inner.shape[1])]
-            elif axis == 1:
-                summed = cp.sum(inner, axis=1)
-                return [summed[j] for j in range(summed.shape[0])]
-
-        else:
-            term = 0
-            for subexpr in breakdown_expression(inner, dir):
-                term += subexpr
-            return [term]
-        return [expr]
+        if expr.axis == None:
+            terms.append(expr)
+        elif expr.axis == 0:
+            for i in range(expr.shape[0]):
+                terms.append(expr.args[0][:, i])
+        elif expr.axis == 1:
+            for i in range(expr.shape[0]):
+                terms.append(expr.args[0][i])
     elif isinstance(expr, AddExpression):
         terms = []
         expr_list = []
