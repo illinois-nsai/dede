@@ -5,10 +5,13 @@ from heapq import heappush, heappop
 
 from cvxpy.atoms.affine.add_expr import AddExpression
 from cvxpy.atoms.affine.unary_operators import NegExpression
+from cvxpy.atoms.affine.binary_operators import MulExpression
 from cvxpy.atoms.affine.binary_operators import multiply
 from cvxpy.atoms.affine.sum import Sum
 from cvxpy.atoms.affine.index import index
 from cvxpy.atoms.affine.promote import Promote
+from cvxpy.atoms.affine.trace import trace
+from cvxpy.atoms.elementwise.log import log
 from cvxpy.atoms.quad_over_lin import quad_over_lin
 from cvxpy.expressions.variable import Variable
 from cvxpy.expressions.leaf import Leaf
@@ -21,7 +24,11 @@ def expand_expr(expr):
     Args:
         expr: expression to expand
     '''
-    if isinstance(expr, NegExpression):
+    if isinstance(expr, (Variable, index)):
+        if len(expr.shape) == 0:
+            return [expr]
+        return [arg for arg in expr]
+    elif isinstance(expr, NegExpression):
         return [NegExpression(
             new_expr) for new_expr in expand_expr(expr.args[0])]
     elif isinstance(expr, AddExpression):
@@ -29,12 +36,26 @@ def expand_expr(expr):
         for arg in expr.args:
             expr_list += expand_expr(arg)
         return expr_list
+    elif isinstance(expr, multiply):
+        if len(expr.shape) == 0:
+            return [expr]
+        left, right = expr.args
+        return [multiply(left[i], right[i]) for i in range(left.shape[0])]
+    elif isinstance(expr, MulExpression):
+        if len(expr.shape) == 0:
+            return [expr]
+        return [expr[i] for i in range(expr.shape[0])]
     elif isinstance(expr, Sum):
-        return [Sum(arg) for arg in expr.args[0]]
+        return [Sum(new_expr) for new_expr in expand_expr(expr.args[0])]
     # (sum_{ij}X^2_{ij})/y
     elif isinstance(expr, quad_over_lin):
-        return [quad_over_lin(arg, expr.args[1]) for arg in expr.args[0]]
+        return [quad_over_lin(new_expr, expr.args[1]) for new_expr in expand_expr(expr.args[0])]
+    elif isinstance(expr, log):
+        return [log(new_expr) for new_expr in expand_expr(expr.args[0])]
+    elif isinstance(expr, trace):
+        return [expr.args[0][i, i] for i in range(expr.args[0].shape[0])]
     else:
+        print(type(expr))
         return [expr]
 
 
@@ -67,7 +88,7 @@ def replace_variables(expr, var_id_to_var):
         return type(expr)(*new_args)
 
 
-def get_var_id_pos_list_from_linear2(expr):
+def get_var_id_pos_list_from_linear(expr):
     '''Return a list of (var_id, pos).'''
     terms = break_into_vars(expr)
     vars = set()
@@ -210,8 +231,9 @@ def get_var_id_pos_list_from_cone(expr, solver):
     return var_id_pos_list
 
 
+'''
 def get_var_id_pos_list_from_linear(expr, solver):
-    '''Return a list of (var_id, pos).'''
+    Return a list of (var_id, pos).
     if not expr.variables():
         return []
 
@@ -239,6 +261,7 @@ def get_var_id_pos_list_from_linear(expr, solver):
         var_id_pos_list.append((var_id, col - start_col))
 
     return var_id_pos_list
+'''
 
 
 def heapsched_rt(lrts, k):
