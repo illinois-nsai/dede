@@ -1,3 +1,6 @@
+'''
+#!/usr/bin/env python3
+
 import numpy as np
 import cvxpy as cp
 from dede.constraints_utils import func
@@ -149,3 +152,5 @@ if __name__ == '__main__':
     test_1d_sum()
     test_2d_sum()
     test_sum_vars()
+
+'''
