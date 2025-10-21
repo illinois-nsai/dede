@@ -41,7 +41,6 @@ def test_cvx_cont():
     for i in range(N):
         for j in range(M):
             w[i][j] = i + j
-    #expr = dd.sum([dd.sum(dd.multiply(w[i, :], dd.log(x[i, :]))) for i in range(N)])
     expr = dd.sum(dd.multiply(w, dd.log(x)))
     objective = dd.Maximize(expr)
 

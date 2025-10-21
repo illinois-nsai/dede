@@ -15,7 +15,6 @@ def test_log():
     resource_constraints = [x >= 1] + [x[i, :].sum() <= (i + 1) * M for i in range(N)]
     demand_constraints = [x[:, j].sum() <= (j + 1) * N for j in range(M)]
     
-    # write in separable form, dd.sum(x) fails
     expr = dd.sum(dd.log(x))
     objective = dd.Maximize(expr)
 
@@ -40,7 +39,6 @@ def test_log_weighted():
     resource_constraints = [x >= 1] + [x[i, :].sum() <= (i + 1) * M for i in range(N)]
     demand_constraints = [x[:, j].sum() <= (j + 1) * N for j in range(M)]
     
-    # write in separable form, dd.sum(x) fails
     w = np.empty((N, M))
     for i in range(N):
         for j in range(M):
