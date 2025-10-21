@@ -3,6 +3,7 @@ import numpy as np
 import time
 from heapq import heappush, heappop
 
+from cvxpy import Parameter
 from cvxpy.atoms.affine.add_expr import AddExpression
 from cvxpy.atoms.affine.unary_operators import NegExpression
 from cvxpy.atoms.affine.binary_operators import MulExpression
@@ -24,7 +25,7 @@ def expand_expr(expr):
     Args:
         expr: expression to expand
     '''
-    if isinstance(expr, (Variable, index)):
+    if isinstance(expr, (Variable, index, Constant, Parameter)):
         if len(expr.shape) == 0:
             return [expr]
         return [arg for arg in expr]
@@ -39,8 +40,9 @@ def expand_expr(expr):
     elif isinstance(expr, multiply):
         if len(expr.shape) == 0:
             return [expr]
-        left, right = expr.args
-        return [multiply(left[i], right[i]) for i in range(left.shape[0])]
+        left_list = expand_expr(expr.args[0])
+        right_list = expand_expr(expr.args[1])
+        return [multiply(left, right) for left, right in zip(left_list, right_list)]
     elif isinstance(expr, MulExpression):
         if len(expr.shape) == 0:
             return [expr]
@@ -112,7 +114,7 @@ def break_into_vars(expr):
         return [expr != 0]
     elif isinstance(expr, np.ndarray):
         return [bool(expr[idx] != 0) for idx in np.ndindex(expr.shape)]
-    elif isinstance(expr, Constant):
+    elif isinstance(expr, (Constant, Parameter)):
         return [bool(expr.value[idx] != 0) for idx in np.ndindex(expr.value.shape)]
     
     # Base case: variable reached
@@ -229,39 +231,6 @@ def get_var_id_pos_list_from_cone(expr, solver):
         var_id_pos_list.append((var_id, col - start_col))
 
     return var_id_pos_list
-
-
-'''
-def get_var_id_pos_list_from_linear(expr, solver):
-    Return a list of (var_id, pos).
-    if not expr.variables():
-        return []
-
-    data, _, _ = cp.Problem(
-        cp.Minimize(expr.sum())).get_problem_data(solver=solver)
-    if data['dims'].zero or data['dims'].exp or data['dims'].soc \
-            or data['dims'].psd or data['dims'].p3d:
-        raise ValueError(f'Expression {expr} is not linear.')
-
-    col_to_var_id = {
-        col: var_id for var_id, col in data[
-            'param_prob'].var_id_to_col.items()}
-    start_cols = sorted(col_to_var_id.keys()) + [len(data['c'])]
-
-    var_id_pos_list = []
-    start_col_i = 0
-
-    for col, val in enumerate(data['c']):
-        if not val:
-            continue
-        while col >= start_cols[start_col_i + 1]:
-            start_col_i += 1
-        start_col = start_cols[start_col_i]
-        var_id = col_to_var_id[start_col]
-        var_id_pos_list.append((var_id, col - start_col))
-
-    return var_id_pos_list
-'''
 
 
 def heapsched_rt(lrts, k):

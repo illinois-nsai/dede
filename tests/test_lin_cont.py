@@ -187,6 +187,27 @@ def test_multiply_zero():
     print('=== Passed LP MULTIPLY zero test ===')
 
 
+def test_trace():
+    N, M = 10, 10
+    x = dd.Variable((N, M))
+
+    resource_constraints = [x <= 5]
+    demand_constraints = [x[:, j].sum() <= 5 for j in range(M)]
+    objective = dd.Maximize(dd.trace(x))
+
+    prob = dd.Problem(objective, resource_constraints, demand_constraints)
+
+    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=1, num_iter=20)
+    print("DeDe:", result_dede)
+
+    cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
+    result_cvxpy = cvxpy_prob.solve()
+    print("CVXPY:", result_cvxpy)
+
+    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01, abs_tol=0.1)
+    print('=== Passed LP TRACE test ===') 
+
+
 if __name__ == '__main__':
     test_add1()
     test_add2()
@@ -198,3 +219,5 @@ if __name__ == '__main__':
     test_multiply1()
     test_multiply2()
     test_multiply_zero()
+
+    test_trace()

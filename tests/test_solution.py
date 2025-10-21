@@ -34,14 +34,15 @@ def test_cvx_cont():
     x = dd.Variable((N, M), nonneg=True)
 
     # nonnegative log values: x >= 1
-    resource_constraints = [x[i, :] >= 1 for i in range(N)] + [x[i, :].sum() <= (i + 1) * M for i in range(N)]
+    resource_constraints = [x >= 1] + [x[i, :].sum() <= (i + 1) * M for i in range(N)]
     demand_constraints = [x[:, j].sum() <= (j + 1) * N for j in range(M)]
 
     w = np.empty((N, M))
     for i in range(N):
         for j in range(M):
             w[i][j] = i + j
-    expr = dd.sum([dd.sum(dd.multiply(w[i, :], dd.log(x[i, :]))) for i in range(N)])
+    #expr = dd.sum([dd.sum(dd.multiply(w[i, :], dd.log(x[i, :]))) for i in range(N)])
+    expr = dd.sum(dd.multiply(w, dd.log(x)))
     objective = dd.Maximize(expr)
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)

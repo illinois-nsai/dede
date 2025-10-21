@@ -1,5 +1,7 @@
 import numpy as np
 import cvxpy as cp
+
+from cvxpy import Parameter
 from cvxpy.atoms.affine.add_expr import AddExpression
 from cvxpy.atoms.affine.binary_operators import MulExpression
 from cvxpy.atoms.affine.binary_operators import multiply
@@ -49,7 +51,7 @@ def breakdown_expression(expr, dir):
         else:
             return [Constant(expr.value[:, j]) for j in range(expr.value.shape[1])]
     
-    elif isinstance(expr, Variable):
+    elif isinstance(expr, (Variable, Parameter)):
         if len(expr.shape) <= 1:
             return [expr]
         elif dir == 0:

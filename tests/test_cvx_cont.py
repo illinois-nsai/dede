@@ -16,12 +16,12 @@ def test_log():
     demand_constraints = [x[:, j].sum() <= (j + 1) * N for j in range(M)]
     
     # write in separable form, dd.sum(x) fails
-    expr = dd.sum([dd.sum(dd.log(x[i, :])) for i in range(N)])
+    expr = dd.sum(dd.log(x))
     objective = dd.Maximize(expr)
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=0.08, num_iter=30)
+    result_dede = prob.solve(num_cpus=2, solver=dd.SCS, rho=0.08, num_iter=30)
     print("DeDe:", result_dede)
 
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
@@ -50,7 +50,7 @@ def test_log_weighted():
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=1, num_iter=50)
+    result_dede = prob.solve(num_cpus=2, solver=dd.SCS, rho=1, num_iter=50)
     print("DeDe:", result_dede)
 
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)

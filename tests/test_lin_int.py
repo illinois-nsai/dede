@@ -10,7 +10,7 @@ from conftest import GUROBI_OPTS
 def test_add1():
     N, M = 10, 10
     x = dd.Variable((N, M), integer=True)
-    resource_constraints = [x[i, :] >= 0 for i in range(N)] + [x[i, :].sum() >= 2 * i for i in range(N)]
+    resource_constraints = [x >= 0] + [x[i, :].sum() >= 2 * i for i in range(N)]
     demand_constraints = [x[:, j].sum() <= 2 * 1.23456789 * j for j in range(M)]
     expr = 0
     for i in range(min(N, M)):
@@ -37,7 +37,7 @@ def test_add1():
 def test_add2():
     N, M = 10, 10
     x = dd.Variable((N, M), integer=True)
-    resource_constraints = [x[i, :] >= 0 for i in range(N)] + [x[i, :].sum() <= i for i in range(N)]
+    resource_constraints = [x >= 0] + [x[i, :].sum() <= i for i in range(N)]
     demand_constraints = [x[:, j].sum() <= j for j in range(M)]
     
     # pull two elements
@@ -59,7 +59,7 @@ def test_add2():
 def test_constant1():
     N, M = 5, 5
     x = dd.Variable((N, M), integer=True)
-    resource_constraints = [x[i, :] >= 0 for i in range(N)] + [x[i, :].sum() <= i for i in range(N)]
+    resource_constraints = [x >= 0] + [x[i, :].sum() <= i for i in range(N)]
     demand_constraints = [x[:, j].sum() <= j for j in range(M)]
     
     objective = dd.Maximize(2)
@@ -76,7 +76,7 @@ def test_constant1():
 def test_constant2():
     N, M = 10, 10
     x = dd.Variable((N, M), integer=True)
-    resource_constraints = [x[i, :] >= 0 for i in range(N)] + [x[i, :].sum() <= i for i in range(N)]
+    resource_constraints = [x >= 0] + [x[i, :].sum() <= i for i in range(N)]
     demand_constraints = [x[:, j].sum() <= j for j in range(M)]
     
     objective = dd.Maximize(x[N-1, M-1] + 2)
@@ -137,7 +137,7 @@ def test_sum2():
 def test_multiply1():
     N, M = 10, 10
     x = dd.Variable((N, M), integer=True)
-    resource_constraints = [x[i, :] >= 0 for i in range(N)] + [x[i, :].sum() >= i for i in range(N)]
+    resource_constraints = [x >= 0] + [x[i, :].sum() >= i for i in range(N)]
     demand_constraints = [x[:, j].sum() <= j for j in range(M)]
     w = np.empty((N, M))
     for i in range(N):
@@ -161,7 +161,7 @@ def test_multiply1():
 def test_multiply2():
     N, M = 10, 10
     x = dd.Variable((N, M), integer=True)
-    resource_constraints = [x[i, :] >= 0 for i in range(N)] + [x[i, :].sum() >= i for i in range(N)]
+    resource_constraints = [x >= 0] + [x[i, :].sum() >= i for i in range(N)]
     demand_constraints = [x[:, j].sum() <= j for j in range(M)]
     w = np.empty((N, M))
     for i in range(N):
