@@ -14,7 +14,7 @@ def test_add1():
     x1 = dd.Variable((N1, M), integer=True)
     x2 = dd.Variable((N2, M), nonneg=True)
 
-    resource_constraints = [x1[i, :] >= 0 for i in range(N1)] + \
+    resource_constraints = [x1 >= 0] + \
                            [x1[i, :].sum() >= 2 * i for i in range(N1)] + \
                            [x2[i, :].sum() >= 2 * i for i in range(N2)]
     demand_constraints = [x1[:, j].sum() + x2[:, j].sum() <= 2 * 1.23456789 * j for j in range(M)]
@@ -32,7 +32,7 @@ def test_add1():
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=1, solver=dd.GUROBI, rho=1, num_iter=20, **GUROBI_OPTS)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=1, num_iter=20, **GUROBI_OPTS)
     print("DeDe:", result_dede)
 
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
@@ -58,7 +58,7 @@ def test_add2():
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=1, solver=dd.GUROBI, rho=0.5, num_iter=15, **GUROBI_OPTS)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=0.5, num_iter=15, **GUROBI_OPTS)
     print("DeDe:", result_dede)
 
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
@@ -84,7 +84,7 @@ def test_sum1():
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=1, solver=dd.GUROBI, rho=1, num_iter=15, **GUROBI_OPTS)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=1, num_iter=15, **GUROBI_OPTS)
     print("DeDe:", result_dede)
 
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
@@ -109,7 +109,7 @@ def test_sum2():
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=1, solver=dd.GUROBI, rho=1, num_iter=15, **GUROBI_OPTS)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=1, num_iter=15, **GUROBI_OPTS)
     print("DeDe:", result_dede)
 
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
@@ -139,7 +139,7 @@ def test_multiply1():
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=1, solver=dd.GUROBI, rho=3, num_iter=25, **GUROBI_OPTS)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=3, num_iter=25, **GUROBI_OPTS)
     print("DeDe:", result_dede)
 
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
@@ -157,7 +157,7 @@ def test_multiply2():
     x1 = dd.Variable((N1, M), nonneg=True)
     x2 = dd.Variable((N2, M), integer=True)
 
-    resource_constraints = [x2[i, :] >= 0 for i in range(N1)] + \
+    resource_constraints = [x2 >= 0] + \
                            [x1[i, :].sum() >= i for i in range(N1)] + \
                            [x2[i, :].sum() >= i for i in range(N2)]
     demand_constraints = [x1[:, j].sum() + x2[:, j].sum() <= j for j in range(M)]
@@ -169,7 +169,7 @@ def test_multiply2():
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=1, solver=dd.GUROBI, rho=0.1, num_iter=31, **GUROBI_OPTS)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=0.1, num_iter=46, **GUROBI_OPTS)
     print("DeDe:", result_dede)
 
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
@@ -191,7 +191,7 @@ def test_boolean():
     objective = dd.Maximize(dd.sum(x1) + dd.sum(x2) + dd.sum(x3))
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=1, solver=dd.GUROBI, rho=1, num_iter=15, **GUROBI_OPTS)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=1, num_iter=15, **GUROBI_OPTS)
     print("DeDe:", result_dede)
 
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)

@@ -16,6 +16,7 @@ from .utils import (
     get_var_id_pos_list_from_cone,
     get_var_id_pos_list_from_linear)
 from .subproblems_wrap import SubproblemsWrap
+from .constraints_utils import breakdown_constr
 
 
 class SubprobCache:
@@ -49,10 +50,18 @@ class Problem(CpProblem):
             resource_variables: list of resource constraints
             demand_variables: list of demand constraints
         '''
-        self._constrs_r = [
+        start = time.time()
+        
+        # breakdown constraints
+        constrs_r_converted = [
             self.convert_inequality(constr) for constr in resource_constraints]
-        self._constrs_d = [
+        constrs_d_converted = [
             self.convert_inequality(constr) for constr in demand_constraints]
+        
+        self._constrs_r = breakdown_constr(constrs_r_converted, 0)
+        self._constrs_d = breakdown_constr(constrs_d_converted, 1)
+
+        # init subprob cache
         self._subprob_cache = SubprobCache()
 
         # keep track of original problem type
@@ -93,6 +102,8 @@ class Problem(CpProblem):
 
         # get objective groups
         self._obj_expr_r, self._obj_expr_d = self.group_objective()
+        end = time.time()
+        print("init time:", end - start)
 
     def convert_inequality(self, constr):
         if isinstance(constr, Zero) or isinstance(constr, Equality):
@@ -239,7 +250,8 @@ class Problem(CpProblem):
         constr_to_var_id_pos_list = {}
         for constr in constrs:
             constr_to_var_id_pos_list[
-                constr] = get_var_id_pos_list_from_linear(constr.expr, self._solver)
+                #constr] = get_var_id_pos_list_from_linear(constr.expr, self._solver)
+                constr] = get_var_id_pos_list_from_linear(constr.expr)
         return constr_to_var_id_pos_list
 
     def group_constrs(self, constrs, constr_dict):
@@ -372,6 +384,7 @@ class Problem(CpProblem):
                 id_set = id_set & set(var_id_pos_to_idx[var_id_pos])
             if not id_set:
                 raise ValueError('Objective not separable.')
+
             idx = list(id_set)[0]
             if idx[0] == 0:
                 obj_r[idx[1]] += obj
