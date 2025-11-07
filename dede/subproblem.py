@@ -34,7 +34,8 @@ class Subproblem(CpProblem):
         """
 
         self.id = idx
-        self.rho = rho
+        #self.rho = rho
+        self.rho = cp.Parameter(nonneg=True, value=rho)
 
         # create var for the subproblem
         var_id_pos_set1, var_id_pos_set2 = set[VarInfoT](), set[VarInfoT]()
@@ -165,6 +166,9 @@ class Subproblem(CpProblem):
     def get_obj(self) -> np.floating[t.Any]:
         """Return value of the original objective function."""
         return self.obj_expr_old.value
+    
+    def update_rho(self, rho):
+        self.rho.value = rho
 
     def solve(
         self, param_value: NDArray[np.floating[t.Any]], *args, **kwargs
