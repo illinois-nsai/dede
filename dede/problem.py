@@ -181,9 +181,45 @@ class Problem(CpProblem):
         # use num_iter if specifed
         # otherwise, stop under < 1% improvement or reach 10000 upper limit
         i, aug_lgr, aug_lgr_old = 0, 1, 2
+
+        tau = 2
+        mu = 10
+        xi = 1
+        balance_iterations = 10
+        # fix
+        eps_primal = 0.01
+        eps_dual = 0.01
+
+        self.sol_d_old = self.sol_d.copy()
+        self.scaled_dual = {} 
+
         while (num_iter is not None and i < num_iter) or \
-            (num_iter is None and i < 10000 and (
-                i < 2 or abs((aug_lgr - aug_lgr_old)/aug_lgr_old) > 0.01)):
+            (num_iter is None and i < 10000) 
+            
+            if i > 0 and i % balance_iterations == 0:
+                primal_res, dual_res = self.get_relative_residuals(rho)
+                eps_primal, eps_dual = self.get_epsilon()
+
+                # termination condition
+                if num_iter is None and primal_res <= eps_primal and dual_res <= eps_dual:
+                    break
+
+                if primal_res > xi * mu * dual_res:
+                    rho *= tau 
+                    for prob in self._subprob_cache.probs:
+                        prob.update_rho.remote(rho)
+                    print("updated rho up")
+                elif dual_res > (1 / xi) * mu * primal_res:
+                    rho /= tau 
+                    for prob in self._subprob_cache.probs:
+                        prob.update_rho.remote(rho)
+                    print("updated rho down")
+                print("Primal:", primal_res, end=", ")
+                print("Dual:", dual_res, end=", ")
+                print("rho:", rho)
+
+            print("obj:", sum(ray.get([prob.get_obj.remote() for prob in self._subprob_cache.probs])))
+            self.sol_d_old = self.sol_d.copy()
 
             # initialize start time, iteration, augmented Lagrangian
             start, i, aug_lgr_old, aug_lgr = time.time(), i + 1, aug_lgr, 0
@@ -215,6 +251,49 @@ class Problem(CpProblem):
         coeff = 1 if self._problem_type == Minimize else -1
         return coeff * sum(ray.get([
             prob.get_obj.remote() for prob in self._subprob_cache.probs]))
+    
+    def get_relative_residuals(self, rho):
+        sol_idx_d = ray.get([
+            prob.get_solution_idx_d.remote() for prob in self._subprob_cache.probs])
+        sol_idx_r = ray.get([
+            prob.get_solution_idx_r.remote() for prob in self._subprob_cache.probs])
+        flat_idx_d = [idx for arr in sol_idx_d for idx in arr]
+        flat_idx_r = [idx for arr in sol_idx_r for idx in arr]
+
+        map_r = {k: float(v) for k, v in zip(flat_idx_r, self.sol_r)}
+        map_d = {k: float(v) for k, v in zip(flat_idx_d, self.sol_d)}
+
+        shared_pos = sorted(set(map_r.keys()) & set(map_d.keys()))
+        for pos in shared_pos:
+            self.scaled_dual[pos] = self.scaled_dual.get(pos, 0) + map_r[pos] - map_d[pos]
+
+        shared_r = np.array([map_r[pos] for pos in shared_pos])
+        shared_d = np.array([map_d[pos] for pos in shared_pos])
+        primal_res = np.linalg.norm(shared_r - shared_d) / max(np.linalg.norm(self.sol_r), np.linalg.norm(self.sol_d))
+
+        scaled_dual_arr = np.array(list(self.scaled_dual.values()))
+        dual_res = np.linalg.norm(self.sol_d - self.sol_d_old) / np.linalg.norm(scaled_dual_arr)
+
+        print(self.sol_d)
+        print(self.sol_d_old)
+        print(dual_res)
+
+        return primal_res, dual_res
+    
+    def get_epsilon(self):
+        eps_abs = 0.01
+        eps_rel = 0.01
+
+        x_dim = 0
+        for var in self.variables():
+            x_dim += np.prod(var.shape)
+        
+        scaled_dual_arr = np.array(list(self.scaled_dual.values())) 
+
+        eps_primal = np.sqrt(x_dim) * eps_abs / max(np.linalg.norm(self.sol_r), np.linalg.norm(self.sol_d)) + eps_rel
+        eps_dual = np.sqrt(x_dim) * eps_abs / np.linalg.norm(scaled_dual_arr) + eps_rel
+
+        return eps_primal, eps_dual
     
     def populate_vars_with_solution(self):
         '''Fills problem variables with computed solutions.'''

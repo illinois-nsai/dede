@@ -99,6 +99,10 @@ class SubproblemsWrap():
         for param_id, param in self.param_id_to_param.items():
             if param_id in param_id_to_value:
                 param.value = param_id_to_value[param.id]
+    
+    def update_rho(self, rho):
+        for prob in self.probs_r + self.probs_d:
+            prob.update_rho(rho)
 
     def solve_r(self, param_values, *args, **kwargs):
         '''Solve resource problems in the current actor sequentially.'''
