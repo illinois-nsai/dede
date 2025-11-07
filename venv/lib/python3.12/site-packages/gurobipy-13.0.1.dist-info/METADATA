@@ -1,0 +1,349 @@
+Metadata-Version: 2.4
+Name: gurobipy
+Version: 13.0.1
+Summary: Python interface to Gurobi
+Home-page: https://www.gurobi.com
+Author: Gurobi Optimization, LLC
+License: Proprietary
+Project-URL: Documentation, https://docs.gurobi.com
+Keywords: optimization,mip,lp
+Platform: Windows
+Platform: Linux
+Platform: macOS
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE.txt
+Provides-Extra: matrixapi
+Requires-Dist: numpy; extra == "matrixapi"
+Requires-Dist: scipy; extra == "matrixapi"
+Dynamic: author
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: license
+Dynamic: license-file
+Dynamic: platform
+Dynamic: project-url
+Dynamic: provides-extra
+Dynamic: requires-python
+Dynamic: summary
+
+![Python versions](https://img.shields.io/pypi/pyversions/gurobipy.svg)
+[![PyPI](https://badge.fury.io/py/gurobipy.svg)](https://badge.fury.io/py/gurobipy)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/gurobipy)
+[![Gurobi Documentation](https://img.shields.io/badge/Help-Gurobi%20Documentation-red)](https://docs.gurobi.com/)
+
+The Gurobi Optimizer is a mathematical optimization software library for solving mixed-integer linear and quadratic optimization problems.
+
+This package comes with a trial license that allows you to solve problems of limited size. As a student or staff member of an academic institution, you qualify for a free, full product license. For more information, see:
+
+- [Academic Program and Licenses](https://www.gurobi.com/academia/academic-program-and-licenses/)
+
+For a commercial evaluation, you can [request an evaluation license](https://www.gurobi.com/free-trial/?utm_source=internal&utm_medium=documentation&utm_campaign=fy21_pipinstall_eval_pypipointer&utm_content=c_na&utm_term=pypi).
+
+Other useful resources to get started:
+
+- [Gurobi Documentation](https://docs.gurobi.com/)
+- [Gurobi Community](https://support.gurobi.com/hc/en-us/community/topics)
+
+## A simple example
+
+```python
+# Solve the following MIP:
+#  maximize
+#        x +   y + 2 z
+#  subject to
+#        x + 2 y + 3 z <= 4
+#        x +   y       >= 1
+#        x, y, z binary
+
+import gurobipy as gp
+
+# Create a new model
+m = gp.Model()
+
+# Create variables
+x = m.addVar(vtype='B', name="x")
+y = m.addVar(vtype='B', name="y")
+z = m.addVar(vtype='B', name="z")
+
+# Set objective function
+m.setObjective(x + y + 2 * z, gp.GRB.MAXIMIZE)
+
+# Add constraints
+m.addConstr(x + 2 * y + 3 * z <= 4)
+m.addConstr(x + y >= 1)
+
+# Solve it!
+m.optimize()
+
+print(f"Optimal objective value: {m.objVal}")
+print(f"Solution values: x={x.X}, y={y.X}, z={z.X}")
+```
+
+# Licensing information
+
+GUROBI OPTIMIZATION, LLC
+END-USER LICENSE AGREEMENT 
+(Evaluation License)
+("Agreement")
+
+By downloading, installing, copying, accessing, clicking on an
+"accept" button or otherwise using the Product, You are accepting the
+terms of this Agreement. The Product will be enabled when You install
+the license key that is supplied to You by Gurobi or made available by
+Gurobi via 'pip'. The "Effective Date" of this Agreement is the date
+on which the Product is enabled. The Product is copyrighted and
+licensed by Gurobi Optimization, LLC, a limited liability company,
+registered in Delaware ("Gurobi").
+
+THIS AGREEMENT IS A LEGAL CONTRACT BETWEEN YOU AND GUROBI. READ THE
+TERMS AND CONDITIONS OF THIS AGREEMENT CAREFULLY BEFORE INSTALLING OR
+OTHERWISE ACCESSING OR USING THE PRODUCT. THE PRODUCT IS COPYRIGHTED
+AND IT IS LICENSED TO YOU UNDER THIS AGREEMENT, NOT SOLD TO YOU. BY
+INSTALLING OR OTHERWISE ACCESSING OR USING THE PRODUCT, YOU
+ACKNOWLEDGE, REPRESENT AND WARRANT THAT YOU HAVE READ THIS AGREEMENT,
+THAT YOU UNDERSTAND IT, THAT YOU HAVE FULL POWER AND AUTHORITY TO BIND
+YOURSELF AS AN INDIVIDUAL AND THE BUSINESS ENTITY ON WHOSE BEHALF YOU
+ARE INSTALLING, ACCESSING OR USING THE PRODUCT, THAT YOU ACCEPT AND
+AGREE TO BE BOUND BY ITS TERMS, AND THAT, UPON INSTALLING OR OTHERWISE
+ACCESSING OR USING THE PRODUCT, THIS AGREEMENT WILL BECOME BECOME THE
+BINDING LEGAL OBLIGATION OF YOU (AS AN INDIVIDUAL AND THE BUSINESS
+ENTITY ON WHOSE BEHALF YOU ARE INSTALLING, ACCESSING OR USING THE
+PRODUCT). IF AT ANY TIME YOU ARE NOT WILLING TO BE BOUND BY THE TERMS
+OF THIS AGREEMENT, YOU SHOULD TERMINATE THE INSTALLATION PROCESS,
+IMMEDIATELY CEASE AND REFRAIN FROM ACCESSING OR USING THE PRODUCT AND
+DELETE ANY COPIES OF THE PRODUCT YOU MAY HAVE.  TERMS AND CONDITIONS
+
+1.	DEFINITIONS
+
+1.1.	 "Product" means the limited, evaluation version of Gurobi
+Optimizer Version 13.0.0 or higher in the form of object code
+libraries, including all upgrades, new releases, modifications,
+enhancements, adaptations, copies and translations thereof. "You" and
+"Your" mean the individual who is installing, accessing or using the
+Product and the business entity on whose behalf such individual is
+installing, accessing or using the Product. Additional defined terms
+have the meaning ascribed to them in the body of this Agreement. 
+
+2.	SCOPE OF RIGHTS
+
+2.1.	Grant of License. Gurobi grants You a limited, non-exclusive,
+non-transferrable, non-sublicensable, revocable license during the
+term of this Agreement to install and operate the Product in
+machine-readable form solely in a non-production environment for
+internal evaluation of the suitability of the Product for Your
+legitimate business needs ("Product License"). You may make a
+reasonable number of copies of the Product in machine- readable,
+object code form, for nonproductive backup purposes only.
+
+2.2.	Limitations on Use. For the avoidance of doubt, the Product
+License does not grant You any right to use the Product in a live
+production environment (i.e. non-test environment). Except as
+expressly set forth in Section 2.1, You will not use, copy, modify, or
+distribute the Product, or make any copy, adaptation, transcription,
+or merge any portion thereof, unless expressly authorized by Gurobi in
+a separate written agreement signed by an authorized representative of
+Gurobi. You will not reverse assemble, reverse compile, translate, or
+reverse engineer the Product.  Your Product License may not be sold,
+transferred, leased, assigned, or sub-licensed without Gurobi's prior
+written consent. If You copy or modify the Product in any way not
+expressly authorized by Gurobi in writing, Your Product License is
+automatically terminated. You will not use the Product for the benefit
+of any third party including as part of any service bureau, time
+sharing or third party training arrangement. You will not publish any
+benchmark testing results on the Product. You will not use the Product
+in violation of any law, rules or regulation. The license granted to
+You in Section 2.1 is conditioned upon Your strict compliance with all
+restrictions and obligations in this Section 2.2.
+
+3.	WARRANTIES; LIMITATION OF LIABILITY
+
+3.1	Warranty Disclaimer. THE PRODUCT IS PROVIDED "AS IS," AND
+GUROBI MAKES NO WARRANTIES, EXPRESS, IMPLIED, ARISING FROM COURSE OF
+DEALING OR USAGE OF TRADE, OR STATUTORY, AS TO THE PRODUCT, OR ANY
+MATTER WHATSOEVER. GUROBI DISCLAIMS ALL IMPLIED WARRANTIES, INCLUDING
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, SATISFACTORY
+QUALITY, TITLE AND NON-INFRINGEMENT. THE PRODUCT LICENSED HEREUNDER IS
+AN EVALUATION VERSION OF GUROBI'S STANDARD PRODUCT. ACCORDINGLY, THE
+PRODUCT WILL HAVE CONSTRAINTS AND LIMITATIONS THAT LIMIT THE SIZE OF
+THE OPTIMIZATION PROBLEM THE PRODUCT IS ABLE TO SOLVE.  FOR THE
+AVOIDANCE OF DOUBT, GUROBI HAS NO OBLIGATION TO PROVIDE ANY
+MAINTENANCE AND SUPPORT SERVICES, OR ANY OTHER SERVICES, UNDER THIS
+AGREEMENT.
+
+3.2	Limitation of Liability. GUROBI SHALL NOT BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL OR CONSEQUENTIAL DAMAGES
+(INCLUDING FOR LOSS OF PROFITS, SAVINGS, REVENUE, OR USE, DAMAGED OR
+LOST FILES OR DATA, OR BUSINESS INTERRUPTION) IN CONNECTION WITH THIS
+AGREEMENT OR THE PRODUCT, REGARDLESS OF THE CAUSE OF ACTION OR
+CHARACTERIZATION OF THE DAMAGES, EVEN IF GUROBI HAS BEEN ADVISED OF
+THE POSSIBILITY OF THESE DAMAGES. GUROBI WILL NOT BE LIABLE FOR ANY
+DAMAGES FOR THE COST OF PROCUREMENT OF SUBSTITUTE SOFTWARE, GOODS OR
+SERVICES, OR FOR ANY LIABILITY TO YOU RELATING TO THIS AGREEMENT,
+REGARDLESS OF THE CAUSE OF ACTION OR CHARACTERIZATION OF THE DAMAGES.
+YOU ACKNOWLEDGE THAT THE PROVISIONS FOR LIMITATION OF LIABILITY
+DESCRIBED IN THIS AGREEMENT FORM AN ESSENTIAL BASIS OF THE BARGAIN
+BETWEEN THE PARTIES AND THAT GUROBI WOULD NOT BE WILLING TO ENTER THIS
+AGREEMENT WITHOUT THEM. THEREFORE, YOU AGREE TO THIS ALLOCATION OF
+RISK AND HEREBY WAIVE ANY RIGHT, THROUGH EQUITABLE RELIEF OR
+OTHERWISE, TO SUBSEQUENTLY SEEK A MODIFICATION OF THESE PROVISIONS OR
+ALLOCATION OF RISK.
+
+3.3	Disabling Device. THE PRODUCT MAY CONTAIN A DISABLING DEVICE
+THAT WILL PREVENT IT FROM BEING USED AFTER THE TERM OF THIS AGREEMENT
+ENDS. YOU AGREE NOT TO TAMPER WITH THE DISABLING DEVICE OR THE
+PRODUCT. YOU  SHOULD TAKE PRECAUTIONS TO AVOID ANY LOSS OF DATA THAT
+MIGHT RESULT WHEN THE PRODUCT CAN NO LONGER BE USED.
+
+4.	OWNERSHIP
+
+4.1.	Ownership. Gurobi shall have sole right, title, and interest
+in and to the Product and all documentation relating to the Product
+(including its development or its operation, testing or use, and all
+reports and copies created), and all intellectual property rights
+associated with the Product (including, without limitation, rights to
+copyrights, patents, trade secrets, and know-how). This Agreement does
+not provide You with title or ownership of the Product, but only a
+right of limited use pursuant to Section 2.1. If You are deemed to
+posses any rights in the Product, You hereby assign to Gurobi or all
+of such rights. To the extent Your rights are inalienable under
+applicable law, You hereby waive such rights in the Product and, if
+such waiver is deemed invalid, grant to Gurobi the exclusive,
+irrevocable, perpetual, worldwide, royalty free right to use, market,
+modify and grant licenses to the Product without identifying You or
+seeking Your consent.
+
+5.	TERM AND TERMINATION
+
+5.1.	Term. Unless earlier terminated, this Agreement and Your
+Product License commences on the Effective Date and terminates on the
+expiration date set forth in the license file that is included with
+the Product. Either party may immediately terminate Your Product
+License and this Agreement by delivery of written notice of
+termination to the other party.
+
+5.2.	Effects of Termination. Upon the expiration or termination of
+this Agreement, (i) You shall immediately cease using the Product;
+(ii) You shall irretrievably destroy all copies of the Product in Your
+possession or control or return such copies to Gurobi the other Party,
+and (iii) You shall certify in writing to Gurobi that You have
+returned or destroyed such copies of the Product, with no copies
+retained.	
+
+5.3	Survival. Notwithstanding the expiration or termination of
+this Agreement for any reason, the rights and duties of the parties
+under Sections 2.2 (Limitations on Use), 3 (Warranties; Limitation of
+Liability), 4 (Ownership), 5.2 (Effects of Termination), 5.3
+(Survival), 6 (Export Controls), and 7 (General) shall survive such
+expiration or termination and remain in full force and effect.
+
+6.	EXPORT CONTROLS
+
+6.1.	Export Restrictions. The Product delivered to You under this
+Agreement is subject to U.S. export control laws and regulations and
+may also be subject to import and export laws of the jurisdiction in
+which it was obtained, if outside the U.S. You shall abide by all
+applicable export control laws, rules and regulations applicable to
+the Product and documentation. You agree that You will not export,
+re-export, or transfer the Product or documentation, in whole or in
+part, to any country, person, or entity subject to U.S. export
+restrictions. You specifically agree not to export, re- export, or
+transfer the Product or documentation (i) to any country to which the
+U.S. has embargoed or restricted the export of goods or services, or
+to any national of any such country, wherever located, who intends to
+transmit or transport the Product back to such country; (ii) to any
+person or entity who You know or have reason to know will utilize the
+Product or portion thereof in the design, development, production or
+use of nuclear, chemical or biological materials, facilities, or
+weapons; or (iii) to any person or entity who has been prohibited from
+participating in U.S.  export transactions by any federal agency of
+the U.S. government.
+
+7.	GENERAL 
+
+7.1. 	Assignment. This Agreement shall not be assignable by You
+without the prior written consent of Gurobi.
+
+7.2. 	Waiver of Construction Against the Drafter. This Agreement
+shall be interpreted in accordance with the plain meaning of its terms
+and not strictly for or against either of the parties to this
+Agreement.
+
+7.3. 	Severability. In the event that any provision of this
+Agreement is found invalid or unenforceable pursuant to judicial
+decree or decision, the remainder of this Agreement shall remain valid
+and enforceable according to its terms.  WITHOUT LIMITING THE
+FOREGOING, IT IS EXPRESSLY UNDERSTOOD AND AGREED THAT, IN THE EVENT
+ANY REMEDY HEREUNDER IS DETERMINED TO HAVE FAILED OF ITS ESSENTIAL
+PURPOSE, ALL OTHER LIMITATIONS OF LIABILITY AND EXCLUSION OF DAMAGES
+SET FORTH HEREIN SHALL REMAIN IN FULL FORCE AND EFFECT.
+
+7.4.	Notices. All notices or other communications required to be
+given under this Agreement shall be in writing and delivered either
+personally, by a reputable overnight courier service (e.g., FedEx or
+UPS), or by U.S. mail, certified, return receipt requested, postage
+prepaid, and addressed as provided in this Agreement or as otherwise
+requested by the receiving party. Notices delivered personally shall
+be effective upon delivery and notices delivered by courier or U.S,
+mail shall be effective upon their receipt by the party to whom they
+are addressed.
+
+7.5.	Governing Law. 
+
+7.5.1 This Agreement shall be governed by, and construed and enforced
+in accordance with the laws of the State of California as they apply
+to a contract made and performed in such state and as if entered into
+by the residents of such state.
+
+7.5.2 In all cases, the United Nations Convention on the International
+Sale of Goods shall not apply. The parties also agree that the
+provisions of the Uniform Computer Information Transactions Act shall
+not apply. 
+
+7.6.	Modifications and Waivers. This Agreement may not be modified
+except by a writing signed by authorized representatives of both
+parties. A waiver by either party of its rights hereunder shall not be
+binding unless contained in a writing signed by an authorized
+representative of the party waiving its rights. The non-enforcement or
+waiver of any provision on one occasion shall not constitute a waiver
+of such provision on any other occasion unless expressly agreed in
+writing. The parties agree that no use of trade or other regular
+practice or method of dealing between the parties shall be used to
+modify, interpret, supplement, or alter in any manner the terms of
+this Agreement.
+
+7.7.	Arbitration. Any controversy or claim arising out of or
+relating to this Agreement, or the breach thereof that fails to settle
+by mediation, shall be settled by binding arbitration administered by
+JAMS in accordance with its then current Commercial Arbitration Rules,
+and judgment on the award rendered by the arbitrator may be entered in
+any court having jurisdiction thereof. The arbitrator may award
+monetary damages, injunctive relief, rescission, restitution, costs
+and attorneys' fees. The arbitration award shall be final and binding
+regardless of whether one of the parties fails or refuses to
+participate in the arbitration. The arbitrator shall not have the
+power to amend this Agreement in any respect.  Notwithstanding the
+foregoing, the parties agree that this Section 7.7 does not apply to
+the breach of provisions set forth in Section 2.2 (Limitations on Use)
+and Section 4 (Ownership), and that either party may petition a court
+of law for injunctive relief and such other rights and remedies as it
+may have at law or equity against breaches of these sections.
+
+7.8.	Attorneys' Fees. In the event of any dispute with respect to
+this Agreement, the prevailing party shall be entitled to reasonable
+attorneys' fees and other costs and expenses incurred in resolving
+such dispute.
+
+Rev. October 2020
+4810-9864-2638.2 

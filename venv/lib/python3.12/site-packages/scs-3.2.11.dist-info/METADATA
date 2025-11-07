@@ -1,0 +1,54 @@
+Metadata-Version: 2.1
+Name: scs
+Version: 3.2.11
+Summary: Splitting conic solver
+Author-Email: Brendan O'Donoghue <bodonoghue85@gmail.com>
+License: MIT License
+         
+         Copyright (c) 2017 Brendan O'Donoghue
+         
+         Permission is hereby granted, free of charge, to any person obtaining a copy
+         of this software and associated documentation files (the "Software"), to deal
+         in the Software without restriction, including without limitation the rights
+         to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+         copies of the Software, and to permit persons to whom the Software is
+         furnished to do so, subject to the following conditions:
+         
+         The above copyright notice and this permission notice shall be included in all
+         copies or substantial portions of the Software.
+         
+         THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+         IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+         FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+         AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+         SOFTWARE.
+         
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: C
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX
+Classifier: Operating System :: Unix
+Classifier: Operating System :: MacOS
+Requires-Python: >=3.9
+Requires-Dist: numpy
+Requires-Dist: scipy
+Description-Content-Type: text/markdown
+
+scs-python
+===
+
+[![Build Status](https://github.com/bodono/scs-python/actions/workflows/build.yml/badge.svg)](https://github.com/bodono/scs-python/actions/workflows/build.yml)
+[![Documentation](https://img.shields.io/badge/docs-online-brightgreen?logo=read-the-docs&style=flat)](https://www.cvxgrp.org/scs/)
+[![PyPI Downloads/Month](https://static.pepy.tech/personalized-badge/scs?period=month&units=abbreviation&left_color=grey&right_color=brightgreen&left_text=downloads/month)](https://pepy.tech/project/scs)
+
+Python interface for [SCS](https://github.com/cvxgrp/scs) 3.0.0 and higher.
+The full documentation is available [here](https://www.cvxgrp.org/scs/).
