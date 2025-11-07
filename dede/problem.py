@@ -186,9 +186,6 @@ class Problem(CpProblem):
         mu = 10
         xi = 1
         balance_iterations = 10
-        # fix
-        eps_primal = 0.01
-        eps_dual = 0.01
 
         self.sol_d_old = self.sol_d.copy()
         self.scaled_dual = {} 
