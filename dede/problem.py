@@ -318,6 +318,7 @@ class Problem(CpProblem):
 
         end = time.time()
         print("DeDe Solve Time:", end - start)
+        self._subprob_cache.rho = rho
         self.populate_vars_with_solution()
         coeff = 1 if self._problem_type == Minimize else -1
         return t.cast(

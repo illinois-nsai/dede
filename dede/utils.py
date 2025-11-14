@@ -29,7 +29,7 @@ BreakIntoVarsOutput = list[t.Union[bool, VarInfoT, "BreakIntoVarsOutput"]]
 
 def expand_expr(expr: cp.Expression) -> list[cp.Expression]:
     """return a list of expanded expression
-    TODO: add norm1, quad_form, convolve, multiply, MulExpression
+    TODO: add quad_form, convolve
     Args:
         expr: expression to expand
     """
