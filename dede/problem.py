@@ -149,6 +149,9 @@ class Problem(CpProblem):
         if num_cpus > os.cpu_count():
             raise ValueError(
                 f'{num_cpus} CPUs exceeds upper limit of {os.cpu_count()}.')
+        
+        rho = 1
+        num_iter = None
 
         # check whether settings has been changed
         key = self._subprob_cache.make_key(rho, num_cpus)
@@ -182,16 +185,18 @@ class Problem(CpProblem):
         # otherwise, stop under < 1% improvement or reach 10000 upper limit
         i, aug_lgr, aug_lgr_old = 0, 1, 2
 
-        tau = 2
         mu = 10
         xi = 1
         balance_iterations = 10
+        max_tau = 200
 
         self.sol_d_old = self.sol_d.copy()
         self.scaled_dual = {} 
 
+        start = time.time()
+
         while (num_iter is not None and i < num_iter) or \
-            (num_iter is None and i < 10000) 
+            (num_iter is None and i < 10000): 
             
             if i > 0 and i % balance_iterations == 0:
                 primal_res, dual_res = self.get_relative_residuals(rho)
@@ -200,7 +205,15 @@ class Problem(CpProblem):
                 # termination condition
                 if num_iter is None and primal_res <= eps_primal and dual_res <= eps_dual:
                     break
+                
+                # adaptive multiplier
+                tau = max_tau
+                if 1 <= np.sqrt((1 / xi) * primal_res / dual_res) < max_tau:
+                    tau = np.sqrt((1 / xi) * primal_res / dual_res)
+                elif 1 / max_tau < np.sqrt((1 / xi) * primal_res / dual_res) < 1:
+                    tau = np.sqrt(xi * dual_res / primal_res)
 
+                # adaptive rho
                 if primal_res > xi * mu * dual_res:
                     rho *= tau 
                     for prob in self._subprob_cache.probs:
@@ -243,6 +256,9 @@ class Problem(CpProblem):
 
             print('iter%d: end2end time %.4f, aug_lgr=%.4f' % (
                 i, time.time() - start, aug_lgr))
+        
+        end = time.time()
+        print("solve time:", end - start)
 
         self.populate_vars_with_solution()
         coeff = 1 if self._problem_type == Minimize else -1

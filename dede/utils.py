@@ -21,7 +21,7 @@ from cvxpy.expressions.constants import Constant
 
 def expand_expr(expr):
     '''return a list of expanded expression
-    TODO: add norm1, quad_form, convolve, multiply, MulExpression
+    TODO: add quad_form, convolve
     Args:
         expr: expression to expand
     '''

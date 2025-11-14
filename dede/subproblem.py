@@ -77,6 +77,14 @@ class Subproblem(CpProblem):
         self.f2 = self.var[:self.x_z_num] - self.param
         self.l2 = cp.Parameter(self.f2.shape, value=np.zeros(self.f2.shape))
 
+        '''
+        super(Subproblem, self).__init__(
+            cp.Minimize(
+                self.obj_expr_old +
+                self.rho / 2 * cp.norm(self.f1 + self.l1, "fro") ** 2 +
+                self.rho / 2 * cp.norm(self.f2 + self.l2, "fro") ** 2),
+            constrs_var_attr)
+        '''
         super(Subproblem, self).__init__(
             cp.Minimize(
                 self.obj_expr_old +
