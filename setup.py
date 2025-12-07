@@ -13,7 +13,7 @@ setup(
     install_requires=[
         "cvxpy==1.4",
         "numpy==1.26",
-        "scipy>=1.12,<1.14"
+        "scipy>=1.12,<1.14",
         "ray",
     ],
     classifiers=[
