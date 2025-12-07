@@ -218,17 +218,19 @@ class Problem(CpProblem):
                     rho *= tau 
                     for prob in self._subprob_cache.probs:
                         prob.update_rho.remote(rho)
-                    print("updated rho up")
+                    #print("updated rho up")
                 elif dual_res > (1 / xi) * mu * primal_res:
                     rho /= tau 
                     for prob in self._subprob_cache.probs:
                         prob.update_rho.remote(rho)
-                    print("updated rho down")
+                    #print("updated rho down")
+                '''
                 print("Primal:", primal_res, end=", ")
                 print("Dual:", dual_res, end=", ")
                 print("rho:", rho)
+                '''
 
-            print("obj:", sum(ray.get([prob.get_obj.remote() for prob in self._subprob_cache.probs])))
+            #print("obj:", sum(ray.get([prob.get_obj.remote() for prob in self._subprob_cache.probs])))
             self.sol_d_old = self.sol_d.copy()
 
             # initialize start time, iteration, augmented Lagrangian
@@ -254,8 +256,10 @@ class Problem(CpProblem):
             self.sol_d = np.hstack(ray.get([prob.get_solution_d.remote(
             ) for prob in self._subprob_cache.probs]))
 
+            '''
             print('iter%d: end2end time %.4f, aug_lgr=%.4f' % (
                 i, time.time() - start, aug_lgr))
+            '''
         
         end = time.time()
         print("solve time:", end - start)
@@ -287,9 +291,11 @@ class Problem(CpProblem):
         scaled_dual_arr = np.array(list(self.scaled_dual.values()))
         dual_res = np.linalg.norm(self.sol_d - self.sol_d_old) / np.linalg.norm(scaled_dual_arr)
 
+        '''
         print(self.sol_d)
         print(self.sol_d_old)
         print(dual_res)
+        '''
 
         return primal_res, dual_res
     
