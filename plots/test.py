@@ -31,5 +31,5 @@ def test(n):
 
 
 if __name__ == '__main__':
-    for i in range(500, 10001, 500):
+    for i in range(4500, 10000, 500):
         test(i)
