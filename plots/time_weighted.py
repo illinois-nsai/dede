@@ -11,10 +11,14 @@ import time
 def test(n):
     N, M = n, n
     x = dd.Variable((N, M), nonneg=True)
-    resource_constraints = [x[i, :].sum() >= i for i in range(N)]
-    demand_constraints = [x[:, j].sum() <= j for j in range(M)]
+    w = np.random.uniform(0, 1, (N, M))
+    bn = np.random.uniform(0, 1, (N,))
+    bm = np.random.uniform(0, 1, (M,))
+
+    resource_constraints = [x[i, :].sum() >= bn[i] for i in range(N)]
+    demand_constraints = [x[:, j].sum() >= bm[j] for j in range(M)]
     
-    objective = dd.Maximize(dd.sum(x))
+    objective = dd.Minimize(dd.sum(dd.multiply(x, w)))
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
     start = time.time()
@@ -31,5 +35,5 @@ def test(n):
 
 
 if __name__ == '__main__':
-    for i in range(4500, 10000, 500):
+    for i in range(125, 10000, 500):
         test(i)
