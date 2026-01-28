@@ -11,9 +11,9 @@ import time
 def test(n):
     N, M = n, n
     x = dd.Variable((N, M), nonneg=True)
-    w = np.random.uniform(0, 1, (N, M))
-    bn = np.random.uniform(0, 1, (N,))
-    bm = np.random.uniform(0, 1, (M,))
+    w = 9 * np.random.uniform(0, 1, (N, M)) + 1
+    bn = 9 * np.random.uniform(0, 1, (N,)) + 1
+    bm = 9 * np.random.uniform(0, 1, (M,)) + 1
 
     resource_constraints = [x[i, :].sum() >= bn[i] for i in range(N)]
     demand_constraints = [x[:, j].sum() >= bm[j] for j in range(M)]
@@ -31,9 +31,9 @@ def test(n):
     time_cvxpy = time.time() - start
 
     with open("timing.txt", "a") as f:
-        f.write(f"{n} {time_dede} {time_cvxpy} {result_dede} {result_cvxpy}\n")
+        f.write(f"{n} {time_dede} {time_cvxpy}\n")
 
 
 if __name__ == '__main__':
-    for i in range(125, 10000, 500):
+    for i in range(2125, 10000, 500):
         test(i)

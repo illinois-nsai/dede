@@ -300,8 +300,8 @@ class Problem(CpProblem):
         return primal_res, dual_res
     
     def get_epsilon(self):
-        eps_abs = 0.01
-        eps_rel = 0.01
+        eps_abs = 0.005
+        eps_rel = 0.005
 
         x_dim = 0
         for var in self.variables():
