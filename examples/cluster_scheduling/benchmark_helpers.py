@@ -1,6 +1,3 @@
-from collections import defaultdict
-from glob import iglob
-
 import argparse
 import os
 import sys
@@ -9,7 +6,7 @@ from lib.policies.objective import OBJ_STRS
 
 
 def check_gurobi_license():
-    if not os.system('gurobi_cl --license'):
+    if not os.system("gurobi_cl --license"):
         return True
     else:
         return False
@@ -30,13 +27,13 @@ def get_args(formatted_fname_template):
     parser.add_argument(
         "--cluster-spec-file",
         type=str,
-        default='data/cluster_spec.json',
+        default="data/cluster_spec.json",
         help="number of workers for each worker type",
     )
     parser.add_argument(
         "--throughputs-file",
         type=str,
-        default='data/simulation_throughputs.npy',
+        default="data/simulation_throughputs.npy",
         help="throughput file",
     )
     parser.add_argument(

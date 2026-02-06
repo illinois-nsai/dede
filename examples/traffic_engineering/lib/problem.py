@@ -1,24 +1,18 @@
-import re
-import os
 import json
-import numpy as np
-import networkx as nx
-from networkx.readwrite import json_graph
+import os
+import re
 from numbers import Real
+
+import networkx as nx
+import numpy as np
+from networkx.readwrite import json_graph
+
 from .graph_utils import commodity_gen
 from .traffic_matrix import *
 
 
 class Problem(object):
-    def __init__(
-        self,
-        G,
-        traffic_matrix=None,
-        model="gravity",
-        seed=0,
-        scale_factor=1.0,
-        **kwargs
-    ):
+    def __init__(self, G, traffic_matrix=None, model="gravity", seed=0, scale_factor=1.0, **kwargs):
         self.G = G
         self.capacity_seed = seed
 
@@ -34,9 +28,7 @@ class Problem(object):
                 self.traffic_matrix._problem = self
             else:
                 raise Exception(
-                    '"{}" is an invalid type for traffic matrix'.format(
-                        traffic_matrix.__class__
-                    )
+                    '"{}" is an invalid type for traffic matrix'.format(traffic_matrix.__class__)
                 )
         elif model == "gravity":
             try:
@@ -117,9 +109,7 @@ class Problem(object):
             )
         else:
             raise Exception(
-                'no traffic matrix passed in; model argument "{}" is invalid'.format(
-                    model
-                )
+                'no traffic matrix passed in; model argument "{}" is invalid'.format(model)
             )
 
     ############################
@@ -230,9 +220,7 @@ class Problem(object):
     @property
     def commodity_list(self):
         if not hasattr(self, "_commodity_list"):
-            self._commodity_list = list(
-                enumerate(commodity_gen(self.traffic_matrix.tm))
-            )
+            self._commodity_list = list(enumerate(commodity_gen(self.traffic_matrix.tm)))
         return self._commodity_list
 
     @property
@@ -248,8 +236,7 @@ class Problem(object):
     def sparse_commodity_list(self):
         if not hasattr(self, "_sparse_commodity_list"):
             self._sparse_commodity_list = list(
-                enumerate(commodity_gen(
-                    self.traffic_matrix.tm, skip_zero=False))
+                enumerate(commodity_gen(self.traffic_matrix.tm, skip_zero=False))
             )
         return self._sparse_commodity_list
 
@@ -257,8 +244,7 @@ class Problem(object):
     def edge_idx(self):
         return {edge: e for e, edge in enumerate(self.G.edges)}
 
-    def new_capacities(self, *, min_cap, max_cap,
-                       fixed_caps=[], same_both_ways=True):
+    def new_capacities(self, *, min_cap, max_cap, fixed_caps=[], same_both_ways=True):
         assert isinstance(min_cap, Real)
         assert isinstance(max_cap, Real)
         assert max_cap >= min_cap
@@ -300,9 +286,7 @@ class Problem(object):
     # Private helper methods #
     ##########################
 
-    def _change_capacities(
-        self, *, min_cap, max_cap, fixed_caps=[], same_both_ways=True
-    ):
+    def _change_capacities(self, *, min_cap, max_cap, fixed_caps=[], same_both_ways=True):
         assert isinstance(min_cap, Real)
         assert isinstance(max_cap, Real)
         assert max_cap >= min_cap
@@ -325,7 +309,7 @@ class Problem(object):
                 if same_both_ways and "capacity" not in self.G[v][u]:
                     self.G[v][u]["capacity"] = float(cap)
 
-        for (u, v, cap) in fixed_caps:
+        for u, v, cap in fixed_caps:
             self.G[u][v]["capacity"] = float(cap)
             if same_both_ways:
                 self.G[v][u]["capacity"] = float(cap)
@@ -404,8 +388,7 @@ class Problem(object):
         if hasattr(self, "_name"):
             return self._name
         raise NotImplementedError(
-            "name needs to be implemented in the subclass: {}".format(
-                self.__class__)
+            "name needs to be implemented in the subclass: {}".format(self.__class__)
         )
 
     @name.setter

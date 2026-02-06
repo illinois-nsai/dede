@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
-import dede as dd
 import math
+
+import dede as dd
 
 
 def test_dede():
@@ -28,7 +29,7 @@ def test_dede():
 
     # Validate the results
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.1, abs_tol=0.1)
-    print('=== Passed test_dede ===')
+    print("=== Passed test_dede ===")
 
 
 def test_dede_with_param():
@@ -70,9 +71,9 @@ def test_dede_with_param():
 
     # Validate the results
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.1, abs_tol=0.1)
-    print('=== Passed test_dede_with_param ===')
+    print("=== Passed test_dede_with_param ===")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_dede()
     test_dede_with_param()

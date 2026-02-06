@@ -1,13 +1,9 @@
-import hashlib
-
-
-class JobIdPair():
-
+class JobIdPair:
     def __init__(self, job0, job1):
         if job0 is None and job1 is None:
-            raise ValueError('Cannot form JobIdPair with both ids None')
+            raise ValueError("Cannot form JobIdPair with both ids None")
         elif job0 is None and job1 is not None:
-            raise ValueError('First job id in a JobIdPair cannot be None')
+            raise ValueError("First job id in a JobIdPair cannot be None")
         elif job0 is not None and job1 is not None:
             self._job0 = min(job0, job1)
             self._job1 = max(job0, job1)
@@ -27,15 +23,14 @@ class JobIdPair():
         if self._job1 is None:
             self._singletons = (self,)
         else:
-            self._singletons = (JobIdPair(self._job0, None),
-                                JobIdPair(self._job1, None))
+            self._singletons = (JobIdPair(self._job0, None), JobIdPair(self._job1, None))
 
         self._as_set = set([self._job0, self._job1])
 
         if self._job1 is None:
-            self._repr = '%d' % (self._job0)
+            self._repr = "%d" % (self._job0)
         else:
-            self._repr = '(%d, %d)' % (self._job0, self._job1)
+            self._repr = "(%d, %d)" % (self._job0, self._job1)
 
     def __getitem__(self, index):
         if index == 0:
@@ -43,8 +38,7 @@ class JobIdPair():
         elif index == 1:
             return self._job1
         else:
-            raise ValueError('Attempting to access invalid JobIdPair '
-                             'index %d' % index)
+            raise ValueError("Attempting to access invalid JobIdPair index %d" % index)
 
     def __lt__(self, other):
         if other._job1 is not None:
@@ -73,8 +67,7 @@ class JobIdPair():
 
     def overlaps_with(self, other):
         if self._is_pair:
-            raise ValueError('Can only call overlaps_with on a '
-                             'single job id')
+            raise ValueError("Can only call overlaps_with on a single job id")
         return self._job0 in other._as_set
 
     def is_pair(self):

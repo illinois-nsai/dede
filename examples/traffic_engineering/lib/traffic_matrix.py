@@ -1,11 +1,11 @@
-from .utils import uni_rand
+import os
+import pickle
 from collections import defaultdict
 
 import networkx as nx
 import numpy as np
 
-import pickle
-import os
+from .utils import uni_rand
 
 
 class TrafficMatrix(object):
@@ -57,16 +57,14 @@ class TrafficMatrix(object):
 
     @property
     def is_full(self):
-        return np.alltrue(
-            np.argwhere(self._tm == 0.0)
-            == np.array([[i, i] for i in range(self.tm.shape[0])])
+        return np.all(
+            np.argwhere(self._tm == 0.0) == np.array([[i, i] for i in range(self.tm.shape[0])])
         )
 
     def serialize(self, dir_path, fmt="pickle"):
         if fmt == "pickle":
             with open(
-                os.path.join(
-                    dir_path, "{}_traffic-matrix.pkl".format(self._fname)),
+                os.path.join(dir_path, "{}_traffic-matrix.pkl".format(self._fname)),
                 "wb",
             ) as w:
                 pickle.dump(self.tm, w)
@@ -78,14 +76,13 @@ class TrafficMatrix(object):
                 delimiter=" ",
             )
         else:
-            raise Exception(
-                '"{}" not a valid serialization format'.format(fmt))
+            raise Exception('"{}" not a valid serialization format'.format(fmt))
 
     @classmethod
     def from_file(cls, fname):
         if fname.endswith(".pkl"):
             with open(fname, "rb") as f:
-                tm = pickle.load(f).astype('float64')
+                tm = pickle.load(f).astype("float64")
         elif fname.endswith(".txt"):
             tm = np.loadtxt(fname)
         else:
@@ -113,7 +110,7 @@ class TrafficMatrix(object):
                 seed=seed,
                 scale_factor=scale_factor,
             )
-        elif model == "real" or model == 'toy':
+        elif model == "real" or model == "toy":
             vals = os.path.basename(fname)[:-4].split("_")
             date, time = vals[0], vals[1]
             return RealTrafficMatrix(
@@ -138,12 +135,9 @@ class TrafficMatrix(object):
                 scale_factor=scale_factor,
             )
         elif model == "behnaz":
-            return BehnazTrafficMatrix(
-                problem=None, tm=tm, seed=seed, scale_factor=scale_factor
-            )
+            return BehnazTrafficMatrix(problem=None, tm=tm, seed=seed, scale_factor=scale_factor)
         elif model == "poisson":
-            lam, decay, const_factor = float(
-                vals[0]), float(vals[1]), float(vals[2])
+            lam, decay, const_factor = float(vals[0]), float(vals[1]), float(vals[2])
             return PoissonTrafficMatrix(
                 problem=None,
                 tm=tm,
@@ -170,11 +164,8 @@ class TrafficMatrix(object):
         self._tm[self._tm < 0.0] = 0.0  # demands can never be less than 0
 
     def perturb_matrix_mult(self, mean, stdev, seed_prob_tm):
-        self._tm *= 1 + \
-            np.random.choice([-1, 1]) * np.random.normal(mean, stdev)
-        np.fill_diagonal(
-            self._tm, 0.0
-        )  # should not be needed if self._tm has a zero diagonal
+        self._tm *= 1 + np.random.choice([-1, 1]) * np.random.normal(mean, stdev)
+        np.fill_diagonal(self._tm, 0.0)  # should not be needed if self._tm has a zero diagonal
         too_low_indexes = self._tm < 0.1 * seed_prob_tm
         self._tm[too_low_indexes] = seed_prob_tm[too_low_indexes]
 
@@ -198,15 +189,12 @@ class TrafficMatrix(object):
     @property
     def model(self):
         raise NotImplementedError(
-            "@property model needs to be implemented in the subclass: {}".format(
-                self.__class__
-            )
+            "@property model needs to be implemented in the subclass: {}".format(self.__class__)
         )
 
     def copy(self):
         raise NotImplementedError(
-            "copy needs to be implemented in the subclass: {}".format(
-                self.__class__)
+            "copy needs to be implemented in the subclass: {}".format(self.__class__)
         )
 
     def _init_traffic_matrix(self):
@@ -218,9 +206,7 @@ class TrafficMatrix(object):
 
     def _update(self, type, **kwargs):
         raise NotImplementedError(
-            "update_matrix needs to be implemented in the subclass: {}".format(
-                self.__class__
-            )
+            "update_matrix needs to be implemented in the subclass: {}".format(self.__class__)
         )
 
     @property
@@ -256,9 +242,7 @@ class GenericTrafficMatrix(TrafficMatrix):
 
 
 class GravityTrafficMatrix(TrafficMatrix):
-    def __init__(
-        self, problem, tm, total_demand, random=False, seed=0, scale_factor=1.0
-    ):
+    def __init__(self, problem, tm, total_demand, random=False, seed=0, scale_factor=1.0):
         if tm is not None:
             self._total_demand = np.sum(tm)
         else:
@@ -307,13 +291,11 @@ class GravityTrafficMatrix(TrafficMatrix):
                 for v in scc:
                     if u == v:
                         continue
-                    frac = norm_u * in_cap_sum[v] / \
-                        (in_total_cap - in_cap_sum[u])
+                    frac = norm_u * in_cap_sum[v] / (in_total_cap - in_cap_sum[u])
                     if self.random:
                         # sample from gaussian with mean = frac, stddev = frac /
                         # 4
-                        self._tm[u, v] = max(
-                            np.random.normal(frac, frac / 4), 0.0)
+                        self._tm[u, v] = max(np.random.normal(frac, frac / 4), 0.0)
                     else:
                         self._tm[u, v] = frac
 
@@ -365,9 +347,7 @@ class UniformTrafficMatrix(TrafficMatrix):
 
 
 class ExponentialTrafficMatrix(TrafficMatrix):
-    def __init__(
-        self, problem, tm, beta, decay, const_factor, seed=0, scale_factor=1.0
-    ):
+    def __init__(self, problem, tm, beta, decay, const_factor, seed=0, scale_factor=1.0):
         assert decay <= 1.0
         self._beta = beta
         self._decay = decay
@@ -406,7 +386,7 @@ class ExponentialTrafficMatrix(TrafficMatrix):
         np.random.seed(self.seed)
         num_nodes = len(G.nodes)
 
-        distances = np.zeros((num_nodes, num_nodes), dtype=np.int)
+        distances = np.zeros((num_nodes, num_nodes), dtype=int)
         dist_iter = nx.shortest_path_length(G)
         for src, dist_dict in dist_iter:
             for target, dist in dist_dict.items():
@@ -414,10 +394,7 @@ class ExponentialTrafficMatrix(TrafficMatrix):
 
         self._tm = np.array(
             [
-                [
-                    np.random.exponential(self._beta * (self._decay ** dist))
-                    for dist in row
-                ]
+                [np.random.exponential(self._beta * (self._decay**dist)) for dist in row]
                 for row in distances
             ],
             dtype=np.float32,
@@ -436,8 +413,7 @@ class ExponentialTrafficMatrix(TrafficMatrix):
 
 
 class PoissonTrafficMatrix(TrafficMatrix):
-    def __init__(self, problem, tm, lam, decay,
-                 const_factor, seed=0, scale_factor=1.0):
+    def __init__(self, problem, tm, lam, decay, const_factor, seed=0, scale_factor=1.0):
         assert decay <= 1.0
         self._lam = lam
         self._decay = decay
@@ -476,7 +452,7 @@ class PoissonTrafficMatrix(TrafficMatrix):
         np.random.seed(self.seed)
         num_nodes = len(G.nodes)
 
-        distances = np.zeros((num_nodes, num_nodes), dtype=np.int)
+        distances = np.zeros((num_nodes, num_nodes), dtype=int)
         dist_iter = nx.shortest_path_length(G)
         for src, dist_dict in dist_iter:
             for target, dist in dist_dict.items():
@@ -484,8 +460,7 @@ class PoissonTrafficMatrix(TrafficMatrix):
 
         self._tm = np.array(
             [
-                [np.random.poisson(self._lam * (self._decay ** dist))
-                 for dist in row]
+                [np.random.poisson(self._lam * (self._decay**dist)) for dist in row]
                 for row in distances
             ],
             dtype=np.float32,
@@ -536,8 +511,7 @@ class GaussianTrafficMatrix(TrafficMatrix):
         np.random.seed(self.seed)
         num_nodes = len(G.nodes)
 
-        self._tm = np.random.normal(
-            self.mean, self.stddev, (num_nodes, num_nodes))
+        self._tm = np.random.normal(self.mean, self.stddev, (num_nodes, num_nodes))
         self._tm[self._tm < 0.0] = 0.0
         # No traffic between node and itself
         np.fill_diagonal(self._tm, 0.0)
@@ -554,9 +528,7 @@ class GaussianTrafficMatrix(TrafficMatrix):
 # entries sampled uniformly from [high_range[0], high_range[1]], and 1 -
 # `fraction` entries sampled uniformly from [low_range[0], low_range[1]]
 class BimodalTrafficMatrix(TrafficMatrix):
-    def __init__(
-        self, problem, tm, fraction, low_range, high_range, seed=0, scale_factor=1.0
-    ):
+    def __init__(self, problem, tm, fraction, low_range, high_range, seed=0, scale_factor=1.0):
         assert 0.0 <= low_range[0] < low_range[1] < high_range[0] < high_range[1]
         # assert low_range[0] >= 0.0
         # assert low_range[0] < low_range[1]
@@ -604,12 +576,8 @@ class BimodalTrafficMatrix(TrafficMatrix):
         inds = np.random.choice(
             2, (num_nodes, num_nodes), p=[self.fraction, 1 - self.fraction]
         ).astype("bool")
-        self._tm[inds] = np.random.uniform(
-            self.low_range[0], self.low_range[1], np.sum(inds)
-        )
-        self._tm[~inds] = np.random.uniform(
-            self.high_range[0], self.high_range[1], np.sum(~inds)
-        )
+        self._tm[inds] = np.random.uniform(self.low_range[0], self.low_range[1], np.sum(inds))
+        self._tm[~inds] = np.random.uniform(self.high_range[0], self.high_range[1], np.sum(~inds))
         # No traffic between node and itself
         np.fill_diagonal(self._tm, 0.0)
 
@@ -677,8 +645,7 @@ class RealTrafficMatrix(TrafficMatrix):
 
         else:
             raise Exception(
-                '"{}" not a valid perturbation type for the traffic matrix'.format(
-                    type)
+                '"{}" not a valid perturbation type for the traffic matrix'.format(type)
             )
 
         mat = np.zeros_like(self.tm)
