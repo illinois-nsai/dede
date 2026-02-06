@@ -39,7 +39,7 @@ def expand_expr(expr):
             return [expr]
         left_list = expand_expr(expr.args[0])
         right_list = expand_expr(expr.args[1])
-        return [multiply(left, right) for left, right in zip(left_list, right_list)]
+        return [multiply(left, right) for left, right in zip(left_list, right_list, strict=True)]
     elif isinstance(expr, MulExpression):
         if len(expr.shape) == 0:
             return [expr]
@@ -148,12 +148,12 @@ def break_into_vars(expr):
         return [break_into_vars(expr.args[0])]
     elif isinstance(expr, AddExpression):
         vars = [break_into_vars(arg) for arg in expr.args]
-        return list(map(list, zip(*vars)))
+        return list(map(list, zip(*vars, strict=True)))
     elif isinstance(expr, multiply):
         vars = []
         left_list = break_into_vars(expr.args[0])
         right_list = break_into_vars(expr.args[1])
-        for left, right in zip(left_list, right_list):
+        for left, right in zip(left_list, right_list, strict=True):
             if left is False or right is False:
                 vars.append(False)
                 continue
@@ -254,9 +254,6 @@ def parallelized_rt(lrts, k):
     """Return a mathematical parallel runtime with k cpus for sorted jobs."""
     if len(lrts) == 0:
         return 0.0
-    inorder_rt = heapsched_rt(lrts, k)
-    cp_bound = max(lrts)
-    area_bound = sum(lrts) / k
     lrts.sort(reverse=True)
     two_approx = heapsched_rt(lrts, k)
 
