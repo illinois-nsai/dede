@@ -1,6 +1,7 @@
-from gurobipy import GurobiError
-from enum import Enum, unique
 import sys
+from enum import Enum, unique
+
+from gurobipy import GurobiError
 
 
 @unique
@@ -13,9 +14,7 @@ class Method(Enum):
 
 
 class LpSolver(object):
-    def __init__(
-        self, model, debug_fn=None, DEBUG=False, VERBOSE=False, out=None, gurobi_out=""
-    ):
+    def __init__(self, model, debug_fn=None, DEBUG=False, VERBOSE=False, out=None, gurobi_out=""):
         if out is None:
             out = sys.stdout
         self._model = model

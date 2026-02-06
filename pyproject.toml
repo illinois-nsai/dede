@@ -1,3 +1,14 @@
 [build-system]
 requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+# E/W: pycodestyle (standard PEP8)
+# F: Pyflakes (catches logic errors like undefined variables)
+# B: flake8-bugbear (catches likely bugs/design flaws)
+# I: isort (keeps imports tidy automatically)
+# NPY: NumPy-specific rules
+select = ["E", "W", "F", "B", "I", "NPY"]

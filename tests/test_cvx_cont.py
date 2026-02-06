@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 
-import dede as dd
+import math
+
 import cvxpy as cp
 import numpy as np
-from scipy.optimize import minimize
-import math
+
+import dede as dd
 
 
 def test_log():
@@ -14,7 +15,7 @@ def test_log():
     # nonnegative log values: x >= 1
     resource_constraints = [x >= 1] + [x[i, :].sum() <= (i + 1) * M for i in range(N)]
     demand_constraints = [x[:, j].sum() <= (j + 1) * N for j in range(M)]
-    
+
     expr = dd.sum(dd.log(x))
     objective = dd.Maximize(expr)
 
@@ -28,7 +29,7 @@ def test_log():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
-    print('=== Passed CONTINUOUS LOG test ===') 
+    print("=== Passed CONTINUOUS LOG test ===")
 
 
 def test_log_weighted():
@@ -38,7 +39,7 @@ def test_log_weighted():
     # nonnegative log values: x >= 1
     resource_constraints = [x >= 1] + [x[i, :].sum() <= (i + 1) * M for i in range(N)]
     demand_constraints = [x[:, j].sum() <= (j + 1) * N for j in range(M)]
-    
+
     w = np.empty((N, M))
     for i in range(N):
         for j in range(M):
@@ -56,7 +57,7 @@ def test_log_weighted():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
-    print('=== Passed CONTINUOUS LOG weighted test ===')  
+    print("=== Passed CONTINUOUS LOG weighted test ===")
 
 
 def test_quadratic():
@@ -70,13 +71,13 @@ def test_quadratic():
 
     result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=12, num_iter=7)
     print("DeDe:", result_dede)
-    
+
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
     result_cvxpy = cvxpy_prob.solve(solver=cp.ECOS_BB)
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
-    print('=== Passed CONTINUOUS QUADRATIC test ===')
+    print("=== Passed CONTINUOUS QUADRATIC test ===")
 
 
 def test_quadratic_weighted():
@@ -94,16 +95,16 @@ def test_quadratic_weighted():
 
     result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=20, num_iter=15)
     print("DeDe:", result_dede)
-    
+
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
     result_cvxpy = cvxpy_prob.solve(solver=cp.ECOS_BB)
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
-    print('=== Passed CONTINUOUS QUADRATIC weighted test ===')
+    print("=== Passed CONTINUOUS QUADRATIC weighted test ===")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_log()
     test_log_weighted()
 

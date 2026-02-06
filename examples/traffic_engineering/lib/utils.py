@@ -1,5 +1,6 @@
-import numpy as np
 from collections import defaultdict
+
+import numpy as np
 
 # sort commods from lowest demand to highest demand
 # flow_remaining = flow_val
@@ -29,14 +30,10 @@ def waterfall_memoized():
         EPS = 1e-6
         demand_remaining = {commod[0]: commod[-1][-1] for commod in commods}
         flow_remaining = flow_val
-        sorted_commods = [
-            commod[0] for commod in sorted(commods, key=lambda x: x[-1][-1])
-        ]
+        sorted_commods = [commod[0] for commod in sorted(commods, key=lambda x: x[-1][-1])]
         while len(demand_remaining) > 0:
             k_smallest = sorted_commods[0]
-            flow_to_assign = min(
-                flow_remaining / len(commods), demand_remaining[k_smallest]
-            )
+            flow_to_assign = min(flow_remaining / len(commods), demand_remaining[k_smallest])
             for commod_id, (_, _, orig_demand) in commods:
                 if commod_id not in demand_remaining:
                     continue
@@ -50,8 +47,7 @@ def waterfall_memoized():
                 break
         for commod_id, (_, _, orig_demand) in commods:
             if commod_id in demand_remaining:
-                demand_satisfied[commod_id] = orig_demand - \
-                    demand_remaining[commod_id]
+                demand_satisfied[commod_id] = orig_demand - demand_remaining[commod_id]
 
         return demand_satisfied[k]
 

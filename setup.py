@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 setup(
     name="dede",
@@ -15,18 +15,11 @@ setup(
         "numpy>=1.26.0, <=1.26.4",
         "ray",
     ],
-    extras_require={
-        "dev": [
-            "pytest",
-            "pytest-xdist",
-            "gurobipy==12.0.3",
-            "ruff"
-        ]
-    },
+    extras_require={"dev": ["pytest", "pytest-xdist", "gurobipy==12.0.3", "ruff"]},
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.8',
+    python_requires=">=3.8",
 )
