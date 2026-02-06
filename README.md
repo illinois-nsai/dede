@@ -14,7 +14,6 @@ DeDe is a general, scalable, and theoretically grounded optimization framework t
 ### Dependencies
 - Python >= 3.8
 - `g++` (required by `cvxpy`)
-- (optional) install `pytest` with `pip install -U pytest`
 
 ## Installation
 We have made DeDe available as a PyPI package! You can simply install it using pip:
@@ -29,6 +28,12 @@ to the project root directory and run:
 ```
 pip install -e .
 ```
+
+For a complete development environment that includes tests and linting, run the following instead:
+```
+pip install -e ".[dev]"
+```
+
 - After making modifications, there is no need to rerun this command, as the package was installed in editable (`-e`) mode.
 - Once again, we recommend creating a Python virtual environment beforehand.
 
@@ -91,6 +96,9 @@ or, if `pytest` is installed:
 ```
 pytest
 ```
+
+In the test suite, [gurobi](https://www.gurobi.com/solutions/gurobi-optimizer/), a third-party optimizer, is utilized as a point of comparison for DeDe's outputs. The `gurobipy` packages an installation of gurobi, but a gurobi license is required. The gurobi site has a [help page](https://support.gurobi.com/hc/en-us/articles/12872879801105-How-do-I-retrieve-and-set-up-a-Gurobi-license) for setting up a license. 
+
 Example output screenshots are provided in the `assets` folder.
 
 ## Example use cases of DeDe
