@@ -1,4 +1,4 @@
-'''
+"""
 #!/usr/bin/env python3
 
 import numpy as np
@@ -153,4 +153,4 @@ if __name__ == '__main__':
     test_2d_sum()
     test_sum_vars()
 
-'''
+"""

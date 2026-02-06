@@ -1,20 +1,19 @@
-import os
-import pickle
-import time
 import itertools
-import numpy as np
+import os
+import time
+
 import cvxpy as cp
+import numpy as np
 import ray
 
 from .dede_subproblems import SubproblemsWrap
 from .objective import Objective
 
-
 EPS = 1e-6
 
 
 class SubprobCache:
-    '''Cache subproblems.'''
+    """Cache subproblems."""
 
     def __init__(self):
         self.key = None
@@ -36,22 +35,34 @@ class SubprobCache:
         return (
             rho,
             num_cpus,
-            tuple([(worker_type, cluster_spec[worker_type]) for worker_type in sorted(list(cluster_spec.keys()))]),
+            tuple(
+                [
+                    (worker_type, cluster_spec[worker_type])
+                    for worker_type in sorted(list(cluster_spec.keys()))
+                ]
+            ),
             self.N if N <= self.N else int(1.5 * N),
         )
 
 
 class DeDeFormulation:
     def __init__(
-        self, policy, num_cpus, rho, warmup, warmup_admm_steps, admm_steps, fix_steps,
+        self,
+        policy,
+        num_cpus,
+        rho,
+        warmup,
+        warmup_admm_steps,
+        admm_steps,
+        fix_steps,
     ):
         self._name = policy._name
-        if self._name == 'MaxMinFairness_Perf':
+        if self._name == "MaxMinFairness_Perf":
             self._objective = Objective.MAX_MIN_ALLOC
-        elif self._name == 'MaxProportionalFairness':
+        elif self._name == "MaxProportionalFairness":
             self._objective = Objective.TOTAL_UTIL
         else:
-            raise ValueError(f'Objective {self._name} is not supported')
+            raise ValueError(f"Objective {self._name} is not supported")
         self._solver = policy._solver
 
         self.num_cpus = num_cpus
@@ -69,21 +80,41 @@ class DeDeFormulation:
     def name(self):
         return self._name
 
-    def get_allocation(self, unflattened_throughputs, scale_factors,
-                       unflattened_priority_weights, cluster_spec, debug=False):
+    def get_allocation(
+        self,
+        unflattened_throughputs,
+        scale_factors,
+        unflattened_priority_weights,
+        cluster_spec,
+        debug=False,
+    ):
 
         self._job_ids = sorted(list(scale_factors.keys()))
         self._worker_types = sorted(list(cluster_spec.keys()))
 
-        self._num_workers = np.array([cluster_spec[worker_type] for worker_type in self._worker_types])
+        self._num_workers = np.array(
+            [cluster_spec[worker_type] for worker_type in self._worker_types]
+        )
         self._scale_factors_list = np.array([scale_factors[job_id] for job_id in self._job_ids])
-        self._throughputs = np.array([[unflattened_throughputs[job_id][worker_type]
-                                     for job_id in self._job_ids] for worker_type in self._worker_types])
+        self._throughputs = np.array(
+            [
+                [unflattened_throughputs[job_id][worker_type] for job_id in self._job_ids]
+                for worker_type in self._worker_types
+            ]
+        )
         if self._objective == Objective.MAX_MIN_ALLOC:
-            priority_weights = np.array([unflattened_priority_weights[job_id] for job_id in self._job_ids])
-            self._throughputs = self._throughputs / \
-                ((self._num_workers / self._num_workers.sum()) @ self._throughputs *
-                 priority_weights / self._scale_factors_list)[None, :]
+            priority_weights = np.array(
+                [unflattened_priority_weights[job_id] for job_id in self._job_ids]
+            )
+            self._throughputs = (
+                self._throughputs
+                / (
+                    (self._num_workers / self._num_workers.sum())
+                    @ self._throughputs
+                    * priority_weights
+                    / self._scale_factors_list
+                )[None, :]
+            )
         elif self._objective == Objective.TOTAL_UTIL:
             self._throughputs = self._throughputs * self._scale_factors_list[None, :]
 
@@ -100,11 +131,12 @@ class DeDeFormulation:
                 self.rho = self._subprob_cache.rho
         # check whether num_cpus is more than all available
         if self.num_cpus > os.cpu_count():
-            raise ValueError(
-                f'{self.num_cpus} CPUs exceeds upper limit of {os.cpu_count()}.')
+            raise ValueError(f"{self.num_cpus} CPUs exceeds upper limit of {os.cpu_count()}.")
 
         # check whether settings has been changed
-        key = self._subprob_cache.make_key(self.rho, self.num_cpus, cluster_spec, len(scale_factors))
+        key = self._subprob_cache.make_key(
+            self.rho, self.num_cpus, cluster_spec, len(scale_factors)
+        )
         if key != self._subprob_cache.key:
             # invalidate old settings
             self._subprob_cache.invalidate()
@@ -124,7 +156,9 @@ class DeDeFormulation:
             # store subproblem in last solution
             self._subprob_cache.probs = self.get_subproblems(self.num_cpus, self.rho)
             # get initial demand solutions
-            self.sol_d = np.vstack(ray.get([prob.get_solution_d.remote() for prob in self._subprob_cache.probs]))
+            self.sol_d = np.vstack(
+                ray.get([prob.get_solution_d.remote() for prob in self._subprob_cache.probs])
+            )
             self.sol_d = self.sol_d[self.param_idx_d_back, :].T
             self.alpha, self.alpha_lambda_mean = 0, 0
 
@@ -144,26 +178,44 @@ class DeDeFormulation:
         self._scale_factors_list_[self.valid_idx_d] = self._scale_factors_list
 
         # update shards values
-        [prob.update_parameters.remote(self._scale_factors_list_, self._throughputs_[
-                                       :, param_idx], self.is_valid_idx_d[param_idx]) for prob, param_idx in zip(self._subprob_cache.probs, self.param_idx_d)]
+        [
+            prob.update_parameters.remote(
+                self._scale_factors_list_,
+                self._throughputs_[:, param_idx],
+                self.is_valid_idx_d[param_idx],
+            )
+            for prob, param_idx in zip(self._subprob_cache.probs, self.param_idx_d)
+        ]
         self._runtime = 0
 
         self.warmup_used += 1
         if self._objective == Objective.TOTAL_UTIL:
-            for i in range(self.warmup_admm_steps if self.warmup_used <= self.warmup else self.admm_steps):
+            for i in range(
+                self.warmup_admm_steps if self.warmup_used <= self.warmup else self.admm_steps
+            ):
                 start = time.time()
 
                 # resource allocation
                 # solver=cp.CLARABEL is necessary to avoid solver failure
-                [prob.solve_r.remote(self.sol_d[param_idx], enforce_dpp=True, solver=cp.CLARABEL)
-                 for prob, param_idx in zip(self._subprob_cache.probs, self.param_idx_r)]
-                self.sol_r = np.vstack(ray.get([prob.get_solution_r.remote() for prob in self._subprob_cache.probs]))
+                [
+                    prob.solve_r.remote(self.sol_d[param_idx], enforce_dpp=True, solver=cp.CLARABEL)
+                    for prob, param_idx in zip(self._subprob_cache.probs, self.param_idx_r)
+                ]
+                self.sol_r = np.vstack(
+                    ray.get([prob.get_solution_r.remote() for prob in self._subprob_cache.probs])
+                )
                 self.sol_r = self.sol_r[self.param_idx_r_back, :].T
 
                 # demand allocation
-                [prob.solve_d.remote(self.sol_r[param_idx], enforce_dpp=True, solver=self._solver)
-                 for prob, param_idx in zip(self._subprob_cache.probs, self.param_idx_d)]
-                self.sol_d = np.vstack(ray.get([prob.get_solution_d.remote() for prob in self._subprob_cache.probs]))
+                [
+                    prob.solve_d.remote(
+                        self.sol_r[param_idx], enforce_dpp=True, solver=self._solver
+                    )
+                    for prob, param_idx in zip(self._subprob_cache.probs, self.param_idx_d)
+                ]
+                self.sol_d = np.vstack(
+                    ray.get([prob.get_solution_d.remote() for prob in self._subprob_cache.probs])
+                )
                 self.sol_d = self.sol_d[self.param_idx_d_back, :].T
 
                 stop = time.time()
@@ -172,11 +224,22 @@ class DeDeFormulation:
                 obj = self.get_obj()
                 r_t, r_process_t, d_t, d_process_t = self.get_t()
                 if debug:
-                    print('iter%d: end2end time %.4f, obj=%.4f' % (i, stop - start, obj))
-                    print('%d r %.2f=%.2f+%.2f ms, scheduling overhead %.2f; %d d %.2f=%.2f+%.2f ms, scheduling overhead %.2f' % (
-                        r_t.shape[0], r_t.mean(0)[0], r_t.mean(0)[1], r_t.mean(
-                            0)[2], max(r_process_t) / np.mean(r_process_t),
-                        d_t.shape[0], d_t.mean(0)[0], d_t.mean(0)[1], d_t.mean(0)[2], max(d_process_t) / np.mean(d_process_t)))
+                    print("iter%d: end2end time %.4f, obj=%.4f" % (i, stop - start, obj))
+                    print(
+                        "%d r %.2f=%.2f+%.2f ms, scheduling overhead %.2f; %d d %.2f=%.2f+%.2f ms, scheduling overhead %.2f"
+                        % (
+                            r_t.shape[0],
+                            r_t.mean(0)[0],
+                            r_t.mean(0)[1],
+                            r_t.mean(0)[2],
+                            max(r_process_t) / np.mean(r_process_t),
+                            d_t.shape[0],
+                            d_t.mean(0)[0],
+                            d_t.mean(0)[1],
+                            d_t.mean(0)[2],
+                            max(d_process_t) / np.mean(d_process_t),
+                        )
+                    )
 
             # fix constraint violation
             assert self.fix_steps > 0
@@ -184,39 +247,67 @@ class DeDeFormulation:
             for i in range(self.fix_steps):
                 start = time.time()
                 # enlarge r
-                self.fix_sol_r = np.vstack(ray.get([prob.fix_r.remote(self.fix_sol_d[param_idx], i)
-                                           for prob, param_idx in zip(self._subprob_cache.probs, self.param_idx_r)]))
+                self.fix_sol_r = np.vstack(
+                    ray.get(
+                        [
+                            prob.fix_r.remote(self.fix_sol_d[param_idx], i)
+                            for prob, param_idx in zip(self._subprob_cache.probs, self.param_idx_r)
+                        ]
+                    )
+                )
                 self.fix_sol_r = self.fix_sol_r[self.param_idx_r_back, :].T
-                self.fix_sol_d = np.vstack(ray.get([prob.fix_d.remote(self.fix_sol_r[param_idx], i)
-                                           for prob, param_idx in zip(self._subprob_cache.probs, self.param_idx_d)]))
+                self.fix_sol_d = np.vstack(
+                    ray.get(
+                        [
+                            prob.fix_d.remote(self.fix_sol_r[param_idx], i)
+                            for prob, param_idx in zip(self._subprob_cache.probs, self.param_idx_d)
+                        ]
+                    )
+                )
                 self.fix_sol_d = self.fix_sol_d[self.param_idx_d_back, :].T
                 stop = time.time()
                 self._runtime += stop - start
                 obj = self.get_fix_obj()
                 if debug:
-                    print(f'Fix constraint violation at iter {i}: {(stop - start):.4f} s, obj {obj:.4f}')
+                    print(
+                        f"Fix constraint violation at iter {i}: {(stop - start):.4f} s, obj {obj:.4f}"
+                    )
         elif self._objective == Objective.MAX_MIN_ALLOC:
             self.sol_d = np.vstack([self.sol_d, self.alpha * np.ones((1, self.sol_d.shape[1]))])
-            for i in range(self.warmup_admm_steps if self.warmup_used <= self.warmup else self.admm_steps):
+            for i in range(
+                self.warmup_admm_steps if self.warmup_used <= self.warmup else self.admm_steps
+            ):
                 start = time.time()
 
                 # resource allocation
                 # solver=cp.CLARABEL is necessary to avoid solver failure
-                [prob.solve_r.remote(self.sol_d[param_idx], enforce_dpp=True, solver=cp.CLARABEL)
-                 for prob, param_idx in zip(self._subprob_cache.probs, self.param_idx_r)]
-                self.sol_r = np.vstack(ray.get([prob.get_solution_r.remote() for prob in self._subprob_cache.probs]))
+                [
+                    prob.solve_r.remote(self.sol_d[param_idx], enforce_dpp=True, solver=cp.CLARABEL)
+                    for prob, param_idx in zip(self._subprob_cache.probs, self.param_idx_r)
+                ]
+                self.sol_r = np.vstack(
+                    ray.get([prob.get_solution_r.remote() for prob in self._subprob_cache.probs])
+                )
                 self.sol_r = self.sol_r[self.param_idx_r_back, :].T
                 # manually solve alpha
                 sol_d_alpha_valid = self.sol_d[-1, self.valid_idx_d].mean()
                 self.alpha_lambda_mean += self.alpha - sol_d_alpha_valid
-                self.alpha = max(sol_d_alpha_valid - self.alpha_lambda_mean + 1 /
-                                 self._subprob_cache.rho / len(self.valid_idx_d), 0)
+                self.alpha = max(
+                    sol_d_alpha_valid
+                    - self.alpha_lambda_mean
+                    + 1 / self._subprob_cache.rho / len(self.valid_idx_d),
+                    0,
+                )
 
                 # demand allocation
                 self.sol_r = np.hstack([self.sol_r, self.alpha * np.ones((self.sol_r.shape[0], 1))])
-                [prob.solve_d.remote(self.sol_r[param_idx], enforce_dpp=True)
-                 for prob, param_idx in zip(self._subprob_cache.probs, self.param_idx_d)]
-                self.sol_d = np.vstack(ray.get([prob.get_solution_d.remote() for prob in self._subprob_cache.probs]))
+                [
+                    prob.solve_d.remote(self.sol_r[param_idx], enforce_dpp=True)
+                    for prob, param_idx in zip(self._subprob_cache.probs, self.param_idx_d)
+                ]
+                self.sol_d = np.vstack(
+                    ray.get([prob.get_solution_d.remote() for prob in self._subprob_cache.probs])
+                )
                 self.sol_d = self.sol_d[self.param_idx_d_back, :].T
 
                 stop = time.time()
@@ -225,11 +316,22 @@ class DeDeFormulation:
                 obj = self.get_obj()
                 r_t, r_process_t, d_t, d_process_t = self.get_t()
                 if debug:
-                    print('iter%d: end2end time %.4f, obj=%.4f' % (i, stop - start, obj))
-                    print('%d r %.2f=%.2f+%.2f ms, scheduling overhead %.2f; %d d %.2f=%.2f+%.2f ms, scheduling overhead %.2f' % (
-                        r_t.shape[0], r_t.mean(0)[0], r_t.mean(0)[1], r_t.mean(
-                            0)[2], max(r_process_t) / np.mean(r_process_t),
-                        d_t.shape[0], d_t.mean(0)[0], d_t.mean(0)[1], d_t.mean(0)[2], max(d_process_t) / np.mean(d_process_t)))
+                    print("iter%d: end2end time %.4f, obj=%.4f" % (i, stop - start, obj))
+                    print(
+                        "%d r %.2f=%.2f+%.2f ms, scheduling overhead %.2f; %d d %.2f=%.2f+%.2f ms, scheduling overhead %.2f"
+                        % (
+                            r_t.shape[0],
+                            r_t.mean(0)[0],
+                            r_t.mean(0)[1],
+                            r_t.mean(0)[2],
+                            max(r_process_t) / np.mean(r_process_t),
+                            d_t.shape[0],
+                            d_t.mean(0)[0],
+                            d_t.mean(0)[1],
+                            d_t.mean(0)[2],
+                            max(d_process_t) / np.mean(d_process_t),
+                        )
+                    )
 
             # fix constraint violation
             assert self.fix_steps > 0
@@ -237,41 +339,71 @@ class DeDeFormulation:
             obj = self.get_fix_obj()
             for i in range(self.fix_steps):
                 start = time.time()
-                self.fix_sol_r = np.hstack([self.fix_sol_r, obj * 1.01 * np.ones((self.sol_r.shape[0], 1))])
+                self.fix_sol_r = np.hstack(
+                    [self.fix_sol_r, obj * 1.01 * np.ones((self.sol_r.shape[0], 1))]
+                )
                 # enlarge d
-                self.fix_sol_d = np.vstack(ray.get([prob.fix_d.remote(self.fix_sol_r[param_idx], i)
-                                           for prob, param_idx in zip(self._subprob_cache.probs, self.param_idx_d)]))
+                self.fix_sol_d = np.vstack(
+                    ray.get(
+                        [
+                            prob.fix_d.remote(self.fix_sol_r[param_idx], i)
+                            for prob, param_idx in zip(self._subprob_cache.probs, self.param_idx_d)
+                        ]
+                    )
+                )
                 self.fix_sol_d = self.fix_sol_d[self.param_idx_d_back, :].T
-                self.fix_sol_r = np.vstack(ray.get([prob.fix_r.remote(self.fix_sol_d[param_idx], i)
-                                           for prob, param_idx in zip(self._subprob_cache.probs, self.param_idx_r)]))
+                self.fix_sol_r = np.vstack(
+                    ray.get(
+                        [
+                            prob.fix_r.remote(self.fix_sol_d[param_idx], i)
+                            for prob, param_idx in zip(self._subprob_cache.probs, self.param_idx_r)
+                        ]
+                    )
+                )
                 self.fix_sol_r = self.fix_sol_r[self.param_idx_r_back, :].T
                 obj = self.get_fix_obj()
                 stop = time.time()
                 self._runtime += stop - start
                 if debug:
-                    print(f'Fix constraint violation at iter {i}: {(stop - start):.4f} s, obj {obj:.4f}')
+                    print(
+                        f"Fix constraint violation at iter {i}: {(stop - start):.4f} s, obj {obj:.4f}"
+                    )
             self.fix_sol_d = self.fix_sol_r.T
             for i in range(10):
                 start = time.time()
                 # enlarge r
-                self.fix_sol_r = np.vstack(ray.get([prob.fix_r.remote(self.fix_sol_d[param_idx], -1)
-                                           for prob, param_idx in zip(self._subprob_cache.probs, self.param_idx_r)]))
+                self.fix_sol_r = np.vstack(
+                    ray.get(
+                        [
+                            prob.fix_r.remote(self.fix_sol_d[param_idx], -1)
+                            for prob, param_idx in zip(self._subprob_cache.probs, self.param_idx_r)
+                        ]
+                    )
+                )
                 self.fix_sol_r = self.fix_sol_r[self.param_idx_r_back, :].T
-                self.fix_sol_d = np.vstack(ray.get([prob.fix_d.remote(self.fix_sol_r[param_idx], -1)
-                                           for prob, param_idx in zip(self._subprob_cache.probs, self.param_idx_d)]))
+                self.fix_sol_d = np.vstack(
+                    ray.get(
+                        [
+                            prob.fix_d.remote(self.fix_sol_r[param_idx], -1)
+                            for prob, param_idx in zip(self._subprob_cache.probs, self.param_idx_d)
+                        ]
+                    )
+                )
                 self.fix_sol_d = self.fix_sol_d[self.param_idx_d_back, :].T
                 stop = time.time()
                 self.fix_sol_r = self.fix_sol_d.T
                 obj = self.get_fix_obj()
                 self._runtime += stop - start
                 if debug:
-                    print(f'After fix at iter {i}: {(stop - start):.4f} s, obj {obj:.4f}')
+                    print(f"After fix at iter {i}: {(stop - start):.4f} s, obj {obj:.4f}")
 
         var_clip = self.sol_mat
         # print(var_clip.sum(1).max(), (self._scale_factors_list @ var_clip / self._num_workers).max())
         d = {}
         for i, job_id in enumerate(self._job_ids):
-            d[job_id] = {worker_type: var_clip[i][j] for j, worker_type in enumerate(self._worker_types)}
+            d[job_id] = {
+                worker_type: var_clip[i][j] for j, worker_type in enumerate(self._worker_types)
+            }
         return d
 
     def get_subproblems(self, num_cpus, rho):
@@ -292,29 +424,47 @@ class DeDeFormulation:
             self.param_idx_d.append(idx_d)
 
             # build subproblems process
-            probs.append(SubproblemsWrap.remote(
-                self._objective,
-                idx_r, idx_d, self.M, self.N,
-                self._num_workers[idx_r],
-                np.zeros((self.M, len(idx_d))),
-                np.zeros(self.N),
-                rho))
+            probs.append(
+                SubproblemsWrap.remote(
+                    self._objective,
+                    idx_r,
+                    idx_d,
+                    self.M,
+                    self.N,
+                    self._num_workers[idx_r],
+                    np.zeros((self.M, len(idx_d))),
+                    np.zeros(self.N),
+                    rho,
+                )
+            )
         self.param_idx_r_back = np.argsort(np.hstack(self.param_idx_r))
         self.param_idx_d_back = np.argsort(np.hstack(self.param_idx_d))
         return probs
 
     def get_obj(self):
         if self._objective == Objective.TOTAL_UTIL:
-            return - np.hstack(ray.get([prob.get_obj.remote() for prob in self._subprob_cache.probs])).sum()
+            return -np.hstack(
+                ray.get([prob.get_obj.remote() for prob in self._subprob_cache.probs])
+            ).sum()
         elif self._objective == Objective.MAX_MIN_ALLOC:
-            return np.hstack(ray.get([prob.get_obj.remote() for prob in self._subprob_cache.probs])).min()
+            return np.hstack(
+                ray.get([prob.get_obj.remote() for prob in self._subprob_cache.probs])
+            ).min()
 
     def get_fix_obj(self):
         if self._objective == Objective.TOTAL_UTIL:
-            return - np.hstack(ray.get([prob.get_fix_obj.remote() for prob in self._subprob_cache.probs])).sum()
+            return -np.hstack(
+                ray.get([prob.get_fix_obj.remote() for prob in self._subprob_cache.probs])
+            ).sum()
         elif self._objective == Objective.MAX_MIN_ALLOC:
-            return np.hstack(ray.get([prob.get_fix_obj.remote(self.fix_sol_r[param_idx])
-                             for prob, param_idx in zip(self._subprob_cache.probs, self.param_idx_d)])).min()
+            return np.hstack(
+                ray.get(
+                    [
+                        prob.get_fix_obj.remote(self.fix_sol_r[param_idx])
+                        for prob, param_idx in zip(self._subprob_cache.probs, self.param_idx_d)
+                    ]
+                )
+            ).min()
 
     @property
     def runtime(self):

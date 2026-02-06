@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 
-import dede as dd
+import math
+
 import cvxpy as cp
 import numpy as np
-import math
 from conftest import GUROBI_OPTS
+
+import dede as dd
 
 
 def test_quadratic():
@@ -24,7 +26,7 @@ def test_quadratic():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
-    print('=== Passed INTEGER QUADRATIC test ===')
+    print("=== Passed INTEGER QUADRATIC test ===")
 
 
 def test_quadratic_weighted():
@@ -42,13 +44,13 @@ def test_quadratic_weighted():
 
     result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=50, num_iter=20, **GUROBI_OPTS)
     print("DeDe:", result_dede)
-    
+
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
     result_cvxpy = cvxpy_prob.solve(solver=cp.ECOS_BB)
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
-    print('=== Passed INTEGER QUADRATIC weighted test ===')
+    print("=== Passed INTEGER QUADRATIC weighted test ===")
 
 
 def test_boolean_quadratic():
@@ -68,10 +70,10 @@ def test_boolean_quadratic():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
-    print('=== Passed BOOLEAN QUADRATIC test ===')
+    print("=== Passed BOOLEAN QUADRATIC test ===")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_quadratic()
     test_quadratic_weighted()
 

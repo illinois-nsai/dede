@@ -18,9 +18,7 @@ PATHS_DIR = os.path.join(TOPOLOGIES_DIR, "paths", "path-form")
 
 class PathFormulation(AbstractFormulation):
     @classmethod
-    def new_total_flow(
-        cls, num_paths, edge_disjoint=True, dist_metric="inv-cap", out=None
-    ):
+    def new_total_flow(cls, num_paths, edge_disjoint=True, dist_metric="inv-cap", out=None):
         return cls(
             objective=Objective.TOTAL_FLOW,
             num_paths=num_paths,
@@ -46,9 +44,7 @@ class PathFormulation(AbstractFormulation):
         )
 
     @classmethod
-    def new_min_max_link_util(
-        cls, num_paths, edge_disjoint=True, dist_metric="inv-cap", out=None
-    ):
+    def new_min_max_link_util(cls, num_paths, edge_disjoint=True, dist_metric="inv-cap", out=None):
         return cls(
             objective=Objective.MIN_MAX_LINK_UTIL,
             num_paths=num_paths,
@@ -95,7 +91,7 @@ class PathFormulation(AbstractFormulation):
         dist_metric="inv-cap",
         DEBUG=False,
         VERBOSE=False,
-        out=None
+        out=None,
     ):
         super().__init__(objective, DEBUG, VERBOSE, out)
         if dist_metric != "inv-cap" and dist_metric != "min-hop":
@@ -109,14 +105,12 @@ class PathFormulation(AbstractFormulation):
         self.dist_metric = dist_metric
 
     # flow caps = [((k1, ..., kn), f1), ...]
-    def _construct_path_lp(self, G, edge_to_paths,
-                           num_total_paths, sat_flows=[]):
+    def _construct_path_lp(self, G, edge_to_paths, num_total_paths, sat_flows=[]):
         self._print("Constructing Path LP")
         m = Model("max-flow: path formulation")
 
         # Create variables: one for each path
-        path_vars = m.addVars(
-            num_total_paths, vtype=GRB.CONTINUOUS, lb=0.0, name="f")
+        path_vars = m.addVars(num_total_paths, vtype=GRB.CONTINUOUS, lb=0.0, name="f")
 
         # Set objective
         if (
@@ -126,8 +120,7 @@ class PathFormulation(AbstractFormulation):
             self._print("{} objective".format(self._objective))
 
             # max link util can exceed 1.0
-            max_link_util_var = m.addVar(
-                vtype=GRB.CONTINUOUS, lb=0.0, name="z")
+            max_link_util_var = m.addVar(vtype=GRB.CONTINUOUS, lb=0.0, name="z")
 
             m.setObjective(max_link_util_var, GRB.MINIMIZE)
             # Add edge util constraints
@@ -138,8 +131,7 @@ class PathFormulation(AbstractFormulation):
                     if c_e == 0.0:
                         m.addConstr(quicksum(constr_vars) <= 0.0)
                     else:
-                        m.addConstr(quicksum(constr_vars) /
-                                    c_e <= max_link_util_var)
+                        m.addConstr(quicksum(constr_vars) / c_e <= max_link_util_var)
 
             # Add demand equality constraints
             commod_id_to_path_inds = {}
@@ -147,8 +139,7 @@ class PathFormulation(AbstractFormulation):
             for k, d_k, path_ids in self.commodities:
                 commod_id_to_path_inds[k] = path_ids
                 self._demand_constrs.append(
-                    m.addConstr(quicksum(path_vars[p]
-                                for p in path_ids) == d_k)
+                    m.addConstr(quicksum(path_vars[p] for p in path_ids) == d_k)
                 )
 
         else:
@@ -157,14 +148,10 @@ class PathFormulation(AbstractFormulation):
                 obj = quicksum(path_vars)
             elif self._objective == Objective.MAX_CONCURRENT_FLOW:
                 self._print("MAX CONCURRENT FLOW objective")
-                self.alpha = m.addVar(
-                    vtype=GRB.CONTINUOUS, lb=0.0, ub=1.0, name="a")
+                self.alpha = m.addVar(vtype=GRB.CONTINUOUS, lb=0.0, ub=1.0, name="a")
                 m.update()
                 for k, d_k, path_ids in self.commodities:
-                    m.addConstr(
-                        quicksum(path_vars[p]
-                                 for p in path_ids) / d_k >= self.alpha
-                    )
+                    m.addConstr(quicksum(path_vars[p] for p in path_ids) / d_k >= self.alpha)
                 obj = self.alpha
             m.setObjective(obj, GRB.MAXIMIZE)
 
@@ -180,15 +167,12 @@ class PathFormulation(AbstractFormulation):
             for k, d_k, path_ids in self.commodities:
                 commod_id_to_path_inds[k] = path_ids
                 self._demand_constrs.append(
-                    m.addConstr(quicksum(path_vars[p]
-                                for p in path_ids) <= d_k)
+                    m.addConstr(quicksum(path_vars[p] for p in path_ids) <= d_k)
                 )
 
         # Flow cap constraints
         for fixed_commods, flow_value in sat_flows:
-            constr_vars = [
-                path_vars[p] for k in fixed_commods for p in commod_id_to_path_inds[k]
-            ]
+            constr_vars = [path_vars[p] for k in fixed_commods for p in commod_id_to_path_inds[k]]
             m.addConstr(quicksum(constr_vars) >= 0.99 * flow_value)
 
         if self.DEBUG:
@@ -218,8 +202,7 @@ class PathFormulation(AbstractFormulation):
         return paths_dict
 
     @staticmethod
-    def read_paths_from_disk_or_compute(
-            problem, num_paths, edge_disjoint, dist_metric):
+    def read_paths_from_disk_or_compute(problem, num_paths, edge_disjoint, dist_metric):
         paths_fname = PathFormulation.paths_full_fname(
             problem, num_paths, edge_disjoint, dist_metric
         )
@@ -264,9 +247,7 @@ class PathFormulation(AbstractFormulation):
             problem = self.problem
 
         self.commodity_list = (
-            problem.sparse_commodity_list
-            if self._warm_start_mode
-            else problem.commodity_list
+            problem.sparse_commodity_list if self._warm_start_mode else problem.commodity_list
         )
         self.commodities = []
         edge_to_paths = defaultdict(list)
@@ -297,9 +278,7 @@ class PathFormulation(AbstractFormulation):
 
     def _construct_lp(self, sat_flows=[]):
         edge_to_paths, num_paths = self.pre_solve()
-        return self._construct_path_lp(
-            self._problem.G, edge_to_paths, num_paths, sat_flows
-        )
+        return self._construct_path_lp(self._problem.G, edge_to_paths, num_paths, sat_flows)
 
     @property
     def sol_dict(self):
@@ -327,8 +306,7 @@ class PathFormulation(AbstractFormulation):
     @property
     def sol_mat(self):
         edge_idx = self.problem.edge_idx
-        sol_mat = np.zeros(
-            (len(edge_idx), len(self._path_to_commod)), dtype=np.float32)
+        sol_mat = np.zeros((len(edge_idx), len(self._path_to_commod)), dtype=np.float32)
         for var in self.model.getVars():
             if var.varName.startswith("f[") and var.x != 0.0:
                 match = re.match(r"f\[(\d+)\]", var.varName)

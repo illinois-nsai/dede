@@ -5,7 +5,7 @@ class SetQueue(queue.Queue):
     """Create a queue object with a set as the underlying data structure."""
 
     def get(self, block=True, timeout=None, item=None):
-        '''Remove and return an item from the queue.
+        """Remove and return an item from the queue.
 
         If optional args 'block' is true and 'timeout' is None (the default),
         block if necessary until an item is available. If 'timeout' is
@@ -14,7 +14,7 @@ class SetQueue(queue.Queue):
         Otherwise ('block' is false), return an item if one is immediately
         available, else raise the Empty exception ('timeout' is ignored
         in that case).
-        '''
+        """
         with self.not_empty:
             if not block:
                 if not self._qsize():
@@ -36,11 +36,11 @@ class SetQueue(queue.Queue):
             return item
 
     def get_nowait(self, item=None):
-        '''Remove and return an item from the queue without blocking.
+        """Remove and return an item from the queue without blocking.
 
         Only get an item if one is immediately available. Otherwise
         raise the Empty exception.
-        '''
+        """
         return self.get(block=False, item=item)
 
     def _init(self, maxsize):

@@ -1,9 +1,10 @@
-from ..graph_utils import compute_in_or_out_flow
-from collections import defaultdict
-from enum import Enum, unique
 import pickle
 import re
 import sys
+from collections import defaultdict
+from enum import Enum, unique
+
+from ..graph_utils import compute_in_or_out_flow
 
 EPS = 1e-5
 
@@ -69,16 +70,13 @@ class AbstractFormulation(object):
     @property
     def sol_dict(self):
         raise NotImplementedError(
-            "sol_dict needs to be implemented in the subclass: {}".format(
-                self.__class__
-            )
+            "sol_dict needs to be implemented in the subclass: {}".format(self.__class__)
         )
 
     @property
     def sol_mat(self):
         raise NotImplementedError(
-            "sol_mat needs to be implemented in the subclass: {}".format(
-                self.__class__)
+            "sol_mat needs to be implemented in the subclass: {}".format(self.__class__)
         )
 
     ##########################
@@ -107,9 +105,7 @@ class AbstractFormulation(object):
 
     def _construct_lp(self, fixed_total_flows=[]):
         raise NotImplementedError(
-            "_construct_lp needs to be implemented in the subclass: {}".format(
-                self.__class__
-            )
+            "_construct_lp needs to be implemented in the subclass: {}".format(self.__class__)
         )
 
     def _save_pkl(self, obj, fname):
@@ -125,8 +121,7 @@ class AbstractFormulation(object):
     @property
     def runtime(self):
         raise NotImplementedError(
-            "runtime needs to be implemented in the subclass: {}".format(
-                self.__class__)
+            "runtime needs to be implemented in the subclass: {}".format(self.__class__)
         )
 
     @property
@@ -137,15 +132,12 @@ class AbstractFormulation(object):
             elif self._objective.value == Objective.MAX_CONCURRENT_FLOW.value:
                 self._obj_val = self.min_frac_flow
             elif (
-                (self._objective.value == Objective.MIN_MAX_LINK_UTIL.value)
-                or self._objective.value == Objective.COMPUTE_DEMAND_SCALE_FACTOR.value
-            ):
+                self._objective.value == Objective.MIN_MAX_LINK_UTIL.value
+            ) or self._objective.value == Objective.COMPUTE_DEMAND_SCALE_FACTOR.value:
                 self._obj_val = self.max_link_util
             else:
                 raise Exception(
-                    "no support for other Objectives besides {}".format(
-                        ", ".join(OBJ_STRS)
-                    )
+                    "no support for other Objectives besides {}".format(", ".join(OBJ_STRS))
                 )
         return self._obj_val
 

@@ -1,7 +1,8 @@
-from .utils import uni_rand
+from collections import defaultdict
 from itertools import tee
 from sys import maxsize
-from collections import defaultdict
+
+from .utils import uni_rand
 
 EPS = 1e-4
 
@@ -266,10 +267,8 @@ def transform_for_network_simplex(problem, vis=False):
         new_src, new_sink = node_index, node_index + 1
         if vis:
             src_pos, sink_pos = G.nodes[s_k]["pos"], G.nodes[t_k]["pos"]
-            new_src_pos = src_pos[0] + \
-                uni_rand(-2, 0), src_pos[-1] + uni_rand(-2, 0)
-            new_sink_pos = sink_pos[0] - \
-                uni_rand(-2, 0), sink_pos[-1] - uni_rand(-2, 0)
+            new_src_pos = src_pos[0] + uni_rand(-2, 0), src_pos[-1] + uni_rand(-2, 0)
+            new_sink_pos = sink_pos[0] - uni_rand(-2, 0), sink_pos[-1] - uni_rand(-2, 0)
 
         G.add_node(new_src, demand=-d_k, label="{}: {}".format(new_src, -d_k))
         G.add_node(new_sink, demand=d_k, label="{}: {}".format(new_sink, d_k))
@@ -311,8 +310,7 @@ def check_feasibility(problem, sol_dicts):
             try:
                 assert flow_for_commod <= commod_key[-1][-1] + EPS
             except BaseException:
-                print("Flow for commodity {} is {}".format(
-                    commod_key, flow_for_commod))
+                print("Flow for commodity {} is {}".format(commod_key, flow_for_commod))
             total_flow += flow_for_commod
             for (u, v), flow_val in flow_list:
                 G_copy[u][v]["capacity"] -= flow_val
@@ -328,8 +326,7 @@ def check_feasibility(problem, sol_dicts):
         assert G_copy[u][v]["capacity"] > -EPS
         if problem.G[u][v]["capacity"] == 0.0:
             continue
-        edge_percent_cap_remaining.append(
-            (u, v, cap / problem.G[u][v]["capacity"]))
+        edge_percent_cap_remaining.append((u, v, cap / problem.G[u][v]["capacity"]))
 
     bottleneck_edges = sorted(edge_percent_cap_remaining, key=lambda x: x[-1])
     print("Top 5 Bottleneck edges", bottleneck_edges[:5])

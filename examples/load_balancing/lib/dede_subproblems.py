@@ -1,27 +1,37 @@
-import numpy as np
-import cvxpy as cp
 import time
-import ray
 
+import cvxpy as cp
+import numpy as np
+import ray
 from cvxpy.problems.problem import Problem as CpProblem
 
 
 @ray.remote
-class SubproblemsWrap():
-    '''Wrap subproblems for one actor in ray.'''
+class SubproblemsWrap:
+    """Wrap subproblems for one actor in ray."""
 
     def __init__(
-            self, idx_r, idx_d, M, N,
-            currentLocation_rows, currentLocations_cols, averageLoad, shardLoads, epsilon, memory_limit, search_limit,
-            rho):
+        self,
+        idx_r,
+        idx_d,
+        M,
+        N,
+        currentLocation_rows,
+        currentLocations_cols,
+        averageLoad,
+        shardLoads,
+        epsilon,
+        memory_limit,
+        search_limit,
+        rho,
+    ):
         self.probs_r = []
         self.M, self.N = M, N
         for i in range(len(idx_r)):
             idx, currentLocation = idx_r[i], currentLocation_rows[i]
             self.probs_r.append(
                 SubproblemR(
-                    (0,
-                     idx),
+                    (0, idx),
                     self.N,
                     currentLocation,
                     averageLoad,
@@ -29,49 +39,51 @@ class SubproblemsWrap():
                     epsilon,
                     memory_limit,
                     search_limit,
-                    rho))
+                    rho,
+                )
+            )
         self.probs_d = []
         for i in range(len(idx_d)):
             idx, currentLocation = idx_d[i], currentLocations_cols[:, i]
             self.probs_d.append(SubproblemD((1, idx), self.M, currentLocation, rho))
 
     def get_solution_r(self):
-        '''Get concatenated solution of resource problems.'''
+        """Get concatenated solution of resource problems."""
         if self.probs_r:
             return np.vstack([prob.get_solution() for prob in self.probs_r])
         else:
             return np.empty((0, self.N))
 
     def get_solution_d(self):
-        '''Get concatenated solution of demand problems.'''
+        """Get concatenated solution of demand problems."""
         if self.probs_d:
             return np.vstack([prob.get_solution() for prob in self.probs_d])
         else:
             return np.empty((0, self.M))
 
     def solve_r(self, param_values, *args, **kwargs):
-        '''Solve resource problems in the current actor sequentially.'''
+        """Solve resource problems in the current actor sequentially."""
         aug_lgr = 0
         for prob, param_value in zip(self.probs_r, param_values):
             aug_lgr += prob.solve(param_value, *args, **kwargs)
         return aug_lgr
 
     def solve_d(self, param_values, *args, **kwargs):
-        '''Solve demand problems in the current actor sequentially.'''
+        """Solve demand problems in the current actor sequentially."""
         aug_lgr = 0
         for prob, param_value in zip(self.probs_d, param_values):
             aug_lgr += prob.solve(param_value, *args, **kwargs)
         return aug_lgr
 
     def get_obj(self):
-        '''Get the sum of objective values.'''
+        """Get the sum of objective values."""
         obj = 0
         for prob in self.probs_r + self.probs_d:
             obj += prob.get_obj()
         return obj
 
     def update_parameters(self, currentLocations, averageLoad, shardLoads):
-        '''Update parameter value in the current actor.'''
+        """Update parameter value in the current actor."""
         for prob, param_value in zip(self.probs_r, currentLocations):
             prob.currentLocation = param_value
             prob.averageLoad.value = averageLoad
@@ -91,7 +103,18 @@ class SubproblemsWrap():
 
 
 class SubproblemR(CpProblem):
-    def __init__(self, idx, N, currentLocation, averageLoad, shardLoads, epsilon, memory_limit, search_limit, rho):
+    def __init__(
+        self,
+        idx,
+        N,
+        currentLocation,
+        averageLoad,
+        shardLoads,
+        epsilon,
+        memory_limit,
+        search_limit,
+        rho,
+    ):
         self._runtime = 0
         self.id = idx
         self.N = N
@@ -100,7 +123,7 @@ class SubproblemR(CpProblem):
         self.memory_limit = memory_limit
         self.search_limit = search_limit
 
-        self.select_idx = (-currentLocation).argsort(kind='stable')[:self.search_limit]
+        self.select_idx = (-currentLocation).argsort(kind="stable")[: self.search_limit]
         # self.var = cp.Variable(N, nonneg=True)
         # self.var.value = currentLocation
         # self.var_ = cp.Variable(N, boolean=True)
@@ -114,7 +137,9 @@ class SubproblemR(CpProblem):
         self.s.value = np.zeros(self.s.shape)
         # self.currentLocation = cp.Parameter(N, value=currentLocation)
         self.currentLocation = currentLocation
-        self.currentLocation_select = cp.Parameter(self.search_limit, value=currentLocation[self.select_idx])
+        self.currentLocation_select = cp.Parameter(
+            self.search_limit, value=currentLocation[self.select_idx]
+        )
         # self.shardLoads = cp.Parameter(N, value=shardLoads)
         self.shardLoads = shardLoads
         self.shardLoads_select = cp.Parameter(self.search_limit, value=shardLoads[self.select_idx])
@@ -122,10 +147,16 @@ class SubproblemR(CpProblem):
         # self.param = cp.Parameter(N, value=currentLocation)
         self.param_select = cp.Parameter(self.search_limit, value=currentLocation[self.select_idx])
 
-        self.f1 = cp.hstack([
-            self.var_select @ self.shardLoads_select + self.s[0] - self.averageLoad * (1 + self.epsilon),
-            self.var_select @ self.shardLoads_select - self.s[1] - self.averageLoad * (1 - self.epsilon),
-        ])
+        self.f1 = cp.hstack(
+            [
+                self.var_select @ self.shardLoads_select
+                + self.s[0]
+                - self.averageLoad * (1 + self.epsilon),
+                self.var_select @ self.shardLoads_select
+                - self.s[1]
+                - self.averageLoad * (1 - self.epsilon),
+            ]
+        )
         self.l1 = cp.Parameter(self.f1.shape, value=np.zeros(self.f1.shape))
         # change l2 and f2 if we need to solve under-allocation of large loads
         self.f2 = self.var_select - self.param_select
@@ -134,10 +165,11 @@ class SubproblemR(CpProblem):
 
         super(SubproblemR, self).__init__(
             cp.Minimize(
-                (1 - self.currentLocation_select) @ self.var_select_ +
-                self.rho / 2 * cp.sum_squares(self.f1 + self.l1) +
-                self.rho / 2 * cp.sum_squares(self.f2 + self.l2_select)),
-            [self.var_select <= self.var_select_, self.var_select_.sum() <= 16]
+                (1 - self.currentLocation_select) @ self.var_select_
+                + self.rho / 2 * cp.sum_squares(self.f1 + self.l1)
+                + self.rho / 2 * cp.sum_squares(self.f2 + self.l2_select)
+            ),
+            [self.var_select <= self.var_select_, self.var_select_.sum() <= 16],
         )
 
     def get_solution(self):
@@ -148,7 +180,7 @@ class SubproblemR(CpProblem):
 
     def solve(self, param_value, *args, **kwargs):
         start = time.time()
-        self.select_idx = (-param_value).argsort(kind='stable')[:self.search_limit]
+        self.select_idx = (-param_value).argsort(kind="stable")[: self.search_limit]
         self.shardLoads_select.value = self.shardLoads[self.select_idx]
         self.currentLocation_select.value = self.currentLocation[self.select_idx]
 
@@ -187,9 +219,7 @@ class SubproblemD(CpProblem):
         self.l2 = cp.Parameter(self.f2.shape, value=np.zeros(self.f2.shape))
 
         super(SubproblemD, self).__init__(
-            cp.Minimize(
-                cp.sum_squares(self.f1 + self.l1) +
-                cp.sum_squares(self.f2 + self.l2)),
+            cp.Minimize(cp.sum_squares(self.f1 + self.l1) + cp.sum_squares(self.f2 + self.l2)),
         )
 
     def get_solution(self):

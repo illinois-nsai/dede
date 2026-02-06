@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 
-import dede as dd
+import math
+
 import cvxpy as cp
 import numpy as np
-import math
 from conftest import GUROBI_OPTS
+
+import dede as dd
 
 
 def test_add1():
@@ -31,7 +33,7 @@ def test_add1():
     print(x.value)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
-    print('=== Passed ILP ADD test #1 ===')
+    print("=== Passed ILP ADD test #1 ===")
 
 
 def test_add2():
@@ -39,9 +41,9 @@ def test_add2():
     x = dd.Variable((N, M), integer=True)
     resource_constraints = [x >= 0] + [x[i, :].sum() <= i for i in range(N)]
     demand_constraints = [x[:, j].sum() <= j for j in range(M)]
-    
+
     # pull two elements
-    objective = dd.Maximize(x[N-1, M-1] + x[N//2, M//2])
+    objective = dd.Maximize(x[N - 1, M - 1] + x[N // 2, M // 2])
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
@@ -53,7 +55,7 @@ def test_add2():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
-    print('=== Passed ILP ADD test #2 ===')
+    print("=== Passed ILP ADD test #2 ===")
 
 
 def test_constant1():
@@ -61,7 +63,7 @@ def test_constant1():
     x = dd.Variable((N, M), integer=True)
     resource_constraints = [x >= 0] + [x[i, :].sum() <= i for i in range(N)]
     demand_constraints = [x[:, j].sum() <= j for j in range(M)]
-    
+
     objective = dd.Maximize(2)
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
@@ -70,7 +72,7 @@ def test_constant1():
     print("DeDe:", result_dede)
 
     assert math.isclose(result_dede, 2, rel_tol=0.01)
-    print('=== Passed ILP CONSTANT test #1 ===') 
+    print("=== Passed ILP CONSTANT test #1 ===")
 
 
 def test_constant2():
@@ -78,8 +80,8 @@ def test_constant2():
     x = dd.Variable((N, M), integer=True)
     resource_constraints = [x >= 0] + [x[i, :].sum() <= i for i in range(N)]
     demand_constraints = [x[:, j].sum() <= j for j in range(M)]
-    
-    objective = dd.Maximize(x[N-1, M-1] + 2)
+
+    objective = dd.Maximize(x[N - 1, M - 1] + 2)
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
@@ -91,7 +93,7 @@ def test_constant2():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
-    print('=== Passed ILP CONSTANT test #2 ===')
+    print("=== Passed ILP CONSTANT test #2 ===")
 
 
 def test_sum1():
@@ -111,7 +113,7 @@ def test_sum1():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
-    print('=== Passed ILP SUM test #1 ===')
+    print("=== Passed ILP SUM test #1 ===")
 
 
 def test_sum2():
@@ -131,7 +133,7 @@ def test_sum2():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
-    print('=== Passed ILP SUM test #2 ===')
+    print("=== Passed ILP SUM test #2 ===")
 
 
 def test_multiply1():
@@ -155,7 +157,7 @@ def test_multiply1():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01, abs_tol=0.1)
-    print('=== Passed ILP MULTIPLY test #1 ===')
+    print("=== Passed ILP MULTIPLY test #1 ===")
 
 
 def test_multiply2():
@@ -179,7 +181,7 @@ def test_multiply2():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01, abs_tol=0.1)
-    print('=== Passed ILP MULTIPLY test #2 ===')
+    print("=== Passed ILP MULTIPLY test #2 ===")
 
 
 def test_boolean():
@@ -199,10 +201,10 @@ def test_boolean():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
-    print('=== Passed BOOLEAN LP test ===')
+    print("=== Passed BOOLEAN LP test ===")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_add1()
     test_add2()
 

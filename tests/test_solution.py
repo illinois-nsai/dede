@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 
-import dede as dd
+import math
+
 import numpy as np
 from conftest import GUROBI_OPTS
-import math
+
+import dede as dd
 
 
 def test_lin_cont():
@@ -26,7 +28,7 @@ def test_lin_cont():
     print("Solution result:", result_solution)
 
     assert math.isclose(result_dede, result_solution, rel_tol=0.01)
-    print('=== Passed CONTINUOUS LINEAR value test ===')
+    print("=== Passed CONTINUOUS LINEAR value test ===")
 
 
 def test_cvx_cont():
@@ -53,7 +55,7 @@ def test_cvx_cont():
     print("Solution result:", result_solution)
 
     assert math.isclose(result_dede, result_solution, rel_tol=0.01)
-    print('=== Passed CONTINUOUS CONVEX value test ===')
+    print("=== Passed CONTINUOUS CONVEX value test ===")
 
 
 def test_lin_int():
@@ -76,7 +78,7 @@ def test_lin_int():
     print("Solution result:", result_solution)
 
     assert math.isclose(result_dede, result_solution, rel_tol=0.01)
-    print('=== Passed INTEGER LINEAR value test ===')
+    print("=== Passed INTEGER LINEAR value test ===")
 
 
 def test_cvx_int():
@@ -94,16 +96,16 @@ def test_cvx_int():
 
     result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=50, num_iter=20, **GUROBI_OPTS)
     print("Returned result:", result_dede)
-    
+
     result_solution = np.sum(np.multiply(x.value, w) ** 2)
     print("Solution result:", result_solution)
 
     assert math.isclose(result_dede, result_solution, rel_tol=0.01)
-    print('=== Passed INTEGER CONVEX value test ===')
+    print("=== Passed INTEGER CONVEX value test ===")
 
 
 def test_lin_mix():
-    M = 5 
+    M = 5
     x1 = dd.Variable(M, boolean=True)
     x2 = dd.Variable(M, nonneg=True)
     x3 = dd.Variable(M, integer=True)
@@ -120,11 +122,11 @@ def test_lin_mix():
     print("Solution result:", result_solution)
 
     assert math.isclose(result_dede, result_solution, rel_tol=0.01)
-    print('=== Passed MIXED LINEAR value test ===') 
+    print("=== Passed MIXED LINEAR value test ===")
 
 
 def test_cvx_mix():
-    M = 5 
+    M = 5
     x1 = dd.Variable(M, boolean=True)
     x2 = dd.Variable(M, nonneg=True)
     x3 = dd.Variable(M, integer=True)
@@ -132,28 +134,32 @@ def test_cvx_mix():
     resource_constraints = [x2.sum() >= 12.3456] + [x3.sum() >= 10]
     demand_constraints = [x1[j] + x2[j] + x3[j] >= 4 * j for j in range(M)]
 
-    w1 = np.arange(1, M+1)
+    w1 = np.arange(1, M + 1)
     w2 = np.empty(M)
     w3 = np.empty(M)
     for i in range(M):
-        w2[i] = np.sin(i ** 2)
-        w3[i] = np.cos(i ** 3)
+        w2[i] = np.sin(i**2)
+        w3[i] = np.cos(i**3)
 
-    objective = dd.Minimize(dd.quad_over_lin(dd.multiply(x1, w1), 1) + \
-                            dd.quad_over_lin(dd.multiply(x2, w2), 1) + \
-                            dd.quad_over_lin(dd.multiply(x3, w3), 1))
+    objective = dd.Minimize(
+        dd.quad_over_lin(dd.multiply(x1, w1), 1)
+        + dd.quad_over_lin(dd.multiply(x2, w2), 1)
+        + dd.quad_over_lin(dd.multiply(x3, w3), 1)
+    )
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
     result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=0.5, num_iter=15, **GUROBI_OPTS)
     print("Returned result:", result_dede)
 
-    result_solution = np.sum(np.multiply(x1.value, w1) ** 2) + \
-                      np.sum(np.multiply(x2.value, w2) ** 2) + \
-                      np.sum(np.multiply(x3.value, w3) ** 2)
+    result_solution = (
+        np.sum(np.multiply(x1.value, w1) ** 2)
+        + np.sum(np.multiply(x2.value, w2) ** 2)
+        + np.sum(np.multiply(x3.value, w3) ** 2)
+    )
     print("Solution result:", result_solution)
 
     assert math.isclose(result_dede, result_solution, rel_tol=0.01)
-    print('=== Passed MIXED CONVEX value test ===')
+    print("=== Passed MIXED CONVEX value test ===")
 
 
 def test_large():
@@ -174,10 +180,10 @@ def test_large():
     print("Solution result:", result_solution)
 
     assert math.isclose(result_dede, result_solution, rel_tol=0.01)
-    print('=== Passed LARGE value test ===')
+    print("=== Passed LARGE value test ===")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_lin_cont()
     test_cvx_cont()
 

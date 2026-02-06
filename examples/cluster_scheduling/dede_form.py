@@ -1,15 +1,11 @@
 #!/usr/bin/env python3
 
-from benchmark_helpers import get_args, print_
-
-import os
-import pickle
 import json
-import cvxpy as cp
+import os
 
+from benchmark_helpers import get_args, print_
 from lib.scheduler import Scheduler
 from lib.utils import get_policy
-
 
 TOP_DIR = "dede-form-logs"
 HEADERS = [
@@ -30,17 +26,22 @@ OUTPUT_CSV_TEMPLATE = "dede-form-{}.csv"
 
 def benchmark(args, output_csv):
     policy = get_policy(args.obj)
-    cluster_spec = json.load(open(args.cluster_spec_file, 'r'))
+    cluster_spec = json.load(open(args.cluster_spec_file, "r"))
     if args.num_worker_types > 0:
         cluster_spec = {
-            worker_type: n for worker_type,
-            n in cluster_spec.items() if int(
-                worker_type.split('_')[1]) < args.num_worker_types}
+            worker_type: n
+            for worker_type, n in cluster_spec.items()
+            if int(worker_type.split("_")[1]) < args.num_worker_types
+        }
     sched = Scheduler(
         policy,
         throughputs_file=args.throughputs_file,
-        enable_dede=True, num_cpus=args.num_cpus, rho=args.rho,
-        warmup=args.warmup, warmup_admm_steps=args.warmup_admm_steps, admm_steps=args.admm_steps,
+        enable_dede=True,
+        num_cpus=args.num_cpus,
+        rho=args.rho,
+        warmup=args.warmup,
+        warmup_admm_steps=args.warmup_admm_steps,
+        admm_steps=args.admm_steps,
         fix_steps=args.fix_steps,
     )
 
@@ -66,7 +67,7 @@ def benchmark(args, output_csv):
         )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     if not os.path.exists(TOP_DIR):
         os.makedirs(TOP_DIR)
 

@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
 
-from benchmark_helpers import get_args_and_problems, print_, DEDE_FORM_HYPERPARAMS
-
 import os
 import pickle
+import sys
 import traceback
 
-import sys
-
+from benchmark_helpers import DEDE_FORM_HYPERPARAMS, get_args_and_problems, print_
 from lib.algorithms import DeDeFormulation, Objective
 from lib.problem import Problem
 
@@ -52,26 +50,27 @@ def benchmark(problems, output_csv, args):
     )
 
     # warm-up
-    for problem_name, topo_fname, tm_fname in problems[:args.warmup]:
+    for problem_name, topo_fname, tm_fname in problems[: args.warmup]:
         problem = Problem.from_file(topo_fname, tm_fname)
-        df.solve(problem, num_cpus=args.num_cpus, rho=args.rho,
-                 num_iter=args.warmup_admm_steps, num_fix_iter=args.fix_steps)
+        df.solve(
+            problem,
+            num_cpus=args.num_cpus,
+            rho=args.rho,
+            num_iter=args.warmup_admm_steps,
+            num_fix_iter=args.fix_steps,
+        )
 
     # after warm-up
     with open(output_csv, "a") as results:
         print_(",".join(HEADERS), file=results)
-        for problem_name, topo_fname, tm_fname in problems[args.warmup:]:
+        for problem_name, topo_fname, tm_fname in problems[args.warmup :]:
             problem = Problem.from_file(topo_fname, tm_fname)
             print_(problem_name, tm_fname)
             traffic_seed = problem.traffic_matrix.seed
             total_demand = problem.total_demand
             print_("traffic seed: {}".format(traffic_seed))
-            print_(
-                "traffic scale factor: {}".format(
-                    problem.traffic_matrix.scale_factor)
-            )
-            print_("traffic matrix model: {}".format(
-                problem.traffic_matrix.model))
+            print_("traffic scale factor: {}".format(problem.traffic_matrix.scale_factor))
+            print_("traffic matrix model: {}".format(problem.traffic_matrix.model))
             print_("total demand: {}".format(total_demand))
 
             run_dir = os.path.join(
@@ -90,8 +89,13 @@ def benchmark(problems, output_csv, args):
                 )
 
                 problem = Problem.from_file(topo_fname, tm_fname)
-                df.solve(problem, num_cpus=args.num_cpus, rho=args.rho,
-                         num_iter=args.admm_steps, num_fix_iter=args.fix_steps)
+                df.solve(
+                    problem,
+                    num_cpus=args.num_cpus,
+                    rho=args.rho,
+                    num_iter=args.admm_steps,
+                    num_fix_iter=args.fix_steps,
+                )
 
                 with open(
                     os.path.join(

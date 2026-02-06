@@ -1,6 +1,13 @@
 class JobTemplate:
-    def __init__(self, model, command, working_directory, num_steps_arg,
-                 needs_data_dir=True, distributed=True):
+    def __init__(
+        self,
+        model,
+        command,
+        working_directory,
+        num_steps_arg,
+        needs_data_dir=True,
+        distributed=True,
+    ):
         self._model = model
         self._command = command
         self._working_directory = working_directory

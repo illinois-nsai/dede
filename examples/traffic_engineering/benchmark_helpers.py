@@ -1,18 +1,17 @@
-from collections import defaultdict
-from glob import iglob
-
 import argparse
 import os
 import sys
+from collections import defaultdict
+from glob import iglob
 
 from lib.algorithms.abstract_formulation import OBJ_STRS
-from lib.config import TOPOLOGIES_DIR, TM_DIR
+from lib.config import TM_DIR, TOPOLOGIES_DIR
 
 PROBLEM_NAMES = [
-    'B4.json',
-    'UsCarrier.json',
-    'Kdl.json',
-    'ASN2k.json',
+    "B4.json",
+    "UsCarrier.json",
+    "Kdl.json",
+    "ASN2k.json",
 ]
 TM_MODELS = [
     "real",
@@ -37,24 +36,16 @@ for problem_name in PROBLEM_NAMES:
     else:
         topo_fname = os.path.join(TOPOLOGIES_DIR, problem_name)
     for model in TM_MODELS:
-        for tm_fname in iglob(
-            "{}/{}/{}*_traffic-matrix.pkl".format(TM_DIR, model, problem_name)
-        ):
+        for tm_fname in iglob("{}/{}/{}*_traffic-matrix.pkl".format(TM_DIR, model, problem_name)):
             vals = os.path.basename(tm_fname)[:-4].split("_")
-            _, traffic_seed, scale_factor = vals[1], int(
-                vals[2]), float(vals[3])
-            GROUPED_BY_PROBLEMS[(problem_name, model, scale_factor)].append(
-                (topo_fname, tm_fname)
-            )
+            _, traffic_seed, scale_factor = vals[1], int(vals[2]), float(vals[3])
+            GROUPED_BY_PROBLEMS[(problem_name, model, scale_factor)].append((topo_fname, tm_fname))
             PROBLEMS.append((problem_name, topo_fname, tm_fname))
         for tm_fname in iglob(
-            "{}/holdout/{}/{}*_traffic-matrix.pkl".format(
-                TM_DIR, model, problem_name
-            )
+            "{}/holdout/{}/{}*_traffic-matrix.pkl".format(TM_DIR, model, problem_name)
         ):
             vals = os.path.basename(tm_fname)[:-4].split("_")
-            _, traffic_seed, scale_factor = vals[1], int(
-                vals[2]), float(vals[3])
+            _, traffic_seed, scale_factor = vals[1], int(vals[2]), float(vals[3])
             GROUPED_BY_HOLDOUT_PROBLEMS[(problem_name, model, scale_factor)].append(
                 (topo_fname, tm_fname)
             )
@@ -62,13 +53,11 @@ for problem_name in PROBLEM_NAMES:
 
 GROUPED_BY_PROBLEMS = dict(GROUPED_BY_PROBLEMS)
 for key, vals in GROUPED_BY_PROBLEMS.items():
-    GROUPED_BY_PROBLEMS[key] = sorted(vals,
-                                      key=lambda x: int(x[-1].split('_')[-3]))
+    GROUPED_BY_PROBLEMS[key] = sorted(vals, key=lambda x: int(x[-1].split("_")[-3]))
 
 GROUPED_BY_HOLDOUT_PROBLEMS = dict(GROUPED_BY_HOLDOUT_PROBLEMS)
 for key, vals in GROUPED_BY_HOLDOUT_PROBLEMS.items():
-    GROUPED_BY_HOLDOUT_PROBLEMS[key] = sorted(vals,
-                                              key=lambda x: int(x[-1].split('_')[-3]))
+    GROUPED_BY_HOLDOUT_PROBLEMS[key] = sorted(vals, key=lambda x: int(x[-1].split("_")[-3]))
 
 
 def get_problems(args):
@@ -85,12 +74,12 @@ def get_problems(args):
             ):
                 problems.append((problem_name, topo_fname, tm_fname))
     if not problems:
-        raise Exception('Traffic matrices not found')
+        raise Exception("Traffic matrices not found")
     return problems
 
 
 def check_gurobi_license():
-    if not os.system('gurobi_cl --license'):
+    if not os.system("gurobi_cl --license"):
         return True
     else:
         return False

@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
 
-from benchmark_helpers import get_args_and_problems, print_, PATH_FORM_HYPERPARAMS
-
 import os
 import pickle
+import sys
 import traceback
 
-import sys
-
-from lib.algorithms import PathFormulation, Objective
+from benchmark_helpers import PATH_FORM_HYPERPARAMS, get_args_and_problems, print_
+from lib.algorithms import Objective, PathFormulation
 from lib.problem import Problem
 
 TOP_DIR = "path-form-logs"
@@ -47,12 +45,8 @@ def benchmark(problems, output_csv, obj):
             traffic_seed = problem.traffic_matrix.seed
             total_demand = problem.total_demand
             print_("traffic seed: {}".format(traffic_seed))
-            print_(
-                "traffic scale factor: {}".format(
-                    problem.traffic_matrix.scale_factor)
-            )
-            print_("traffic matrix model: {}".format(
-                problem.traffic_matrix.model))
+            print_("traffic scale factor: {}".format(problem.traffic_matrix.scale_factor))
+            print_("traffic matrix model: {}".format(problem.traffic_matrix.model))
             print_("total demand: {}".format(total_demand))
 
             run_dir = os.path.join(
