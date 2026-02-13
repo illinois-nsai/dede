@@ -39,7 +39,7 @@ def expand_expr(expr):
             return [expr]
         left_list = expand_expr(expr.args[0])
         right_list = expand_expr(expr.args[1])
-        return [multiply(left, right) for left, right in zip(left_list, right_list, strict=True)]
+        return [multiply(left, right) for left, right in zip(left_list, right_list)]
     elif isinstance(expr, MulExpression):
         if len(expr.shape) == 0:
             return [expr]
@@ -148,12 +148,12 @@ def break_into_vars(expr):
         return [break_into_vars(expr.args[0])]
     elif isinstance(expr, AddExpression):
         vars = [break_into_vars(arg) for arg in expr.args]
-        return list(map(list, zip(*vars, strict=True)))
+        return list(map(list, zip(*vars)))
     elif isinstance(expr, multiply):
         vars = []
         left_list = break_into_vars(expr.args[0])
         right_list = break_into_vars(expr.args[1])
-        for left, right in zip(left_list, right_list, strict=True):
+        for left, right in zip(left_list, right_list):
             if left is False or right is False:
                 vars.append(False)
                 continue
