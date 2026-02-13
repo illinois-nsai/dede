@@ -183,7 +183,7 @@ class Problem(CpProblem):
                     [
                         prob.solve_r.remote(self.sol_d[param_idx], *args, **kwargs)
                         for prob, param_idx in zip(
-                            self._subprob_cache.probs, self._subprob_cache.param_idx_r, strict=True
+                            self._subprob_cache.probs, self._subprob_cache.param_idx_r
                         )
                     ]
                 )
@@ -198,7 +198,7 @@ class Problem(CpProblem):
                     [
                         prob.solve_d.remote(self.sol_r[param_idx], *args, **kwargs)
                         for prob, param_idx in zip(
-                            self._subprob_cache.probs, self._subprob_cache.param_idx_d, strict=True
+                            self._subprob_cache.probs, self._subprob_cache.param_idx_d
                         )
                     ]
                 )
@@ -238,11 +238,9 @@ class Problem(CpProblem):
         flat_idx_r = [idx for arr in sol_idx_r for idx in arr]
 
         for sol_idx, sol in zip(
-            [flat_local_idx, flat_idx_d, flat_idx_r],
-            [flat_local_sol, self.sol_d, self.sol_r],
-            strict=True,
+            [flat_local_idx, flat_idx_d, flat_idx_r], [flat_local_sol, self.sol_d, self.sol_r]
         ):
-            for (var_id, pos), value in zip(sol_idx, sol, strict=True):
+            for (var_id, pos), value in zip(sol_idx, sol):
                 var = var_id_to_var[var_id]
                 idx = np.unravel_index(pos, var.shape[::-1])[::-1]
                 var.value[idx] = value
@@ -378,7 +376,6 @@ class Problem(CpProblem):
             [0, 1],
             [self.constrs_gps_r, self.constrs_gps_d],
             [self.constr_dict_r, self.constr_dict_d],
-            strict=True,
         ):
             for j, constrs in enumerate(constrs_gps):
                 for constr in constrs:

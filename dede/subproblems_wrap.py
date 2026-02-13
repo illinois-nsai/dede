@@ -103,7 +103,7 @@ class SubproblemsWrap:
         """Solve resource problems in the current actor sequentially."""
         param_value_list = np.split(param_values, self.sol_split_r)
         aug_lgr = 0
-        for prob, param_value in zip(self.probs_r, param_value_list, strict=True):
+        for prob, param_value in zip(self.probs_r, param_value_list):
             aug_lgr += prob.solve(param_value, *args, **kwargs)
         return aug_lgr
 
@@ -111,7 +111,7 @@ class SubproblemsWrap:
         """Solve demand problems in the current actor sequentially."""
         param_value_list = np.split(param_values, self.sol_split_d)
         aug_lgr = 0
-        for prob, param_value in zip(self.probs_d, param_value_list, strict=True):
+        for prob, param_value in zip(self.probs_d, param_value_list):
             aug_lgr += prob.solve(param_value, *args, **kwargs)
         return aug_lgr
 
