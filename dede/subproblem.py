@@ -1,19 +1,27 @@
+import typing as t
 from collections import defaultdict
 
 import cvxpy as cp
 import cvxpy.lin_ops.lin_utils as lu
 import numpy as np
 from cvxpy.problems.problem import Problem as CpProblem
+from numpy.typing import NDArray
 from scipy.sparse import coo_matrix
 
-from .utils import replace_variables
+from .utils import VarInfoT, replace_variables
 
 
 class Subproblem(CpProblem):
     """Subproblem for per-resource allocation or per-demand allocation."""
 
     def __init__(
-        self, idx, objective_expr, constrs_gp, active_var_id_to_pos_gp, inactive_var_id_pos_set, rho
+        self,
+        idx: tuple[int, int],
+        objective_expr: cp.Expression,
+        constrs_gp: list[cp.Constraint],
+        active_var_id_to_pos_gp: list[list[VarInfoT]],
+        inactive_var_id_pos_set: set[VarInfoT],
+        rho: float,
     ):
         """Initialize subproblem.
         Args:
@@ -29,7 +37,7 @@ class Subproblem(CpProblem):
         self.rho = rho
 
         # create var for the subproblem
-        var_id_pos_set1, var_id_pos_set2 = set(), set()
+        var_id_pos_set1, var_id_pos_set2 = set[VarInfoT](), set[VarInfoT]()
         for var_id_pos_list in active_var_id_to_pos_gp:
             for var_id_pos in var_id_pos_list:
                 # whether var_id_pos has its counterpart in inactive var_id_pos
@@ -43,10 +51,10 @@ class Subproblem(CpProblem):
         # avoid parameters of the same id in the same process
         max_param_id = -1
         for param in objective_expr.parameters():
-            max_param_id = max(max_param_id, param.id)
+            max_param_id = max(max_param_id, t.cast(int, param.id))
         for constr in constrs_gp:
             for param in constr.parameters():
-                max_param_id = max(max_param_id, param.id)
+                max_param_id = max(max_param_id, t.cast(int, param.id))
         param_id = lu.get_id()
         while param_id < max_param_id:
             param_id = lu.get_id()
@@ -81,29 +89,31 @@ class Subproblem(CpProblem):
             constrs_var_attr,
         )
 
-    def get_var_id_to_new_var(self, objective_expr, constrs_gp):
+    def get_var_id_to_new_var(
+        self, objective_expr: cp.Expression, constrs_gp: list[cp.Constraint]
+    ) -> tuple[dict[int, NDArray[np.floating[t.Any]]], list[cp.Constraint]]:
         """Replace inactive var in old var."""
-        var_id_to_var = {}
+        var_id_to_var: dict[int, cp.Variable] = {}
         for constr in [objective_expr] + constrs_gp:
             for var in constr.variables():
-                var_id_to_var[var.id] = var
+                var_id_to_var[t.cast(int, var.id)] = var
 
-        var_id_to_pos = defaultdict(list)
-        for var_id, pos in self.var_id_pos_list:
-            var_id_to_pos[var_id].append(pos)
+        var_id_to_pos: dict[int, list[int]] = defaultdict(list)
+        for var_info in self.var_id_pos_list:
+            var_id_to_pos[var_info.var_id].append(var_info.pos)
 
         var_id_pos_to_idx = {k: i for i, k in enumerate(self.var_id_pos_list)}
 
-        var_id_to_new_var = {}
-        constrs_var_attr = []
-        attr_idx = {"nonneg": [], "boolean": [], "integer": []}
+        var_id_to_new_var: dict[int, NDArray[np.floating[t.Any]]] = {}
+        constrs_var_attr: list[cp.Constraint] = []
+        attr_idx: dict[str, list[int]] = {"nonneg": [], "boolean": [], "integer": []}
         for var_id, var in var_id_to_var.items():
             # fill pos not in pos_list with 0
             pos_list = var_id_to_pos[var_id]
             m = coo_matrix(
                 (
                     np.ones(len(pos_list)),
-                    (pos_list, [var_id_pos_to_idx[(var_id, pos)] for pos in pos_list]),
+                    (pos_list, [var_id_pos_to_idx[VarInfoT(var_id, pos)] for pos in pos_list]),
                 ),
                 shape=(var.size, self.var.size),
             )
@@ -114,7 +124,7 @@ class Subproblem(CpProblem):
                 if not value:
                     continue
                 for pos in pos_list:
-                    idx = var_id_pos_to_idx[(var_id, pos)]
+                    idx = var_id_pos_to_idx[VarInfoT(var_id, pos)]
                     if attr in ["nonneg", "boolean", "integer"]:
                         attr_idx[attr].append(idx)
                     else:
@@ -132,36 +142,39 @@ class Subproblem(CpProblem):
 
         return var_id_to_new_var, constrs_var_attr
 
-    def get_solution_idx(self):
+    def get_solution_idx(self) -> list[VarInfoT]:
         """Record (var_id, position) to keep similar in the z round."""
         return self.var_id_pos_list[: self.x_z_num]
 
-    def get_solution(self):
+    def get_solution(self) -> NDArray[np.floating[t.Any]]:
         """Return solution."""
         if self.var.value is None:
             self.var.value = np.zeros(self.var.shape)
         return self.var.value[: self.x_z_num]
 
-    def get_local_solution_idx(self):
+    def get_local_solution_idx(self) -> list[VarInfoT]:
         """Record (var_id, position) of local-only variables."""
         return self.var_id_pos_list[self.x_z_num :]
 
-    def get_local_solution(self):
+    def get_local_solution(self) -> NDArray[np.floating[t.Any]]:
         """Returns solution of local-only variables."""
         if self.var.value is None:
             self.var.value = np.zeros(self.var.shape)
         return self.var.value[self.x_z_num :]
 
-    def get_obj(self):
+    def get_obj(self) -> np.floating[t.Any]:
         """Return value of the original objective function."""
         return self.obj_expr_old.value
 
-    def solve(self, param_value, *args, **kwargs):
+    def solve(
+        self, param_value: NDArray[np.floating[t.Any]], *args, **kwargs
+    ) -> np.floating[t.Any]:
         """Update lambda and solve the subproblem.
         Args:
         param_value: value of parameters that keeps x == z
         """
-        self.l1.value += self.f1.value
+        assert self.l1.value is not None
+        self.l1.value += t.cast(NDArray[np.floating[t.Any]], self.f1.value)
         if self.id[0] == 1:
             # note: we haven't update param yet
             self.l2.value += self.f2.value
@@ -169,4 +182,4 @@ class Subproblem(CpProblem):
         if self.id[0] == 0:
             self.l2.value += self.f2.value
 
-        return super(Subproblem, self).solve(*args, **kwargs)
+        return t.cast(np.floating[t.Any], super(Subproblem, self).solve(*args, **kwargs))
