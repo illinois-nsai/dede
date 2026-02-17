@@ -1,3 +1,7 @@
+import typing as t
+from collections.abc import Iterable
+
+import cvxpy as cp
 from cvxpy import Parameter
 from cvxpy.atoms.affine.add_expr import AddExpression
 from cvxpy.atoms.affine.binary_operators import MulExpression, multiply
@@ -8,9 +12,13 @@ from cvxpy.atoms.affine.unary_operators import NegExpression
 from cvxpy.expressions.constants.constant import Constant
 from cvxpy.expressions.variable import Variable
 
+DirT = t.Union[t.Literal[0], t.Literal[1]]
 
-def breakdown_constr(constr, dir):
-    if isinstance(constr, (list, tuple)):
+
+def breakdown_constr(
+    constr: t.Union[cp.Constraint, t.Iterable[cp.Constraint]], dir: DirT
+) -> list[cp.Constraint]:
+    if isinstance(constr, Iterable):
         out = []
         for c in constr:
             out.extend(breakdown_constr(c, dir))
@@ -19,14 +27,17 @@ def breakdown_constr(constr, dir):
     return [expr == 0 for expr in breakdown_expression(constr.expr, dir)]
 
 
-def split_index_by_dir(index_obj, dir):
-    key = index_obj.get_data()[0]
-    var = index_obj.args[0]
+def split_index_by_dir(index_obj: index, dir: DirT) -> list[cp.Expression]:
+    """Given a multi-dimensional (2d) index object and a direction, splits the index
+    into a list of one-dimensional indices, one for each index along the specified direction,
+    and returns the resulting Expressions."""
+    key: tuple[slice, ...] = index_obj.get_data()[0]
+    var: cp.Expression = index_obj.args[0]
 
     split_list = []
 
-    new_key = list(key)
-    k = key[dir]
+    new_key: list[t.Union[int, slice]] = list(key)
+    k = t.cast(slice, key[dir])
     for i in range(k.start, k.stop, k.step):
         new_key[dir] = i
         split_list.append(var[tuple(new_key)])
@@ -34,7 +45,7 @@ def split_index_by_dir(index_obj, dir):
     return split_list
 
 
-def breakdown_expression(expr, dir):
+def breakdown_expression(expr: cp.Expression, dir: DirT) -> list[cp.Expression]:
     if len(expr.shape) > 2:
         raise TypeError("3D constraints and above are not supported")
 

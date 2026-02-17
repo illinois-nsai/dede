@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.ruff]
 line-length = 100
-target-version = "py38"
+target-version = "py39"
 
 [tool.ruff.lint]
 # E/W: pycodestyle (standard PEP8)
@@ -13,3 +13,10 @@ target-version = "py38"
 # I: isort (keeps imports tidy automatically)
 # NPY: NumPy-specific rules
 select = ["E", "W", "F", "B", "I", "NPY"]
+
+# pyright settings if enabled
+[tool.pyright]
+typeCheckingMode = "standard"  # Options: "off", "basic", "standard", "strict"
+pythonVersion = "3.9"         # Target Python version
+include = ["dede/"]              # Folders to check
+exclude = ["**/node_modules", "**/__pycache__", ".venv"]
