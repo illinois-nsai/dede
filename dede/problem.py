@@ -1,45 +1,68 @@
 import os
 import time
+import typing as t
 from collections import defaultdict
 
 import cvxpy as cp
 import numpy as np
 import ray
+import ray.actor
 from cvxpy.constraints.nonpos import Inequality
 from cvxpy.constraints.zero import Equality, Zero
 from cvxpy.problems.objective import Minimize
 from cvxpy.problems.problem import Problem as CpProblem
+from numpy.typing import NDArray
 
 from .constraints_utils import breakdown_constr
 from .subproblems_wrap import SubproblemsWrap
-from .utils import expand_expr, get_var_id_pos_list_from_cone, get_var_id_pos_list_from_linear
+from .utils import (
+    VarInfoT,
+    expand_expr,
+    get_var_id_pos_list_from_cone,
+    get_var_id_pos_list_from_linear,
+)
+
+KeyT = tuple[float, int]
+ObjectiveT = t.Union[cp.Maximize, cp.Minimize]
+ConstraintT = t.Union[Equality, Zero, Inequality]
 
 
 class SubprobCache:
     """Cache subproblems."""
 
     def __init__(self):
-        self.key = None
-        self.rho = None
-        self.num_cpus = None
-        self.probs = None
-        self.param_idx_r, self.param_idx_d = [], []
+        self.rho: t.Optional[float] = None
+        self.num_cpus: t.Optional[int] = None
+        self.probs: t.Optional[list[ray.actor.ActorProxy[SubproblemsWrap]]] = None
+        self.param_idx_r: list[list[int]] = []
+        self.param_idx_d: list[list[int]] = []
 
     def invalidate(self):
-        self.key = None
         self.rho = None
         self.num_cpus = None
         self.probs = None
         self.param_idx_r, self.param_idx_d = [], []
 
-    def make_key(self, rho, num_cpus):
+    @property
+    def key(self) -> t.Optional[KeyT]:
+        if self.rho is None or self.num_cpus is None:
+            return None
+        return (self.rho, self.num_cpus)
+
+    @classmethod
+    def make_key(cls, rho: float, num_cpus: int) -> KeyT:
         return (rho, num_cpus)
 
 
 class Problem(CpProblem):
     """Build a resource allocation problem."""
 
-    def __init__(self, objective, resource_constraints, demand_constraints):
+    def __init__(
+        self,
+        objective: ObjectiveT,
+        resource_constraints: list[ConstraintT],
+        demand_constraints: list[ConstraintT],
+    ):
         """Initialize problem with the objective and constraints.
         Args:
             objective: Minimize or Maximize. The problem's objective
@@ -49,8 +72,8 @@ class Problem(CpProblem):
         start = time.time()
 
         # breakdown constraints
-        constrs_r_converted = [self.convert_inequality(constr) for constr in resource_constraints]
-        constrs_d_converted = [self.convert_inequality(constr) for constr in demand_constraints]
+        constrs_r_converted = [self._convert_inequality(constr) for constr in resource_constraints]
+        constrs_d_converted = [self._convert_inequality(constr) for constr in demand_constraints]
 
         self._constrs_r = breakdown_constr(constrs_r_converted, 0)
         self._constrs_d = breakdown_constr(constrs_d_converted, 1)
@@ -81,22 +104,24 @@ class Problem(CpProblem):
         )
 
         # get a dict mapping from param_id to value
-        self.param_id_to_param = {param.id: param for param in self.parameters()}
+        params = t.cast(list[cp.Parameter], self.parameters())
+        self.param_id_to_param = {t.cast(int, param.id): param for param in params}
 
         # get a dict mapping from constraints to list of (var_id, position)
-        self.constr_dict_r = self.get_constr_dict(self._constrs_r)
-        self.constr_dict_d = self.get_constr_dict(self._constrs_d)
+        self.constr_dict_r = self._get_constr_dict(self._constrs_r)
+        self.constr_dict_d = self._get_constr_dict(self._constrs_d)
 
         # get constraints groups
-        self.constrs_gps_r = self.group_constrs(self._constrs_r, self.constr_dict_r)
-        self.constrs_gps_d = self.group_constrs(self._constrs_d, self.constr_dict_d)
+        self.constrs_gps_r = self._group_constrs(self._constrs_r, self.constr_dict_r)
+        self.constrs_gps_d = self._group_constrs(self._constrs_d, self.constr_dict_d)
 
         # get objective groups
         self._obj_expr_r, self._obj_expr_d = self.group_objective()
         end = time.time()
         print("init time:", end - start)
 
-    def convert_inequality(self, constr):
+    @classmethod
+    def _convert_inequality(cls, constr: ConstraintT) -> cp.Constraint:
         if isinstance(constr, Zero) or isinstance(constr, Equality):
             return constr
         elif isinstance(constr, Inequality):
@@ -104,7 +129,15 @@ class Problem(CpProblem):
         else:
             raise ValueError(f"Constraint {constr} is neither equality nor inequality.")
 
-    def solve(self, enable_dede=True, num_cpus=None, rho=None, num_iter=None, *args, **kwargs):
+    def solve(
+        self,
+        enable_dede: bool = True,
+        num_cpus: t.Optional[int] = None,
+        rho: t.Optional[float] = None,
+        num_iter: t.Optional[int] = None,
+        *args,
+        **kwargs,
+    ) -> np.floating[t.Any]:
         """Compiles and solves the original problem.
         Args:
             enable_dede: whether to decouple and decompose with DeDe
@@ -120,12 +153,12 @@ class Problem(CpProblem):
             self._total_time = end - start
 
             coeff = 1 if self._problem_type == Minimize else -1
-            return coeff * self.value
+            return t.cast(np.floating[t.Any], coeff * self.value)
 
         # initialize num_cpus, rho
         if num_cpus is None:
             if self._subprob_cache.num_cpus is None:
-                num_cpus = os.cpu_count()
+                num_cpus = os.cpu_count() or 1
             else:
                 num_cpus = self._subprob_cache.num_cpus
         if rho is None:
@@ -134,7 +167,7 @@ class Problem(CpProblem):
             else:
                 rho = self._subprob_cache.rho
         # check whether num_cpus is more than all available
-        if num_cpus > os.cpu_count():
+        if num_cpus > (os.cpu_count() or 1):
             raise ValueError(f"{num_cpus} CPUs exceeds upper limit of {os.cpu_count()}.")
 
         # check whether settings has been changed
@@ -142,7 +175,6 @@ class Problem(CpProblem):
         if key != self._subprob_cache.key:
             # invalidate old settings
             self._subprob_cache.invalidate()
-            self._subprob_cache.key = key
             self._subprob_cache.rho = rho
             # initialize ray
             ray.shutdown()
@@ -157,9 +189,12 @@ class Problem(CpProblem):
                 ray.get([prob.get_solution_d.remote() for prob in self._subprob_cache.probs])
             )
 
+        assert self._subprob_cache.probs is not None
+
         # update parameter values
         param_id_to_value = {
-            param_id: param.value for param_id, param in self.param_id_to_param.items()
+            param_id: t.cast(NDArray[np.floating[t.Any]], param.value)
+            for param_id, param in self.param_id_to_param.items()
         }
         ray.get(
             [prob.update_parameters.remote(param_id_to_value) for prob in self._subprob_cache.probs]
@@ -171,7 +206,7 @@ class Problem(CpProblem):
         i, aug_lgr, aug_lgr_old = 0, 1, 2
         while (num_iter is not None and i < num_iter) or (
             num_iter is None
-            and i < 10000
+            and i < (num_iter or 10000)
             and (i < 2 or abs((aug_lgr - aug_lgr_old) / aug_lgr_old) > 0.01)
         ):
             # initialize start time, iteration, augmented Lagrangian
@@ -188,7 +223,7 @@ class Problem(CpProblem):
                     ]
                 )
             )
-            self.sol_r = np.hstack(
+            self.sol_r: NDArray[np.floating[t.Any]] = np.hstack(
                 ray.get([prob.get_solution_r.remote() for prob in self._subprob_cache.probs])
             )
 
@@ -203,7 +238,7 @@ class Problem(CpProblem):
                     ]
                 )
             )
-            self.sol_d = np.hstack(
+            self.sol_d: NDArray[np.floating[t.Any]] = np.hstack(
                 ray.get([prob.get_solution_d.remote() for prob in self._subprob_cache.probs])
             )
 
@@ -211,27 +246,32 @@ class Problem(CpProblem):
 
         self.populate_vars_with_solution()
         coeff = 1 if self._problem_type == Minimize else -1
-        return coeff * sum(ray.get([prob.get_obj.remote() for prob in self._subprob_cache.probs]))
+        return t.cast(
+            np.floating[t.Any],
+            coeff * sum(ray.get([prob.get_obj.remote() for prob in self._subprob_cache.probs])),
+        )
 
-    def populate_vars_with_solution(self):
+    def populate_vars_with_solution(self) -> None:
         """Fills problem variables with computed solutions."""
         var_id_to_var = {var.id: var for var in self.variables()}
         for var in self.variables():
             var.value = np.zeros(var.shape)
 
-        local_sol_idx = ray.get(
+        assert self._subprob_cache.probs is not None
+
+        local_sol_idx: list[list[VarInfoT]] = ray.get(
             [prob.get_local_solution_idx.remote() for prob in self._subprob_cache.probs]
         )
-        local_sol = ray.get(
+        local_sol: list[NDArray[np.floating[t.Any]]] = ray.get(
             [prob.get_local_solution.remote() for prob in self._subprob_cache.probs]
         )
         flat_local_idx = [idx for arr in local_sol_idx for idx in arr]
-        flat_local_sol = [sol for arr in local_sol for sol in arr]
+        flat_local_sol: list[np.float64] = [sol for arr in local_sol for sol in arr]
 
-        sol_idx_d = ray.get(
+        sol_idx_d: list[list[VarInfoT]] = ray.get(
             [prob.get_solution_idx_d.remote() for prob in self._subprob_cache.probs]
         )
-        sol_idx_r = ray.get(
+        sol_idx_r: list[list[VarInfoT]] = ray.get(
             [prob.get_solution_idx_r.remote() for prob in self._subprob_cache.probs]
         )
         flat_idx_d = [idx for arr in sol_idx_d for idx in arr]
@@ -245,45 +285,49 @@ class Problem(CpProblem):
                 idx = np.unravel_index(pos, var.shape[::-1])[::-1]
                 var.value[idx] = value
 
-    def get_constr_dict(self, constrs):
+    @classmethod
+    def _get_constr_dict(cls, constrs: list[cp.Constraint]) -> dict[cp.Constraint, list[VarInfoT]]:
         """Get a mapping of constraint to its var_id_pos_list."""
-        constr_to_var_id_pos_list = {}
+        constr_to_var_id_pos_list: dict[cp.Constraint, list[VarInfoT]] = {}
         for constr in constrs:
-            constr_to_var_id_pos_list[
-                # constr] = get_var_id_pos_list_from_linear(constr.expr, self._solver)
-                constr
-            ] = get_var_id_pos_list_from_linear(constr.expr)
+            # [constr] = get_var_id_pos_list_from_linear(constr.expr, self._solver)
+            constr_to_var_id_pos_list[constr] = get_var_id_pos_list_from_linear(constr.expr)
         return constr_to_var_id_pos_list
 
-    def group_constrs(self, constrs, constr_dict):
+    @classmethod
+    def _group_constrs(
+        cls, constrs: list[cp.Constraint], constr_dict: dict[cp.Constraint, list[VarInfoT]]
+    ) -> list[list[cp.Constraint]]:
         """Group constraints into non-overlapped groups with union-find."""
-        parents = np.arange(len(constrs)).tolist()
+        parents: list[int] = np.arange(len(constrs)).tolist()
 
-        def find(x):
+        def find(x: int) -> int:
             if x == parents[x]:
                 return x
             parents[x] = find(parents[x])
             return parents[x]
 
-        def union(x1, x2):
+        def union(x1: int, x2: int) -> None:
             parent_x1 = find(x1)
             parent_x2 = find(x2)
             if parent_x1 != parent_x2:
                 parents[parent_x2] = parent_x1
 
-        var_id_pos_to_i = {}
+        var_id_pos_to_i: dict[VarInfoT, int] = {}
         for i, constr in enumerate(constrs):
             for var_id_pos in constr_dict[constr]:
                 if var_id_pos in var_id_pos_to_i:
                     union(var_id_pos_to_i[var_id_pos], i)
                 var_id_pos_to_i[var_id_pos] = i
 
-        parent_to_constrs = defaultdict(list)
+        parent_to_constrs: dict[int, list[cp.Constraint]] = defaultdict(list)
         for i, parent in enumerate(parents):
             parent_to_constrs[find(parent)].append(constrs[i])
-        return [constrs for _, constrs in parent_to_constrs.items()]
+        return list(parent_to_constrs.values())
 
-    def get_subproblems(self, num_cpus, rho):
+    def get_subproblems(
+        self, num_cpus: int, rho: float
+    ) -> list[ray.actor.ActorProxy[SubproblemsWrap]]:
         """Return objective and constraints assignments for subproblems."""
 
         # shuffle group order
@@ -294,19 +338,19 @@ class Problem(CpProblem):
         np.random.shuffle(constrs_gps_idx_d)  # noqa: NPY002 TODO: replace with np.random.Generator at some point
 
         # get the set of var_id_pos
-        var_id_pos_set_r = set()
+        var_id_pos_set_r = set[VarInfoT]()
         for var_id_pos in self.constr_dict_r.values():
             var_id_pos_set_r.update(var_id_pos)
-        var_id_pos_set_d = set()
+        var_id_pos_set_d = set[VarInfoT]()
         for var_id_pos in self.constr_dict_d.values():
             var_id_pos_set_d.update(var_id_pos)
 
         # build actors with subproblems
-        probs = []
+        probs: list[ray.actor.ActorProxy[SubproblemsWrap]] = []
         for cpu in range(num_cpus):
             # get constraint idx for the group
-            idx_r = constrs_gps_idx_r[cpu::num_cpus].tolist()
-            idx_d = constrs_gps_idx_d[cpu::num_cpus].tolist()
+            idx_r: list[int] = constrs_gps_idx_r[cpu::num_cpus].tolist()
+            idx_d: list[int] = constrs_gps_idx_d[cpu::num_cpus].tolist()
             # get constraints group
             constrs_r = [self.constrs_gps_r[j] for j in idx_r]
             constrs_d = [self.constrs_gps_d[j] for j in idx_d]
@@ -339,23 +383,28 @@ class Problem(CpProblem):
             )
         return probs
 
-    def get_param_idx(self):
+    def get_param_idx(self) -> tuple[list[list[int]], list[list[int]]]:
         """Get parameter z index in last solution."""
+        assert self._subprob_cache.probs is not None
+
         # map var_id_pos in the big resource solution list
-        sol_idx_r = ray.get(
+        sol_idx_r: list[list[VarInfoT]] = ray.get(
             [prob.get_solution_idx_r.remote() for prob in self._subprob_cache.probs]
         )
-        sol_idx_dict_r, idx = {}, 0
+
+        sol_idx_dict_r: dict[VarInfoT, int] = {}
+        idx = 0
         for sol_idx in sol_idx_r:
             for var_id_pos in sol_idx:
                 sol_idx_dict_r[var_id_pos] = idx
                 idx += 1
 
         # map var_id_pos in the big demand solution list
-        sol_idx_d = ray.get(
+        sol_idx_d: list[list[VarInfoT]] = ray.get(
             [prob.get_solution_idx_d.remote() for prob in self._subprob_cache.probs]
         )
-        sol_idx_dict_d, idx = {}, 0
+        sol_idx_dict_d: dict[VarInfoT, int] = {}
+        idx = 0
         for sol_idx in sol_idx_d:
             for var_id_pos in sol_idx:
                 sol_idx_dict_d[var_id_pos] = idx
@@ -370,9 +419,9 @@ class Problem(CpProblem):
         ]
         return param_idx_r, param_idx_d
 
-    def group_objective(self):
+    def group_objective(self) -> tuple[list[cp.Expression], list[cp.Expression]]:
         """Split objective into corresponding constraint groups"""
-        var_id_pos_to_idx = defaultdict(list)
+        var_id_pos_to_idx: dict[VarInfoT, list[tuple[int, int]]] = defaultdict(list)
         for i, constrs_gps, constr_dict in zip(
             [0, 1],
             [self.constrs_gps_r, self.constrs_gps_d],
@@ -383,8 +432,8 @@ class Problem(CpProblem):
                     for var_id_pos in constr_dict[constr]:
                         var_id_pos_to_idx[var_id_pos].append((i, j))
 
-        obj_r = [cp.Constant(0) for _ in self.constrs_gps_r]
-        obj_d = [cp.Constant(0) for _ in self.constrs_gps_d]
+        obj_r: list[cp.Expression] = [cp.Constant(0) for _ in self.constrs_gps_r]
+        obj_d: list[cp.Expression] = [cp.Constant(0) for _ in self.constrs_gps_d]
         for obj in expand_expr(self.objective.expr):
             var_id_pos_list = get_var_id_pos_list_from_cone(obj, self._solver)
             if not var_id_pos_list:
