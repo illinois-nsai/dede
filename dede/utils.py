@@ -1,3 +1,4 @@
+import typing as t
 from heapq import heappop, heappush
 
 import cvxpy as cp
@@ -12,12 +13,21 @@ from cvxpy.atoms.affine.trace import trace
 from cvxpy.atoms.affine.unary_operators import NegExpression
 from cvxpy.atoms.elementwise.log import log
 from cvxpy.atoms.quad_over_lin import quad_over_lin
-from cvxpy.expressions.constants import Constant
+from cvxpy.expressions.constants.constant import Constant
 from cvxpy.expressions.leaf import Leaf
 from cvxpy.expressions.variable import Variable
+from numpy.typing import NDArray
 
 
-def expand_expr(expr):
+class VarInfoT(t.NamedTuple):
+    var_id: int  # id of the variable
+    pos: int  # flattened position of the variable
+
+
+BreakIntoVarsOutput = list[t.Union[bool, VarInfoT, "BreakIntoVarsOutput"]]
+
+
+def expand_expr(expr: cp.Expression) -> list[cp.Expression]:
     """return a list of expanded expression
     TODO: add norm1, quad_form, convolve, multiply, MulExpression
     Args:
@@ -58,7 +68,9 @@ def expand_expr(expr):
         return [expr]
 
 
-def replace_variables(expr, var_id_to_var):
+def replace_variables(
+    expr: cp.Expression, var_id_to_var: dict[int, NDArray[np.floating[t.Any]]]
+) -> cp.Expression:
     """Replace variables in var_id_to_var with variables;
     Replace other variables with zero.
     Args:
@@ -87,12 +99,15 @@ def replace_variables(expr, var_id_to_var):
         return type(expr)(*new_args)
 
 
-def get_var_id_pos_list_from_linear(expr):
-    """Return a list of (var_id, pos)."""
-    terms = break_into_vars(expr)
-    vars = set()
+def get_var_id_pos_list_from_linear(expr: cp.Expression) -> list[VarInfoT]:
+    """
+    Extracts variable ids and their corresponding positions from a expression.
 
-    def dfs(x):
+    Return a list of (var_id, pos)."""
+    terms = break_into_vars(expr)
+    vars = set[VarInfoT]()
+
+    def dfs(x: t.Union[bool, VarInfoT, BreakIntoVarsOutput]) -> None:
         if isinstance(x, list):
             for item in x:
                 dfs(item)
@@ -103,7 +118,9 @@ def get_var_id_pos_list_from_linear(expr):
     return sorted(vars)
 
 
-def break_into_vars(expr):
+def break_into_vars(
+    expr: cp.Expression,
+) -> BreakIntoVarsOutput:
     """Helper for get_var_id_pos_list."""
 
     # Base case: constant reached
@@ -112,12 +129,13 @@ def break_into_vars(expr):
     elif isinstance(expr, np.ndarray):
         return [bool(expr[idx] != 0) for idx in np.ndindex(expr.shape)]
     elif isinstance(expr, (Constant, Parameter)):
+        assert expr.value is not None
         return [bool(expr.value[idx] != 0) for idx in np.ndindex(expr.value.shape)]
 
     # Base case: variable reached
     elif isinstance(expr, Variable):
         return [
-            (expr.id, np.ravel_multi_index(idx[::-1], expr.shape[::-1]))
+            VarInfoT(expr.id, t.cast(int, np.ravel_multi_index(idx[::-1], expr.shape[::-1])))
             for idx in np.ndindex(expr.shape)
         ]
 
@@ -125,7 +143,7 @@ def break_into_vars(expr):
     elif isinstance(expr, index) and isinstance(expr.args[0], Variable):
         var = expr.args[0]
         return [
-            (var.id, np.ravel_multi_index(idx[::-1], var.shape[::-1]))
+            VarInfoT(var.id, t.cast(int, np.ravel_multi_index(idx[::-1], var.shape[::-1])))
             for idx in get_indices_from_index(expr)
         ]
 
@@ -150,7 +168,7 @@ def break_into_vars(expr):
         vars = [break_into_vars(arg) for arg in expr.args]
         return list(map(list, zip(*vars)))
     elif isinstance(expr, multiply):
-        vars = []
+        vars: list[t.Union[bool, VarInfoT, BreakIntoVarsOutput]] = []
         left_list = break_into_vars(expr.args[0])
         right_list = break_into_vars(expr.args[1])
         for left, right in zip(left_list, right_list):
@@ -168,22 +186,24 @@ def break_into_vars(expr):
                 vars.append(left + right)
 
         return vars
+    else:
+        raise TypeError("Unsupported expression type: {}".format(type(expr)))
 
 
-def get_indices_from_index(index_obj):
+def get_indices_from_index(index_obj: index) -> list[tuple[int, ...]]:
     """Returns all indices used in an index object."""
-    key = index_obj.get_data()[0]  # key = (start, stop, step)
+    key: list[slice] = index_obj.get_data()[0]  # key = (start, stop, step)
 
-    shape = []
+    shape: list[int] = []
     for k in key:
         # number of 'rows' is ceil((k.stop - k.start) / k.step)
         dim_size = (k.stop - k.start + k.step - 1) // k.step
         shape.append(dim_size)
-    shape = tuple(shape)
+    shape_tuple = tuple(shape)
 
-    indices = []
-    for rel_idx in np.ndindex(shape):
-        abs_idx = []
+    indices: list[tuple[int, ...]] = []
+    for rel_idx in np.ndindex(shape_tuple):
+        abs_idx: list[int] = []
         for axis, k in enumerate(key):
             abs_idx.append(k.start + rel_idx[axis] * k.step)
         indices.append(tuple(abs_idx))
@@ -191,22 +211,24 @@ def get_indices_from_index(index_obj):
     return indices
 
 
-def get_var_id_pos_list_from_cone(expr, solver):
+def get_var_id_pos_list_from_cone(expr: cp.Expression, solver: str) -> list[VarInfoT]:
     """Return a list of (var_id, pos)."""
     if not expr.variables():
         return []
 
     data, _, _ = cp.Problem(cp.Minimize(expr)).get_problem_data(solver=solver)
 
-    col_to_var_id = {col: var_id for var_id, col in data["param_prob"].var_id_to_col.items()}
+    col_to_var_id: dict[int, int] = {
+        col: var_id for var_id, col in data["param_prob"].var_id_to_col.items()
+    }
     start_cols = sorted(col_to_var_id.keys()) + [len(data["c"])]
-    active_var_id_set = {var.id for var in expr.variables()}
-    num_zeros_nonneg = data["dims"].zero + data["dims"].nonneg
+    active_var_id_set: set[int] = {var.id for var in expr.variables()}
+    num_zeros_nonneg: int = data["dims"].zero + data["dims"].nonneg
 
-    var_id_pos_list = []
+    var_id_pos_list: list[VarInfoT] = []
     start_col_i = 0
 
-    for col, val in enumerate(data["c"]):
+    for col, val in enumerate(t.cast(list[float], data["c"])):
         if not val:
             continue
         while col >= start_cols[start_col_i + 1]:
@@ -215,27 +237,27 @@ def get_var_id_pos_list_from_cone(expr, solver):
         var_id = col_to_var_id[start_col]
         if var_id not in active_var_id_set:
             continue
-        var_id_pos_list.append((var_id, col - start_col))
+        var_id_pos_list.append(VarInfoT(var_id, col - start_col))
 
     if data.get("G", None) is None:
         return var_id_pos_list
 
     G = data["G"].tocoo()
-    for col in sorted(G.col[G.row >= num_zeros_nonneg]):
+    for col in sorted(t.cast(list[int], G.col[G.row >= num_zeros_nonneg])):
         while col >= start_cols[start_col_i + 1]:
             start_col_i += 1
         start_col = start_cols[start_col_i]
         var_id = col_to_var_id[start_col]
         if var_id not in active_var_id_set:
             continue
-        var_id_pos_list.append((var_id, col - start_col))
+        var_id_pos_list.append(VarInfoT(var_id, col - start_col))
 
     return var_id_pos_list
 
 
-def heapsched_rt(lrts, k):
+def heapsched_rt(lrts: list[float], k: int) -> float:
     """Return a mathematical parallel runtime with k cpus for incoming jobs."""
-    h = []
+    h: list[float] = []
     for rt in lrts[:k]:
         heappush(h, rt)
 
@@ -250,7 +272,7 @@ def heapsched_rt(lrts, k):
     return curr_rt
 
 
-def parallelized_rt(lrts, k):
+def parallelized_rt(lrts: list[float], k: int) -> float:
     """Return a mathematical parallel runtime with k cpus for sorted jobs."""
     if len(lrts) == 0:
         return 0.0
