@@ -60,6 +60,8 @@ def expand_expr(expr: cp.Expression) -> list[cp.Expression]:
     elif isinstance(expr, quad_over_lin):
         return [quad_over_lin(new_expr, expr.args[1]) for new_expr in expand_expr(expr.args[0])]
     elif isinstance(expr, log):
+        if len(expr.shape) == 0:
+            return [expr]
         return [log(new_expr) for new_expr in expand_expr(expr.args[0])]
     elif isinstance(expr, trace):
         return [expr.args[0][i, i] for i in range(expr.args[0].shape[0])]
