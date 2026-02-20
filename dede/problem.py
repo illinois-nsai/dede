@@ -70,7 +70,6 @@ class Problem(CpProblem):
             demand_variables: list of demand constraints
         """
         start = time.time()
-
         # breakdown constraints
         constrs_r_converted = [self._convert_inequality(constr) for constr in resource_constraints]
         constrs_d_converted = [self._convert_inequality(constr) for constr in demand_constraints]
@@ -177,9 +176,8 @@ class Problem(CpProblem):
             self._subprob_cache.invalidate()
             self._subprob_cache.rho = rho
             # initialize ray
-            ray.shutdown()
             self._subprob_cache.num_cpus = num_cpus
-            ray.init(num_cpus=num_cpus)
+            ray.init(address="auto")
             # store subproblem in last solution
             self._subprob_cache.probs = self.get_subproblems(num_cpus, rho)
             # store parameter index in z solutions for x problems
@@ -246,6 +244,7 @@ class Problem(CpProblem):
 
         self.populate_vars_with_solution()
         coeff = 1 if self._problem_type == Minimize else -1
+
         return t.cast(
             np.floating[t.Any],
             coeff * sum(ray.get([prob.get_obj.remote() for prob in self._subprob_cache.probs])),
@@ -364,6 +363,7 @@ class Problem(CpProblem):
             var_id_to_pos_d = [
                 [self.constr_dict_d[constr] for constr in constrs] for constrs in constrs_d
             ]
+
             # build subproblems
             actor = ray.remote(SubproblemsWrap)
             probs.append(
