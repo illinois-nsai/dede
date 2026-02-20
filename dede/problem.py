@@ -27,44 +27,49 @@ ConstraintT = t.Union[Equality, Zero, Inequality]
 
 
 @ray.remote
-def process_obj_chunk(
-    chunk: list[cp.Expression],
+def process_obj_chunk_indices(
+    chunk_indices: list[int],
+    expr_list_ref: list[cp.Expression],  # Reference to the shared object store
     solver: str,
     var_id_pos_to_idx: dict[t.Any, list[tuple[int, int]]],
     num_r: int,
     num_d: int,
-) -> tuple[list[list[cp.Expression]], list[list[cp.Expression]]]:
-    """Processes a chunk and returns flat lists of expressions to avoid recursion."""
+) -> tuple[list[list[int]], list[list[int]]]:
+    """
+    Returns only integer indices of the expressions.
+    Moving integers avoids the RecursionError entirely.
+    """
+    # Local accumulation of INDICES
+    local_r_idx: list[list[int]] = [[] for _ in range(num_r)]
+    local_d_idx: list[list[int]] = [[] for _ in range(num_d)]
 
-    # Accumulate into lists of lists (NOT CVXPY Add objects)
-    local_obj_r_lists: list[list[cp.Expression]] = [[] for _ in range(num_r)]
-    local_obj_d_lists: list[list[cp.Expression]] = [[] for _ in range(num_d)]
+    for idx in chunk_indices:
+        # Access the object from the shared reference
+        obj: cp.Expression = expr_list_ref[idx]
 
-    for obj in chunk:
         var_id_pos_list = get_var_id_pos_list_from_cone(obj, solver)
 
         if not var_id_pos_list:
             if num_r > 0:
-                local_obj_r_lists[0].append(obj)
+                local_r_idx[0].append(idx)
             elif num_d > 0:
-                local_obj_d_lists[0].append(obj)
+                local_d_idx[0].append(idx)
             continue
 
-        # Find the intersection of groups this variable belongs to
         id_set = set(var_id_pos_to_idx[var_id_pos_list[0]])
         for var_id_pos in var_id_pos_list[1:]:
             id_set &= set(var_id_pos_to_idx[var_id_pos])
 
         if not id_set:
-            raise ValueError("Objective not separable.")
+            raise ValueError(f"Objective term at index {idx} is not separable.")
 
-        idx = list(id_set)[0]
-        if idx[0] == 0:
-            local_obj_r_lists[idx[1]].append(obj)
+        target: tuple[int, int] = list(id_set)[0]
+        if target[0] == 0:
+            local_r_idx[target[1]].append(idx)
         else:
-            local_obj_d_lists[idx[1]].append(obj)
+            local_d_idx[target[1]].append(idx)
 
-    return local_obj_r_lists, local_obj_d_lists
+    return local_r_idx, local_d_idx
 
 
 class SubprobCache:
@@ -466,15 +471,21 @@ class Problem(CpProblem):
 
         expr_list: list[cp.Expression] = expand_expr(self.objective.expr)
 
-        # Determine chunking based on available CPUs
-        num_cpus = int(ray.cluster_resources().get("CPU", 1))
-        chunks = np.array_split(np.arange(len(expr_list)), num_cpus)
-
+        # 1. Put heavy data in Object Store
+        # This ensures workers pull data rather than having it pushed/pickled to them
+        expr_ref = ray.put(expr_list)
         dict_ref = ray.put(dict(var_id_pos_to_idx))
 
+        # 2. Chunk only the indices
+        num_cpus = int(ray.cluster_resources().get("CPU", 1))
+        indices = list(range(len(expr_list)))
+        chunks = np.array_split(indices, num_cpus)
+
+        # 3. Dispatch
         futures = [
-            process_obj_chunk.remote(
-                [expr_list[i] for i in c],
+            process_obj_chunk_indices.remote(
+                c.tolist(),
+                expr_ref,
                 self._solver,
                 dict_ref,
                 len(self.constrs_gps_r),
@@ -484,24 +495,20 @@ class Problem(CpProblem):
             if len(c) > 0
         ]
 
+        # 4. Collect results (now just lists of integers)
         results = ray.get(futures)
 
-        # Containers for all terms across all workers
-        all_r_terms: list[list[cp.Expression]] = [[] for _ in self.constrs_gps_r]
-        all_d_terms: list[list[cp.Expression]] = [[] for _ in self.constrs_gps_d]
+        # 5. Reconstruct groups on the driver
+        # Since this happens locally on one process, no pickling occurs
+        obj_r: list[cp.Expression] = []
+        for g_idx in range(len(self.constrs_gps_r)):
+            # Gather all expression objects using the returned indices
+            group_terms = [expr_list[i] for res in results for i in res[0][g_idx]]
+            obj_r.append(cp.sum(group_terms) if group_terms else cp.Constant(0))
 
-        for local_r, local_d in results:
-            for i, group_terms in enumerate(local_r):
-                all_r_terms[i].extend(group_terms)
-            for i, group_terms in enumerate(local_d):
-                all_d_terms[i].extend(group_terms)
-
-        # Use cp.sum for a flat, shallow tree structure
-        obj_r: list[cp.Expression] = [
-            cp.sum(terms) if terms else cp.Constant(0) for terms in all_r_terms
-        ]
-        obj_d: list[cp.Expression] = [
-            cp.sum(terms) if terms else cp.Constant(0) for terms in all_d_terms
-        ]
+        obj_d: list[cp.Expression] = []
+        for g_idx in range(len(self.constrs_gps_d)):
+            group_terms = [expr_list[i] for res in results for i in res[1][g_idx]]
+            obj_d.append(cp.sum(group_terms) if group_terms else cp.Constant(0))
 
         return obj_r, obj_d
