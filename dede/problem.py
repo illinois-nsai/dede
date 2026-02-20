@@ -1,4 +1,3 @@
-import os
 import time
 import typing as t
 from collections import defaultdict
@@ -31,40 +30,41 @@ ConstraintT = t.Union[Equality, Zero, Inequality]
 def process_obj_chunk(
     chunk: list[cp.Expression],
     solver: str,
-    var_id_pos_to_idx: dict[VarInfoT, list[tuple[int, int]]],
+    var_id_pos_to_idx: dict[t.Any, list[tuple[int, int]]],
     num_r: int,
     num_d: int,
-) -> tuple[list[cp.Expression], list[cp.Expression]]:
-    """Processes a chunk of objective terms and maps them to r or d constraints."""
+) -> tuple[list[list[cp.Expression]], list[list[cp.Expression]]]:
+    """Processes a chunk and returns flat lists of expressions to avoid recursion."""
 
-    local_obj_r: list[cp.Expression] = [cp.Constant(0) for _ in range(num_r)]
-    local_obj_d: list[cp.Expression] = [cp.Constant(0) for _ in range(num_d)]
+    # Accumulate into lists of lists (NOT CVXPY Add objects)
+    local_obj_r_lists: list[list[cp.Expression]] = [[] for _ in range(num_r)]
+    local_obj_d_lists: list[list[cp.Expression]] = [[] for _ in range(num_d)]
 
     for obj in chunk:
-        var_id_pos_list: list[t.Any] = get_var_id_pos_list_from_cone(obj, solver)
+        var_id_pos_list = get_var_id_pos_list_from_cone(obj, solver)
 
         if not var_id_pos_list:
             if num_r > 0:
-                local_obj_r[0] += obj
+                local_obj_r_lists[0].append(obj)
             elif num_d > 0:
-                local_obj_d[0] += obj
+                local_obj_d_lists[0].append(obj)
             continue
 
-        # Set intersection logic to find the shared index
-        id_set: set[tuple[int, int]] = set(var_id_pos_to_idx[var_id_pos_list[0]])
+        # Find the intersection of groups this variable belongs to
+        id_set = set(var_id_pos_to_idx[var_id_pos_list[0]])
         for var_id_pos in var_id_pos_list[1:]:
             id_set &= set(var_id_pos_to_idx[var_id_pos])
 
         if not id_set:
             raise ValueError("Objective not separable.")
 
-        idx: tuple[int, int] = list(id_set)[0]
+        idx = list(id_set)[0]
         if idx[0] == 0:
-            local_obj_r[idx[1]] += obj
+            local_obj_r_lists[idx[1]].append(obj)
         else:
-            local_obj_d[idx[1]] += obj
+            local_obj_d_lists[idx[1]].append(obj)
 
-    return local_obj_r, local_obj_d
+    return local_obj_r_lists, local_obj_d_lists
 
 
 class SubprobCache:
@@ -194,20 +194,12 @@ class Problem(CpProblem):
             coeff = 1 if self._problem_type == Minimize else -1
             return t.cast(np.floating[t.Any], coeff * self.value)
 
-        # initialize num_cpus, rho
-        if num_cpus is None:
-            if self._subprob_cache.num_cpus is None:
-                num_cpus = os.cpu_count() or 1
-            else:
-                num_cpus = self._subprob_cache.num_cpus
+        num_cpus = int(ray.cluster_resources().get("CPU", 1))
         if rho is None:
             if self._subprob_cache.rho is None:
                 rho = 1
             else:
                 rho = self._subprob_cache.rho
-        # check whether num_cpus is more than all available
-        if num_cpus > (os.cpu_count() or 1):
-            raise ValueError(f"{num_cpus} CPUs exceeds upper limit of {os.cpu_count()}.")
 
         # check whether settings has been changed
         key = self._subprob_cache.make_key(rho, num_cpus)
@@ -460,7 +452,8 @@ class Problem(CpProblem):
 
     def group_objective(self) -> tuple[list[cp.Expression], list[cp.Expression]]:
         """Split objective into corresponding constraint groups"""
-        var_id_pos_to_idx: dict[VarInfoT, list[tuple[int, int]]] = defaultdict(list)
+        var_id_pos_to_idx: dict[t.Any, list[tuple[int, int]]] = defaultdict(list)
+
         for i, constrs_gps, constr_dict in zip(
             [0, 1],
             [self.constrs_gps_r, self.constrs_gps_d],
@@ -471,20 +464,14 @@ class Problem(CpProblem):
                     for var_id_pos in constr_dict[constr]:
                         var_id_pos_to_idx[var_id_pos].append((i, j))
 
-        obj_r: list[cp.Expression] = [cp.Constant(0) for _ in self.constrs_gps_r]
-        obj_d: list[cp.Expression] = [cp.Constant(0) for _ in self.constrs_gps_d]
-        expr_list = expand_expr(self.objective.expr)
+        expr_list: list[cp.Expression] = expand_expr(self.objective.expr)
 
-        # 2. Chunk the expressions
-        chunks = np.array_split(
-            np.arange(len(expr_list)), int(ray.cluster_resources().get("CPU", 1))
-        )
+        # Determine chunking based on available CPUs
+        num_cpus = int(ray.cluster_resources().get("CPU", 1))
+        chunks = np.array_split(np.arange(len(expr_list)), num_cpus)
 
-        # 3. Put heavy shared data in Ray object store (CRITICAL for speed)
-        # This prevents copying the large dict 16 times
-        dict_ref = ray.put(var_id_pos_to_idx)
+        dict_ref = ray.put(dict(var_id_pos_to_idx))
 
-        # 4. Dispatch tasks
         futures = [
             process_obj_chunk.remote(
                 [expr_list[i] for i in c],
@@ -494,18 +481,27 @@ class Problem(CpProblem):
                 len(self.constrs_gps_d),
             )
             for c in chunks
+            if len(c) > 0
         ]
 
-        # 5. Collect and Merge
         results = ray.get(futures)
 
-        obj_r = [cp.Constant(0) for _ in self.constrs_gps_r]
-        obj_d = [cp.Constant(0) for _ in self.constrs_gps_d]
+        # Containers for all terms across all workers
+        all_r_terms: list[list[cp.Expression]] = [[] for _ in self.constrs_gps_r]
+        all_d_terms: list[list[cp.Expression]] = [[] for _ in self.constrs_gps_d]
 
         for local_r, local_d in results:
-            for i in range(len(obj_r)):
-                obj_r[i] += local_r[i]
-            for i in range(len(obj_d)):
-                obj_d[i] += local_d[i]
+            for i, group_terms in enumerate(local_r):
+                all_r_terms[i].extend(group_terms)
+            for i, group_terms in enumerate(local_d):
+                all_d_terms[i].extend(group_terms)
+
+        # Use cp.sum for a flat, shallow tree structure
+        obj_r: list[cp.Expression] = [
+            cp.sum(terms) if terms else cp.Constant(0) for terms in all_r_terms
+        ]
+        obj_d: list[cp.Expression] = [
+            cp.sum(terms) if terms else cp.Constant(0) for terms in all_d_terms
+        ]
 
         return obj_r, obj_d
