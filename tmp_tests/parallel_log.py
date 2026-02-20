@@ -1,5 +1,6 @@
 import csv
 import time
+from pathlib import Path
 
 import ray
 
@@ -33,7 +34,7 @@ if __name__ == "__main__":
         arr.append(res)
 
     # Writing to the CSV
-    with open("output.csv", "w", newline="") as f:
+    with open(Path.home() / "output.csv", "w", newline="") as f:
         writer = csv.writer(f)
 
         # Optional: Write a header
