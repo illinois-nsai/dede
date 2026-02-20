@@ -177,6 +177,7 @@ class Problem(CpProblem):
             self._subprob_cache.rho = rho
             # initialize ray
             self._subprob_cache.num_cpus = num_cpus
+            ray.shutdown()
             ray.init(address="auto")
             # store subproblem in last solution
             self._subprob_cache.probs = self.get_subproblems(num_cpus, rho)
