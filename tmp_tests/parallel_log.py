@@ -1,10 +1,13 @@
 import csv
+import sys
 import time
 from pathlib import Path
 
 import ray
 
 import dede as dd
+
+sys.setrecursionlimit(10000)
 
 ray.init(address="auto")
 
