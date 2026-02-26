@@ -28,43 +28,49 @@ ConstraintT = t.Union[Equality, Zero, Inequality]
 
 
 @ray.remote
-def process_obj_chunk(
-    chunk: list[cp.Expression],
+def process_obj_chunk_indices(
+    chunk_indices: list[int],
+    expr_list_ref: list[cp.Expression],  # Reference to the shared object store
     solver: str,
     var_id_pos_to_idx: dict[VarInfoT, list[tuple[int, int]]],
     num_r: int,
     num_d: int,
-) -> tuple[list[cp.Expression], list[cp.Expression]]:
-    """Processes a chunk of objective terms and maps them to r or d constraints."""
+) -> tuple[list[list[int]], list[list[int]]]:
+    """
+    Returns only integer indices of the expressions.
+    Moving integers avoids the RecursionError entirely.
+    """
+    # Local accumulation of INDICES
+    local_r_idx: list[list[int]] = [[] for _ in range(num_r)]
+    local_d_idx: list[list[int]] = [[] for _ in range(num_d)]
 
-    local_obj_r: list[cp.Expression] = [cp.Constant(0) for _ in range(num_r)]
-    local_obj_d: list[cp.Expression] = [cp.Constant(0) for _ in range(num_d)]
+    for idx in chunk_indices:
+        # Access the object from the shared reference
+        obj: cp.Expression = expr_list_ref[idx]
 
-    for obj in chunk:
-        var_id_pos_list: list[t.Any] = get_var_id_pos_list_from_cone(obj, solver)
+        var_id_pos_list = get_var_id_pos_list_from_cone(obj, solver)
 
         if not var_id_pos_list:
             if num_r > 0:
-                local_obj_r[0] += obj
+                local_r_idx[0].append(idx)
             elif num_d > 0:
-                local_obj_d[0] += obj
+                local_d_idx[0].append(idx)
             continue
 
-        # Set intersection logic to find the shared index
-        id_set: set[tuple[int, int]] = set(var_id_pos_to_idx[var_id_pos_list[0]])
+        id_set = set(var_id_pos_to_idx[var_id_pos_list[0]])
         for var_id_pos in var_id_pos_list[1:]:
             id_set &= set(var_id_pos_to_idx[var_id_pos])
 
         if not id_set:
-            raise ValueError("Objective not separable.")
+            raise ValueError(f"Objective term at index {idx} is not separable.")
 
-        idx: tuple[int, int] = list(id_set)[0]
-        if idx[0] == 0:
-            local_obj_r[idx[1]] += obj
+        target: tuple[int, int] = list(id_set)[0]
+        if target[0] == 0:
+            local_r_idx[target[1]].append(idx)
         else:
-            local_obj_d[idx[1]] += obj
+            local_d_idx[target[1]].append(idx)
 
-    return local_obj_r, local_obj_d
+    return local_r_idx, local_d_idx
 
 
 class SubprobCache:
@@ -476,19 +482,21 @@ class Problem(CpProblem):
         obj_d: list[cp.Expression] = [cp.Constant(0) for _ in self.constrs_gps_d]
         expr_list = expand_expr(self.objective.expr)
 
-        # 2. Chunk the expressions
-        chunks = np.array_split(
-            np.arange(len(expr_list)), int(ray.cluster_resources().get("CPU", 1))
-        )
+        # 1. Put heavy data in Object Store
+        # This ensures workers pull data rather than having it pushed/pickled to them
+        expr_ref = ray.put(expr_list)
+        dict_ref = ray.put(dict(var_id_pos_to_idx))
 
-        # 3. Put heavy shared data in Ray object store (CRITICAL for speed)
-        # This prevents copying the large dict 16 times
-        dict_ref = ray.put(var_id_pos_to_idx)
+        # 2. Chunk only the indices
+        num_cpus = int(ray.cluster_resources().get("CPU", 1))
+        indices = list(range(len(expr_list)))
+        chunks = np.array_split(indices, num_cpus)
 
-        # 4. Dispatch tasks
+        # 3. Dispatch
         futures = [
-            process_obj_chunk.remote(
-                [expr_list[i] for i in c],
+            process_obj_chunk_indices.remote(
+                c.tolist(),
+                expr_ref,
                 self._solver,
                 dict_ref,
                 len(self.constrs_gps_r),
@@ -497,16 +505,20 @@ class Problem(CpProblem):
             for c in chunks
         ]
 
-        # 5. Collect and Merge
+        # 4. Collect results (now just lists of integers)
         results = ray.get(futures)
 
-        obj_r = [cp.Constant(0) for _ in self.constrs_gps_r]
-        obj_d = [cp.Constant(0) for _ in self.constrs_gps_d]
+        # 5. Reconstruct groups on the driver
+        # Since this happens locally on one process, no pickling occurs
+        obj_r: list[cp.Expression] = []
+        for g_idx in range(len(self.constrs_gps_r)):
+            # Gather all expression objects using the returned indices
+            group_terms = [expr_list[i] for res in results for i in res[0][g_idx]]
+            obj_r.append(cp.sum(group_terms) if group_terms else cp.Constant(0))
 
-        for local_r, local_d in results:
-            for i in range(len(obj_r)):
-                obj_r[i] += local_r[i]
-            for i in range(len(obj_d)):
-                obj_d[i] += local_d[i]
+        obj_d: list[cp.Expression] = []
+        for g_idx in range(len(self.constrs_gps_d)):
+            group_terms = [expr_list[i] for res in results for i in res[1][g_idx]]
+            obj_d.append(cp.sum(group_terms) if group_terms else cp.Constant(0))
 
         return obj_r, obj_d
