@@ -27,6 +27,46 @@ ObjectiveT = t.Union[cp.Maximize, cp.Minimize]
 ConstraintT = t.Union[Equality, Zero, Inequality]
 
 
+@ray.remote
+def process_obj_chunk(
+    chunk: list[cp.Expression],
+    solver: str,
+    var_id_pos_to_idx: dict[VarInfoT, list[tuple[int, int]]],
+    num_r: int,
+    num_d: int,
+) -> tuple[list[cp.Expression], list[cp.Expression]]:
+    """Processes a chunk of objective terms and maps them to r or d constraints."""
+
+    local_obj_r: list[cp.Expression] = [cp.Constant(0) for _ in range(num_r)]
+    local_obj_d: list[cp.Expression] = [cp.Constant(0) for _ in range(num_d)]
+
+    for obj in chunk:
+        var_id_pos_list: list[t.Any] = get_var_id_pos_list_from_cone(obj, solver)
+
+        if not var_id_pos_list:
+            if num_r > 0:
+                local_obj_r[0] += obj
+            elif num_d > 0:
+                local_obj_d[0] += obj
+            continue
+
+        # Set intersection logic to find the shared index
+        id_set: set[tuple[int, int]] = set(var_id_pos_to_idx[var_id_pos_list[0]])
+        for var_id_pos in var_id_pos_list[1:]:
+            id_set &= set(var_id_pos_to_idx[var_id_pos])
+
+        if not id_set:
+            raise ValueError("Objective not separable.")
+
+        idx: tuple[int, int] = list(id_set)[0]
+        if idx[0] == 0:
+            local_obj_r[idx[1]] += obj
+        else:
+            local_obj_d[idx[1]] += obj
+
+    return local_obj_r, local_obj_d
+
+
 class SubprobCache:
     """Cache subproblems."""
 
@@ -434,25 +474,39 @@ class Problem(CpProblem):
 
         obj_r: list[cp.Expression] = [cp.Constant(0) for _ in self.constrs_gps_r]
         obj_d: list[cp.Expression] = [cp.Constant(0) for _ in self.constrs_gps_d]
-        for obj in expand_expr(self.objective.expr):
-            var_id_pos_list = get_var_id_pos_list_from_cone(obj, self._solver)
-            if not var_id_pos_list:
-                if len(obj_r) > 0:
-                    obj_r[0] += obj
-                elif len(obj_d) > 0:
-                    obj_d[0] += obj
-                continue
+        expr_list = expand_expr(self.objective.expr)
 
-            id_set = set(var_id_pos_to_idx[var_id_pos_list[0]])
-            for var_id_pos in var_id_pos_list[1:]:
-                id_set = id_set & set(var_id_pos_to_idx[var_id_pos])
-            if not id_set:
-                raise ValueError("Objective not separable.")
+        # 2. Chunk the expressions
+        chunks = np.array_split(
+            np.arange(len(expr_list)), int(ray.cluster_resources().get("CPU", 1))
+        )
 
-            idx = list(id_set)[0]
-            if idx[0] == 0:
-                obj_r[idx[1]] += obj
-            else:
-                obj_d[idx[1]] += obj
+        # 3. Put heavy shared data in Ray object store (CRITICAL for speed)
+        # This prevents copying the large dict 16 times
+        dict_ref = ray.put(var_id_pos_to_idx)
+
+        # 4. Dispatch tasks
+        futures = [
+            process_obj_chunk.remote(
+                [expr_list[i] for i in c],
+                self._solver,
+                dict_ref,
+                len(self.constrs_gps_r),
+                len(self.constrs_gps_d),
+            )
+            for c in chunks
+        ]
+
+        # 5. Collect and Merge
+        results = ray.get(futures)
+
+        obj_r = [cp.Constant(0) for _ in self.constrs_gps_r]
+        obj_d = [cp.Constant(0) for _ in self.constrs_gps_d]
+
+        for local_r, local_d in results:
+            for i in range(len(obj_r)):
+                obj_r[i] += local_r[i]
+            for i in range(len(obj_d)):
+                obj_d[i] += local_d[i]
 
         return obj_r, obj_d
