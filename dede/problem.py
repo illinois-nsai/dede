@@ -91,8 +91,6 @@ class Problem(CpProblem):
             resource_variables: list of resource constraints
             demand_variables: list of demand constraints
         """
-        start = time.time()
-
         # breakdown constraints
         constrs_r_converted = [self._convert_inequality(constr) for constr in resource_constraints]
         constrs_d_converted = [self._convert_inequality(constr) for constr in demand_constraints]
@@ -139,9 +137,6 @@ class Problem(CpProblem):
 
         self._obj_expr_r = None
         self._obj_expr_d = None
-
-        end = time.time()
-        print("init time:", end - start)
 
     @classmethod
     def _convert_inequality(cls, constr: ConstraintT) -> cp.Constraint:
