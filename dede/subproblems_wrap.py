@@ -17,16 +17,27 @@ class SubproblemsWrap:
         self,
         idx_r: list[int],
         idx_d: list[int],
-        obj_gps_r: t.Sequence[cp.Expression],
-        obj_gps_d: t.Sequence[cp.Expression],
-        constrs_gps_r: list[list[cp.Constraint]],
-        constrs_gps_d: list[list[cp.Constraint]],
-        var_id_to_pos_gps_r: list[list[list[VarInfoT]]],
-        var_id_to_pos_gps_d: list[list[list[VarInfoT]]],
+        obj_gps_r_full: t.Sequence[cp.Expression],
+        obj_gps_d_full: t.Sequence[cp.Expression],
+        constrs_gps_r_full: list[list[cp.Constraint]],
+        constrs_gps_d_full: list[list[cp.Constraint]],
+        constr_dict_r: dict[int, list[VarInfoT]],
+        constr_dict_d: dict[int, list[VarInfoT]],
         var_id_pos_set_r: set[VarInfoT],
         var_id_pos_set_d: set[VarInfoT],
         rho: float,
     ):
+        obj_gps_r = [obj_gps_r_full[i] for i in idx_r]
+        obj_gps_d = [obj_gps_d_full[i] for i in idx_d]
+        constrs_gps_r = [constrs_gps_r_full[i] for i in idx_r]
+        constrs_gps_d = [constrs_gps_d_full[i] for i in idx_d]
+        var_id_to_pos_gps_r = [
+            [constr_dict_r[constr.id] for constr in constrs] for constrs in constrs_gps_r
+        ]
+        var_id_to_pos_gps_d = [
+            [constr_dict_d[constr.id] for constr in constrs] for constrs in constrs_gps_d
+        ]
+
         # sort subproblem for better data locality
         self.probs_r: list[Subproblem] = []
         i: int

@@ -1,3 +1,4 @@
+import functools
 import os
 import time
 import typing as t
@@ -25,6 +26,25 @@ from .utils import (
 KeyT = tuple[float, int, str]
 ObjectiveT = t.Union[cp.Maximize, cp.Minimize]
 ConstraintT = t.Union[Equality, Zero, Inequality]
+
+
+def timer(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        start_time = time.perf_counter()
+        result = func(*args, **kwargs)
+        end_time = time.perf_counter()
+        print(f"Executed {func.__name__} in {end_time - start_time:.4f}s")
+        return result
+
+    return wrapper
+
+
+def time_all_methods(cls):
+    for name, val in vars(cls).items():
+        if callable(val):
+            setattr(cls, name, timer(val))
+    return cls
 
 
 class SubprobCache:
@@ -55,6 +75,7 @@ class SubprobCache:
         return (rho, num_cpus, address)
 
 
+@time_all_methods
 class Problem(CpProblem):
     """Build a resource allocation problem."""
 
@@ -70,8 +91,6 @@ class Problem(CpProblem):
             resource_variables: list of resource constraints
             demand_variables: list of demand constraints
         """
-        start = time.time()
-
         # breakdown constraints
         constrs_r_converted = [self._convert_inequality(constr) for constr in resource_constraints]
         constrs_d_converted = [self._convert_inequality(constr) for constr in demand_constraints]
@@ -118,9 +137,6 @@ class Problem(CpProblem):
 
         self._obj_expr_r = None
         self._obj_expr_d = None
-
-        end = time.time()
-        print("init time:", end - start)
 
     @classmethod
     def _convert_inequality(cls, constr: ConstraintT) -> cp.Constraint:
@@ -366,39 +382,37 @@ class Problem(CpProblem):
         for var_id_pos in self.constr_dict_d.values():
             var_id_pos_set_d.update(var_id_pos)
 
+        # serialize expensive objects exactly once
+        obj_expr_r_ref = ray.put(obj_expr_r)
+        obj_expr_d_ref = ray.put(obj_expr_d)
+        constrs_r_ref = ray.put(self.constrs_gps_r)
+        constrs_d_ref = ray.put(self.constrs_gps_d)
+        constr_dict_r_ref = ray.put({key.id: value for key, value in self.constr_dict_r.items()})
+        constr_dict_d_ref = ray.put({key.id: value for key, value in self.constr_dict_d.items()})
+        var_id_pos_set_r_ref = ray.put(var_id_pos_set_r)
+        var_id_pos_set_d_ref = ray.put(var_id_pos_set_d)
+
         # build actors with subproblems
         probs: list[ray.actor.ActorProxy[SubproblemsWrap]] = []
         for cpu in range(num_cpus):
             # get constraint idx for the group
             idx_r: list[int] = constrs_gps_idx_r[cpu::num_cpus].tolist()
             idx_d: list[int] = constrs_gps_idx_d[cpu::num_cpus].tolist()
-            # get constraints group
-            constrs_r = [self.constrs_gps_r[j] for j in idx_r]
-            constrs_d = [self.constrs_gps_d[j] for j in idx_d]
-            # get obj groups
-            obj_r = [obj_expr_r[j] for j in idx_r]
-            obj_d = [obj_expr_d[j] for j in idx_d]
-            # get var_id_to_pos_list
-            var_id_to_pos_r = [
-                [self.constr_dict_r[constr] for constr in constrs] for constrs in constrs_r
-            ]
-            var_id_to_pos_d = [
-                [self.constr_dict_d[constr] for constr in constrs] for constrs in constrs_d
-            ]
+
             # build subproblems
             actor = ray.remote(SubproblemsWrap)
             probs.append(
                 actor.remote(
                     idx_r,
                     idx_d,
-                    obj_r,
-                    obj_d,
-                    constrs_r,
-                    constrs_d,
-                    var_id_to_pos_r,
-                    var_id_to_pos_d,
-                    var_id_pos_set_r,
-                    var_id_pos_set_d,
+                    obj_expr_r_ref,
+                    obj_expr_d_ref,
+                    constrs_r_ref,
+                    constrs_d_ref,
+                    constr_dict_r_ref,
+                    constr_dict_d_ref,
+                    var_id_pos_set_r_ref,
+                    var_id_pos_set_d_ref,
                     rho,
                 )
             )
