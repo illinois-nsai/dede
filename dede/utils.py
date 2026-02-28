@@ -254,9 +254,6 @@ def parallelized_rt(lrts, k):
     """Return a mathematical parallel runtime with k cpus for sorted jobs."""
     if len(lrts) == 0:
         return 0.0
-    inorder_rt = heapsched_rt(lrts, k)
-    cp_bound = max(lrts)
-    area_bound = sum(lrts) / k
     lrts.sort(reverse=True)
     two_approx = heapsched_rt(lrts, k)
 

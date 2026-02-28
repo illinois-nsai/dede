@@ -289,15 +289,16 @@ class Problem(CpProblem):
         # shuffle group order
         constrs_gps_idx_r = np.arange(len(self.constrs_gps_r))
         constrs_gps_idx_d = np.arange(len(self.constrs_gps_d))
-        np.random.shuffle(constrs_gps_idx_r)
-        np.random.shuffle(constrs_gps_idx_d)
+
+        np.random.shuffle(constrs_gps_idx_r)  # noqa: NPY002 TODO: replace with np.random.Generator at some point
+        np.random.shuffle(constrs_gps_idx_d)  # noqa: NPY002 TODO: replace with np.random.Generator at some point
 
         # get the set of var_id_pos
         var_id_pos_set_r = set()
-        for constr, var_id_pos in self.constr_dict_r.items():
+        for var_id_pos in self.constr_dict_r.values():
             var_id_pos_set_r.update(var_id_pos)
         var_id_pos_set_d = set()
-        for constr, var_id_pos in self.constr_dict_d.items():
+        for var_id_pos in self.constr_dict_d.values():
             var_id_pos_set_d.update(var_id_pos)
 
         # build actors with subproblems
