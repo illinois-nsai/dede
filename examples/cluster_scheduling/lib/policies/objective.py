@@ -1,6 +1,5 @@
 from enum import Enum, unique
 
-
 OBJ_STRS = ["max_min_fairness_perf", "max_proportional_fairness", "gandiva"]
 
 

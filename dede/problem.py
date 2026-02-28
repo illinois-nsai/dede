@@ -1,26 +1,22 @@
-import numpy as np
-import cvxpy as cp
-import time
-import ray
 import os
+import time
 from collections import defaultdict
 
-from cvxpy.problems.problem import Problem as CpProblem
-from cvxpy.constraints.zero import Zero, Equality
+import cvxpy as cp
+import numpy as np
+import ray
 from cvxpy.constraints.nonpos import Inequality
-from cvxpy.expressions.variable import Variable
-from cvxpy.problems.objective import Maximize, Minimize
+from cvxpy.constraints.zero import Equality, Zero
+from cvxpy.problems.objective import Minimize
+from cvxpy.problems.problem import Problem as CpProblem
 
-from .utils import (
-    expand_expr,
-    get_var_id_pos_list_from_cone,
-    get_var_id_pos_list_from_linear)
-from .subproblems_wrap import SubproblemsWrap
 from .constraints_utils import breakdown_constr
+from .subproblems_wrap import SubproblemsWrap
+from .utils import expand_expr, get_var_id_pos_list_from_cone, get_var_id_pos_list_from_linear
 
 
 class SubprobCache:
-    '''Cache subproblems.'''
+    """Cache subproblems."""
 
     def __init__(self):
         self.key = None
@@ -41,23 +37,21 @@ class SubprobCache:
 
 
 class Problem(CpProblem):
-    '''Build a resource allocation problem.'''
+    """Build a resource allocation problem."""
 
     def __init__(self, objective, resource_constraints, demand_constraints):
-        '''Initialize problem with the objective and constraints.
+        """Initialize problem with the objective and constraints.
         Args:
             objective: Minimize or Maximize. The problem's objective
             resource_variables: list of resource constraints
             demand_variables: list of demand constraints
-        '''
+        """
         start = time.time()
-        
+
         # breakdown constraints
-        constrs_r_converted = [
-            self.convert_inequality(constr) for constr in resource_constraints]
-        constrs_d_converted = [
-            self.convert_inequality(constr) for constr in demand_constraints]
-        
+        constrs_r_converted = [self.convert_inequality(constr) for constr in resource_constraints]
+        constrs_d_converted = [self.convert_inequality(constr) for constr in demand_constraints]
+
         self._constrs_r = breakdown_constr(constrs_r_converted, 0)
         self._constrs_d = breakdown_constr(constrs_d_converted, 1)
 
@@ -65,40 +59,37 @@ class Problem(CpProblem):
         self._subprob_cache = SubprobCache()
 
         # keep track of original problem type
-        self._problem_type = type(objective)        
+        self._problem_type = type(objective)
 
         # choose solver for depending on LP or ILP/MILP
         has_int = False
         for constr in resource_constraints + demand_constraints:
             for v in constr.variables():
-                if v.attributes.get('integer', False) or v.attributes.get('boolean', False):
+                if v.attributes.get("integer", False) or v.attributes.get("boolean", False):
                     has_int = True
-        
+
         for v in objective.variables():
-            if v.attributes.get('integer', False) or v.attributes.get('boolean', False):
+            if v.attributes.get("integer", False) or v.attributes.get("boolean", False):
                 has_int = True
-        
+
         self._solver = cp.ECOS_BB if has_int else cp.ECOS
 
         # Initialize original problem
         super(Problem, self).__init__(
-            objective if self._problem_type == Minimize else Minimize(
-                -objective.expr),
-            self._constrs_r + self._constrs_d)
+            objective if self._problem_type == Minimize else Minimize(-objective.expr),
+            self._constrs_r + self._constrs_d,
+        )
 
         # get a dict mapping from param_id to value
-        self.param_id_to_param = {
-            param.id: param for param in self.parameters()}
+        self.param_id_to_param = {param.id: param for param in self.parameters()}
 
         # get a dict mapping from constraints to list of (var_id, position)
         self.constr_dict_r = self.get_constr_dict(self._constrs_r)
         self.constr_dict_d = self.get_constr_dict(self._constrs_d)
 
         # get constraints groups
-        self.constrs_gps_r = self.group_constrs(
-            self._constrs_r, self.constr_dict_r)
-        self.constrs_gps_d = self.group_constrs(
-            self._constrs_d, self.constr_dict_d)
+        self.constrs_gps_r = self.group_constrs(self._constrs_r, self.constr_dict_r)
+        self.constrs_gps_d = self.group_constrs(self._constrs_d, self.constr_dict_d)
 
         # get objective groups
         self._obj_expr_r, self._obj_expr_d = self.group_objective()
@@ -111,19 +102,16 @@ class Problem(CpProblem):
         elif isinstance(constr, Inequality):
             return constr.expr + cp.Variable(constr.shape, nonneg=True) == 0
         else:
-            raise ValueError(
-                f'Constraint {constr} is neither equality nor inequality.')
+            raise ValueError(f"Constraint {constr} is neither equality nor inequality.")
 
-    def solve(
-            self, enable_dede=True, num_cpus=None, rho=None, num_iter=None,
-            *args, **kwargs):
-        '''Compiles and solves the original problem.
+    def solve(self, enable_dede=True, num_cpus=None, rho=None, num_iter=None, *args, **kwargs):
+        """Compiles and solves the original problem.
         Args:
             enable_dede: whether to decouple and decompose with DeDe
             num_cpus: number of CPUs to use; all the CPUs available if None
             rho: rho value in ADMM; 1 if None
             num_iter: ADMM iterations; stop under < 1% improvement if None
-        '''
+        """
         # solve the original problem
         if not enable_dede:
             start = time.time()
@@ -147,8 +135,7 @@ class Problem(CpProblem):
                 rho = self._subprob_cache.rho
         # check whether num_cpus is more than all available
         if num_cpus > os.cpu_count():
-            raise ValueError(
-                f'{num_cpus} CPUs exceeds upper limit of {os.cpu_count()}.')
+            raise ValueError(f"{num_cpus} CPUs exceeds upper limit of {os.cpu_count()}.")
 
         # check whether settings has been changed
         key = self._subprob_cache.make_key(rho, num_cpus)
@@ -164,98 +151,112 @@ class Problem(CpProblem):
             # store subproblem in last solution
             self._subprob_cache.probs = self.get_subproblems(num_cpus, rho)
             # store parameter index in z solutions for x problems
-            self._subprob_cache.param_idx_r, \
-                self._subprob_cache.param_idx_d = self.get_param_idx()
+            self._subprob_cache.param_idx_r, self._subprob_cache.param_idx_d = self.get_param_idx()
             # get demand solution
-            self.sol_d = np.hstack(ray.get([prob.get_solution_d.remote(
-            ) for prob in self._subprob_cache.probs]))
+            self.sol_d = np.hstack(
+                ray.get([prob.get_solution_d.remote() for prob in self._subprob_cache.probs])
+            )
 
         # update parameter values
         param_id_to_value = {
-            param_id: param.value
-            for param_id, param in self.param_id_to_param.items()}
-        ray.get([prob.update_parameters.remote(
-            param_id_to_value) for prob in self._subprob_cache.probs])
+            param_id: param.value for param_id, param in self.param_id_to_param.items()
+        }
+        ray.get(
+            [prob.update_parameters.remote(param_id_to_value) for prob in self._subprob_cache.probs]
+        )
 
         # solve problem
         # use num_iter if specifed
         # otherwise, stop under < 1% improvement or reach 10000 upper limit
         i, aug_lgr, aug_lgr_old = 0, 1, 2
-        while (num_iter is not None and i < num_iter) or \
-            (num_iter is None and i < 10000 and (
-                i < 2 or abs((aug_lgr - aug_lgr_old)/aug_lgr_old) > 0.01)):
-
+        while (num_iter is not None and i < num_iter) or (
+            num_iter is None
+            and i < 10000
+            and (i < 2 or abs((aug_lgr - aug_lgr_old) / aug_lgr_old) > 0.01)
+        ):
             # initialize start time, iteration, augmented Lagrangian
             start, i, aug_lgr_old, aug_lgr = time.time(), i + 1, aug_lgr, 0
 
             # resource allocation
-            aug_lgr += sum(ray.get([
-                prob.solve_r.remote(
-                    self.sol_d[param_idx], *args, **kwargs
-                ) for prob, param_idx in zip(
-                    self._subprob_cache.probs,
-                    self._subprob_cache.param_idx_r)]))
-            self.sol_r = np.hstack(ray.get([prob.get_solution_r.remote(
-            ) for prob in self._subprob_cache.probs]))
+            aug_lgr += sum(
+                ray.get(
+                    [
+                        prob.solve_r.remote(self.sol_d[param_idx], *args, **kwargs)
+                        for prob, param_idx in zip(
+                            self._subprob_cache.probs, self._subprob_cache.param_idx_r
+                        )
+                    ]
+                )
+            )
+            self.sol_r = np.hstack(
+                ray.get([prob.get_solution_r.remote() for prob in self._subprob_cache.probs])
+            )
 
             # demand allocation
-            aug_lgr += sum(ray.get([
-                prob.solve_d.remote(
-                    self.sol_r[param_idx], *args, **kwargs
-                ) for prob, param_idx in zip(
-                    self._subprob_cache.probs,
-                    self._subprob_cache.param_idx_d)]))
-            self.sol_d = np.hstack(ray.get([prob.get_solution_d.remote(
-            ) for prob in self._subprob_cache.probs]))
+            aug_lgr += sum(
+                ray.get(
+                    [
+                        prob.solve_d.remote(self.sol_r[param_idx], *args, **kwargs)
+                        for prob, param_idx in zip(
+                            self._subprob_cache.probs, self._subprob_cache.param_idx_d
+                        )
+                    ]
+                )
+            )
+            self.sol_d = np.hstack(
+                ray.get([prob.get_solution_d.remote() for prob in self._subprob_cache.probs])
+            )
 
-            print('iter%d: end2end time %.4f, aug_lgr=%.4f' % (
-                i, time.time() - start, aug_lgr))
+            print("iter%d: end2end time %.4f, aug_lgr=%.4f" % (i, time.time() - start, aug_lgr))
 
         self.populate_vars_with_solution()
         coeff = 1 if self._problem_type == Minimize else -1
-        return coeff * sum(ray.get([
-            prob.get_obj.remote() for prob in self._subprob_cache.probs]))
-    
+        return coeff * sum(ray.get([prob.get_obj.remote() for prob in self._subprob_cache.probs]))
+
     def populate_vars_with_solution(self):
-        '''Fills problem variables with computed solutions.'''
+        """Fills problem variables with computed solutions."""
         var_id_to_var = {var.id: var for var in self.variables()}
         for var in self.variables():
             var.value = np.zeros(var.shape)
 
-        local_sol_idx = ray.get([
-            prob.get_local_solution_idx.remote() for prob in self._subprob_cache.probs])
-        local_sol = ray.get([
-            prob.get_local_solution.remote() for prob in self._subprob_cache.probs])
+        local_sol_idx = ray.get(
+            [prob.get_local_solution_idx.remote() for prob in self._subprob_cache.probs]
+        )
+        local_sol = ray.get(
+            [prob.get_local_solution.remote() for prob in self._subprob_cache.probs]
+        )
         flat_local_idx = [idx for arr in local_sol_idx for idx in arr]
         flat_local_sol = [sol for arr in local_sol for sol in arr]
-        
-        sol_idx_d = ray.get([
-            prob.get_solution_idx_d.remote() for prob in self._subprob_cache.probs])
-        sol_idx_r = ray.get([
-            prob.get_solution_idx_r.remote() for prob in self._subprob_cache.probs])
+
+        sol_idx_d = ray.get(
+            [prob.get_solution_idx_d.remote() for prob in self._subprob_cache.probs]
+        )
+        sol_idx_r = ray.get(
+            [prob.get_solution_idx_r.remote() for prob in self._subprob_cache.probs]
+        )
         flat_idx_d = [idx for arr in sol_idx_d for idx in arr]
         flat_idx_r = [idx for arr in sol_idx_r for idx in arr]
 
         for sol_idx, sol in zip(
-            [flat_local_idx, flat_idx_d, flat_idx_r],
-            [flat_local_sol, self.sol_d, self.sol_r]
+            [flat_local_idx, flat_idx_d, flat_idx_r], [flat_local_sol, self.sol_d, self.sol_r]
         ):
             for (var_id, pos), value in zip(sol_idx, sol):
                 var = var_id_to_var[var_id]
-                idx = np.unravel_index(pos, var.shape[::-1])[::-1] 
+                idx = np.unravel_index(pos, var.shape[::-1])[::-1]
                 var.value[idx] = value
 
     def get_constr_dict(self, constrs):
-        '''Get a mapping of constraint to its var_id_pos_list.'''
+        """Get a mapping of constraint to its var_id_pos_list."""
         constr_to_var_id_pos_list = {}
         for constr in constrs:
             constr_to_var_id_pos_list[
-                #constr] = get_var_id_pos_list_from_linear(constr.expr, self._solver)
-                constr] = get_var_id_pos_list_from_linear(constr.expr)
+                # constr] = get_var_id_pos_list_from_linear(constr.expr, self._solver)
+                constr
+            ] = get_var_id_pos_list_from_linear(constr.expr)
         return constr_to_var_id_pos_list
 
     def group_constrs(self, constrs, constr_dict):
-        '''Group constraints into non-overlapped groups with union-find.'''
+        """Group constraints into non-overlapped groups with union-find."""
         parents = np.arange(len(constrs)).tolist()
 
         def find(x):
@@ -283,7 +284,7 @@ class Problem(CpProblem):
         return [constrs for _, constrs in parent_to_constrs.items()]
 
     def get_subproblems(self, num_cpus, rho):
-        '''Return objective and constraints assignments for subproblems.'''
+        """Return objective and constraints assignments for subproblems."""
 
         # shuffle group order
         constrs_gps_idx_r = np.arange(len(self.constrs_gps_r))
@@ -312,25 +313,36 @@ class Problem(CpProblem):
             obj_r = [self._obj_expr_r[j] for j in idx_r]
             obj_d = [self._obj_expr_d[j] for j in idx_d]
             # get var_id_to_pos_list
-            var_id_to_pos_r = [[self.constr_dict_r[
-                constr] for constr in constrs] for constrs in constrs_r]
-            var_id_to_pos_d = [[self.constr_dict_d[
-                constr] for constr in constrs] for constrs in constrs_d]
+            var_id_to_pos_r = [
+                [self.constr_dict_r[constr] for constr in constrs] for constrs in constrs_r
+            ]
+            var_id_to_pos_d = [
+                [self.constr_dict_d[constr] for constr in constrs] for constrs in constrs_d
+            ]
             # build subproblems
-            probs.append(SubproblemsWrap.remote(
-                idx_r, idx_d,
-                obj_r, obj_d,
-                constrs_r, constrs_d,
-                var_id_to_pos_r, var_id_to_pos_d,
-                var_id_pos_set_r, var_id_pos_set_d,
-                rho))
+            probs.append(
+                SubproblemsWrap.remote(
+                    idx_r,
+                    idx_d,
+                    obj_r,
+                    obj_d,
+                    constrs_r,
+                    constrs_d,
+                    var_id_to_pos_r,
+                    var_id_to_pos_d,
+                    var_id_pos_set_r,
+                    var_id_pos_set_d,
+                    rho,
+                )
+            )
         return probs
 
     def get_param_idx(self):
-        '''Get parameter z index in last solution.'''
+        """Get parameter z index in last solution."""
         # map var_id_pos in the big resource solution list
-        sol_idx_r = ray.get([prob.get_solution_idx_r.remote(
-        ) for prob in self._subprob_cache.probs])
+        sol_idx_r = ray.get(
+            [prob.get_solution_idx_r.remote() for prob in self._subprob_cache.probs]
+        )
         sol_idx_dict_r, idx = {}, 0
         for sol_idx in sol_idx_r:
             for var_id_pos in sol_idx:
@@ -338,8 +350,9 @@ class Problem(CpProblem):
                 idx += 1
 
         # map var_id_pos in the big demand solution list
-        sol_idx_d = ray.get([prob.get_solution_idx_d.remote(
-        ) for prob in self._subprob_cache.probs])
+        sol_idx_d = ray.get(
+            [prob.get_solution_idx_d.remote() for prob in self._subprob_cache.probs]
+        )
         sol_idx_dict_d, idx = {}, 0
         for sol_idx in sol_idx_d:
             for var_id_pos in sol_idx:
@@ -347,21 +360,21 @@ class Problem(CpProblem):
                 idx += 1
 
         # get parameter index
-        param_idx_r = [[
-            sol_idx_dict_d[var_id_pos] for var_id_pos in sol_idx
-        ] for sol_idx in sol_idx_r]
-        param_idx_d = [[
-            sol_idx_dict_r[var_id_pos] for var_id_pos in sol_idx
-        ] for sol_idx in sol_idx_d]
+        param_idx_r = [
+            [sol_idx_dict_d[var_id_pos] for var_id_pos in sol_idx] for sol_idx in sol_idx_r
+        ]
+        param_idx_d = [
+            [sol_idx_dict_r[var_id_pos] for var_id_pos in sol_idx] for sol_idx in sol_idx_d
+        ]
         return param_idx_r, param_idx_d
 
     def group_objective(self):
-        '''Split objective into corresponding constraint groups'''
+        """Split objective into corresponding constraint groups"""
         var_id_pos_to_idx = defaultdict(list)
         for i, constrs_gps, constr_dict in zip(
             [0, 1],
             [self.constrs_gps_r, self.constrs_gps_d],
-            [self.constr_dict_r, self.constr_dict_d]
+            [self.constr_dict_r, self.constr_dict_d],
         ):
             for j, constrs in enumerate(constrs_gps):
                 for constr in constrs:
@@ -383,7 +396,7 @@ class Problem(CpProblem):
             for var_id_pos in var_id_pos_list[1:]:
                 id_set = id_set & set(var_id_pos_to_idx[var_id_pos])
             if not id_set:
-                raise ValueError('Objective not separable.')
+                raise ValueError("Objective not separable.")
 
             idx = list(id_set)[0]
             if idx[0] == 0:

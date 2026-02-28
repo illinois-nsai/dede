@@ -1,10 +1,6 @@
-import numpy as np
-import cvxpy as cp
-
 from cvxpy import Parameter
 from cvxpy.atoms.affine.add_expr import AddExpression
-from cvxpy.atoms.affine.binary_operators import MulExpression
-from cvxpy.atoms.affine.binary_operators import multiply
+from cvxpy.atoms.affine.binary_operators import MulExpression, multiply
 from cvxpy.atoms.affine.index import index
 from cvxpy.atoms.affine.promote import Promote
 from cvxpy.atoms.affine.sum import Sum
@@ -34,7 +30,7 @@ def split_index_by_dir(index_obj, dir):
     for i in range(k.start, k.stop, k.step):
         new_key[dir] = i
         split_list.append(var[tuple(new_key)])
-    
+
     return split_list
 
 
@@ -50,7 +46,7 @@ def breakdown_expression(expr, dir):
             return [Constant(expr.value[i, :]) for i in range(expr.value.shape[0])]
         else:
             return [Constant(expr.value[:, j]) for j in range(expr.value.shape[1])]
-    
+
     elif isinstance(expr, (Variable, Parameter)):
         if len(expr.shape) <= 1:
             return [expr]
@@ -64,7 +60,7 @@ def breakdown_expression(expr, dir):
             return [expr]
         else:
             return split_index_by_dir(expr, dir)
-    
+
     elif isinstance(expr, Promote):
         if len(expr.shape) <= 1:
             return [expr]
@@ -95,9 +91,9 @@ def breakdown_expression(expr, dir):
         left_list = breakdown_expression(expr.args[0], dir)
         right_list = breakdown_expression(expr.args[1], dir)
         return [multiply(left_list[i], right_list[i]) for i in range(len(left_list))]
-    
+
     elif isinstance(expr, MulExpression):
         return [expr]
-    
+
     else:
         raise TypeError(f"Expression Not Supported: {type(expr)}")

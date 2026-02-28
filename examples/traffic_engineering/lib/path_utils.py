@@ -1,7 +1,9 @@
-from .graph_utils import path_to_edge_list
 from itertools import islice
-import networkx as nx
 from sys import maxsize
+
+import networkx as nx
+
+from .graph_utils import path_to_edge_list
 
 
 # Remove cycles from path
@@ -50,10 +52,7 @@ def find_paths(G, s_k, t_k, num_paths, disjoint=True, include_weight=False):
     def k_shortest_paths(G, source, target, k, weight="weight"):
         try:
             # Yen's shortest path algorithm
-            return list(
-                islice(nx.shortest_simple_paths(
-                    G, source, target, weight=weight), k)
-            )
+            return list(islice(nx.shortest_simple_paths(G, source, target, weight=weight), k))
         except nx.NetworkXNoPath:
             return []
 
@@ -73,14 +72,10 @@ def find_paths(G, s_k, t_k, num_paths, disjoint=True, include_weight=False):
         if include_weight:
             return [
                 (path, compute_weight(path))
-                for path in k_shortest_edge_disjoint_paths(
-                    G, s_k, t_k, num_paths, weight="weight"
-                )
+                for path in k_shortest_edge_disjoint_paths(G, s_k, t_k, num_paths, weight="weight")
             ]
         else:
-            return k_shortest_edge_disjoint_paths(
-                G, s_k, t_k, num_paths, weight="weight"
-            )
+            return k_shortest_edge_disjoint_paths(G, s_k, t_k, num_paths, weight="weight")
     else:
         if include_weight:
             return [

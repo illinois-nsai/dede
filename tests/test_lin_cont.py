@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 
-import dede as dd
+import math
+
 import cvxpy as cp
 import numpy as np
-from scipy.optimize import minimize
-import math
+
+import dede as dd
 
 
 def test_add1():
@@ -30,7 +31,7 @@ def test_add1():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
-    print('=== Passed LP ADD test #1 ===')
+    print("=== Passed LP ADD test #1 ===")
 
 
 def test_add2():
@@ -38,9 +39,9 @@ def test_add2():
     x = dd.Variable((N, M), nonneg=True)
     resource_constraints = [x[i, :].sum() <= i for i in range(N)]
     demand_constraints = [x[:, j].sum() <= j for j in range(M)]
-    
+
     # pull two elements
-    objective = dd.Maximize(x[N-1, M-1] + x[N//2, M//2])
+    objective = dd.Maximize(x[N - 1, M - 1] + x[N // 2, M // 2])
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
@@ -52,7 +53,7 @@ def test_add2():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
-    print('=== Passed LP ADD test #2 ===')
+    print("=== Passed LP ADD test #2 ===")
 
 
 def test_add_zero():
@@ -60,7 +61,7 @@ def test_add_zero():
     x = dd.Variable((N, M), nonneg=True)
     resource_constraints = [x[i, :].sum() <= i for i in range(N)]
     demand_constraints = [x[:, j].sum() <= j for j in range(M)]
-    
+
     # pull two elements
     objective = dd.Maximize(0 * x[0, 0] + 0 * x[1, 1] + 0 * x[2, 2])
 
@@ -74,7 +75,7 @@ def test_add_zero():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
-    print('=== Passed LP ADD zero test ===') 
+    print("=== Passed LP ADD zero test ===")
 
 
 def test_sum1():
@@ -94,7 +95,7 @@ def test_sum1():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
-    print('=== Passed LP SUM test #1 ===')
+    print("=== Passed LP SUM test #1 ===")
 
 
 def test_sum2():
@@ -114,7 +115,7 @@ def test_sum2():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
-    print('=== Passed LP SUM test #2 ===')
+    print("=== Passed LP SUM test #2 ===")
 
 
 def test_multiply1():
@@ -138,7 +139,7 @@ def test_multiply1():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01, abs_tol=0.1)
-    print('=== Passed LP MULTIPLY test #1 ===')
+    print("=== Passed LP MULTIPLY test #1 ===")
 
 
 def test_multiply2():
@@ -162,7 +163,7 @@ def test_multiply2():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01, abs_tol=0.1)
-    print('=== Passed LP MULTIPLY test #2 ===')
+    print("=== Passed LP MULTIPLY test #2 ===")
 
 
 def test_multiply_zero():
@@ -184,7 +185,7 @@ def test_multiply_zero():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01, abs_tol=0.1)
-    print('=== Passed LP MULTIPLY zero test ===')
+    print("=== Passed LP MULTIPLY zero test ===")
 
 
 def test_trace():
@@ -205,10 +206,10 @@ def test_trace():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01, abs_tol=0.1)
-    print('=== Passed LP TRACE test ===') 
+    print("=== Passed LP TRACE test ===")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_add1()
     test_add2()
     test_add_zero()

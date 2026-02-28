@@ -1,3 +1,1 @@
-GUROBI_OPTS = {
-    "Threads": 1
-}
+GUROBI_OPTS = {"Threads": 1}
