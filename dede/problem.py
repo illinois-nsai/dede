@@ -321,8 +321,9 @@ class Problem(CpProblem):
                 [self.constr_dict_d[constr] for constr in constrs] for constrs in constrs_d
             ]
             # build subproblems
+            actor = ray.remote(SubproblemsWrap)
             probs.append(
-                SubproblemsWrap.remote(
+                actor.remote(
                     idx_r,
                     idx_d,
                     obj_r,
