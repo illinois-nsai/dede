@@ -195,16 +195,31 @@ class Problem(CpProblem):
 
         start = time.time()
 
+        terminate_flag = False
         while (num_iter is not None and i < num_iter) or \
             (num_iter is None and i < 10000): 
             
             if i > 0 and i % balance_iterations == 0:
+                '''
                 primal_res, dual_res = self.get_relative_residuals(rho)
                 eps_primal, eps_dual = self.get_epsilon()
+                '''
+                primal_res, dual_res, eps_primal, eps_dual = self.get_relative_residuals_and_epsilon(rho)
+
+                print("eps_pr:", eps_primal, end=", ")
+                print("eps_dual:", eps_dual)
+                print("Primal:", primal_res, end=", ")
+                print("Dual:", dual_res, end=", ")
+                print("rho:", rho)
 
                 # termination condition
                 if num_iter is None and primal_res <= eps_primal and dual_res <= eps_dual:
-                    break
+                    if not terminate_flag:
+                        terminate_flag = True
+                    else:
+                        break
+                else:
+                    terminate_flag = False
                 
                 # adaptive multiplier
                 tau = max_tau
@@ -218,17 +233,12 @@ class Problem(CpProblem):
                     rho *= tau 
                     for prob in self._subprob_cache.probs:
                         prob.update_rho.remote(rho)
-                    #print("updated rho up")
+                    print("updated rho up to:", rho)
                 elif dual_res > (1 / xi) * mu * primal_res:
                     rho /= tau 
                     for prob in self._subprob_cache.probs:
                         prob.update_rho.remote(rho)
-                    #print("updated rho down")
-                '''
-                print("Primal:", primal_res, end=", ")
-                print("Dual:", dual_res, end=", ")
-                print("rho:", rho)
-                '''
+                    print("updated rho down to:", rho)
 
             #print("obj:", sum(ray.get([prob.get_obj.remote() for prob in self._subprob_cache.probs])))
             self.sol_d_old = self.sol_d.copy()
@@ -256,10 +266,8 @@ class Problem(CpProblem):
             self.sol_d = np.hstack(ray.get([prob.get_solution_d.remote(
             ) for prob in self._subprob_cache.probs]))
 
-            '''
             print('iter%d: end2end time %.4f, aug_lgr=%.4f' % (
                 i, time.time() - start, aug_lgr))
-            '''
         
         end = time.time()
         print("solve time:", end - start)
@@ -269,7 +277,8 @@ class Problem(CpProblem):
         return coeff * sum(ray.get([
             prob.get_obj.remote() for prob in self._subprob_cache.probs]))
     
-    def get_relative_residuals(self, rho):
+    def get_relative_residuals_and_epsilon(self, rho):
+        # compute relative residuals
         sol_idx_d = ray.get([
             prob.get_solution_idx_d.remote() for prob in self._subprob_cache.probs])
         sol_idx_r = ray.get([
@@ -279,29 +288,40 @@ class Problem(CpProblem):
 
         map_r = {k: float(v) for k, v in zip(flat_idx_r, self.sol_r)}
         map_d = {k: float(v) for k, v in zip(flat_idx_d, self.sol_d)}
+        map_d_old = {k: float(v) for k, v in zip(flat_idx_d, self.sol_d_old)}
 
+        #all_pos = sorted(set(map_r.keys()) | set(map_d.keys()))
         shared_pos = sorted(set(map_r.keys()) & set(map_d.keys()))
         for pos in shared_pos:
             self.scaled_dual[pos] = self.scaled_dual.get(pos, 0) + map_r[pos] - map_d[pos]
 
         shared_r = np.array([map_r[pos] for pos in shared_pos])
         shared_d = np.array([map_d[pos] for pos in shared_pos])
-        primal_res = np.linalg.norm(shared_r - shared_d) / max(np.linalg.norm(self.sol_r), np.linalg.norm(self.sol_d))
+        primal_res = np.linalg.norm(shared_r - shared_d) / max(np.linalg.norm(shared_r), np.linalg.norm(shared_d))
 
+        shared_d_old = np.array([map_d_old[pos] for pos in shared_pos])
         scaled_dual_arr = np.array(list(self.scaled_dual.values()))
-        dual_res = np.linalg.norm(self.sol_d - self.sol_d_old) / np.linalg.norm(scaled_dual_arr)
+        dual_res = np.linalg.norm(shared_d - shared_d_old) / np.linalg.norm(scaled_dual_arr)
 
-        '''
-        print(self.sol_d)
-        print(self.sol_d_old)
-        print(dual_res)
-        '''
-
-        return primal_res, dual_res
-    
-    def get_epsilon(self):
+        # compute primal and dual epsilons
         eps_abs = 0.005
         eps_rel = 0.005
+
+        '''
+        x_dim = 0
+        for var in self.variables():
+            x_dim += np.prod(var.shape)
+        '''
+        x_dim = len(shared_pos)
+
+        eps_primal = np.sqrt(x_dim) * eps_abs / max(np.linalg.norm(shared_r), np.linalg.norm(shared_d)) + eps_rel
+        eps_dual = np.sqrt(x_dim) * eps_abs / np.linalg.norm(scaled_dual_arr) + eps_rel
+
+        return primal_res, dual_res, eps_primal, eps_dual
+    
+    def get_epsilon(self):
+        eps_abs = 0.01
+        eps_rel = 0.01
 
         x_dim = 0
         for var in self.variables():

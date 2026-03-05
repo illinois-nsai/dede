@@ -31,9 +31,9 @@ def test(n):
     time_cvxpy = time.time() - start
 
     with open("timing.txt", "a") as f:
-        f.write(f"{n} {time_dede} {time_cvxpy}\n")
+        f.write(f"{n} {time_dede} {time_cvxpy} {result_dede} {result_cvxpy}\n")
 
 
 if __name__ == '__main__':
-    for i in range(2125, 10000, 500):
+    for i in range(500, 5000, 125):
         test(i)
