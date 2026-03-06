@@ -502,8 +502,8 @@ class Problem(CpProblem):
         probs: list[ray.actor.ActorProxy[SubproblemsWrap]] = []
         for cpu in range(num_cpus):
             # get constraint idx for the group
-            idx_r: list[int] = constrs_gps_idx_r[cpu::num_cpus].tolist()
-            idx_d: list[int] = constrs_gps_idx_d[cpu::num_cpus].tolist()
+            idx_r: NDArray[np.signedinteger] = constrs_gps_idx_r[cpu::num_cpus]
+            idx_d: NDArray[np.signedinteger] = constrs_gps_idx_d[cpu::num_cpus]
 
             # build subproblems
             actor = ray.remote(SubproblemsWrap).options(
