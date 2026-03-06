@@ -15,8 +15,8 @@ class SubproblemsWrap:
 
     def __init__(
         self,
-        idx_r: list[int],
-        idx_d: list[int],
+        idx_r: NDArray[np.signedinteger],
+        idx_d: NDArray[np.signedinteger],
         obj_gps_r_full: t.Sequence[cp.Expression],
         obj_gps_d_full: t.Sequence[cp.Expression],
         constrs_gps_r_full: list[list[cp.Constraint]],
@@ -27,10 +27,10 @@ class SubproblemsWrap:
         var_id_pos_set_d: set[VarInfoT],
         rho: float,
     ):
-        obj_gps_r = [obj_gps_r_full[i] for i in idx_r]
-        obj_gps_d = [obj_gps_d_full[i] for i in idx_d]
-        constrs_gps_r = [constrs_gps_r_full[i] for i in idx_r]
-        constrs_gps_d = [constrs_gps_d_full[i] for i in idx_d]
+        obj_gps_r: list[cp.Expression] = [obj_gps_r_full[i] for i in idx_r]
+        obj_gps_d: list[cp.Expression] = [obj_gps_d_full[i] for i in idx_d]
+        constrs_gps_r: list[list[cp.Constraint]] = [constrs_gps_r_full[i] for i in idx_r]
+        constrs_gps_d: list[list[cp.Constraint]] = [constrs_gps_d_full[i] for i in idx_d]
         var_id_to_pos_gps_r = [
             [constr_dict_r[constr.id] for constr in constrs] for constrs in constrs_gps_r
         ]
