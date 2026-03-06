@@ -478,13 +478,13 @@ class Problem(CpProblem):
         dict_ref = ray.put(dict(var_id_pos_to_idx))
 
         # chunk the indices to split the work
-        indices = list(range(len(expr_list)))
-        chunks = np.array_split(indices, num_cpus)
+        chunks = np.array_split(np.arange(len(expr_list)), num_cpus)
 
         # send the chunks to the remote function for processing
         futures = [
             _process_obj_chunk_indices.remote(
-                c.tolist(),
+                c[0],
+                c[-1] + 1,
                 expr_ref,
                 self._solver,
                 dict_ref,
@@ -495,7 +495,7 @@ class Problem(CpProblem):
         ]
 
         # block on results
-        results = [ray.get(f) for f in futures]
+        results = ray.get(futures)
 
         # reconstruct groups
         obj_r: list[cp.Expression] = []
@@ -520,7 +520,8 @@ class Problem(CpProblem):
 
 @ray.remote
 def _process_obj_chunk_indices(
-    chunk_indices: list[int],
+    start: int,
+    end: int,
     expr_list_ref: list[cp.Expression],
     solver: str,
     var_id_pos_to_idx: dict[VarInfoT, list[tuple[int, int]]],
@@ -534,7 +535,7 @@ def _process_obj_chunk_indices(
     local_r_idx: list[list[int]] = [[] for _ in range(num_r)]
     local_d_idx: list[list[int]] = [[] for _ in range(num_d)]
 
-    for idx in chunk_indices:
+    for idx in range(start, end):
         # Access the object from the shared reference
         obj = expr_list_ref[idx]
 
