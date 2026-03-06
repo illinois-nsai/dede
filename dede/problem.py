@@ -31,9 +31,13 @@ class SubprobCache:
     """Cache subproblems."""
 
     def __init__(self):
+        # these three fields reflect user-passed arguments
         self.rho: t.Optional[float] = None
-        self.num_cpus: t.Optional[int] = None
+        # this does not necessarily reflect the true number of cpus
+        # in the ray cluster if the user inputted None (i.e., use max)
+        self.user_num_cpus: t.Optional[int] = None
         self.address: t.Optional[str] = None
+
         self.probs: t.Optional[list[ray.actor.ActorProxy[SubproblemsWrap]]] = None
         self.param_idx_r: list[list[int]] = []
         self.param_idx_d: list[list[int]] = []
@@ -45,14 +49,23 @@ class SubprobCache:
         self.param_idx_r, self.param_idx_d = [], []
 
     @property
+    def ray_cpus(self) -> int:
+        """Get the true amount of cpus available in the ray cluster.
+        This only differs from the user inputted when when the user input is None,
+        which indicates that all CPUs should be used."""
+        if not ray.is_initialized():
+            raise RuntimeError("Ray is not initialized. Cannot get number of CPUs in the cluster.")
+        return int(ray.cluster_resources().get("CPU", 1))
+
+    @property
     def key(self) -> t.Optional[KeyT]:
         if self.rho is None or self.num_cpus is None or self.address is None:
             return None
         return (self.rho, self.num_cpus, self.address)
 
     @classmethod
-    def make_key(cls, rho: float, num_cpus: int, address: str) -> KeyT:
-        return (rho, num_cpus, address)
+    def make_key(cls, rho: float, user_num_cpus: int, address: str) -> KeyT:
+        return (rho, user_num_cpus, address)
 
 
 class Problem(CpProblem):
@@ -133,7 +146,7 @@ class Problem(CpProblem):
 
     def solve(
         self,
-        num_cpus: int = os.cpu_count() or 1,
+        num_cpus: t.Optional[int] = None,
         ray_address: str = "local",
         enable_dede: bool = True,
         rho: float = 1.0,
@@ -148,8 +161,7 @@ class Problem(CpProblem):
 
         Args:
             num_cpus: number of CPUs to use; if None, use all available CPUs. If ray_address
-            is not None or ray is already initialized, this argument will be ignored and the
-            number of CPUs available in the ray cluster will be used.
+            is not None or ray is already initialized, this argument must be None.
             ray_address: ray cluster address; if None, will use local ray instance.
             enable_dede: whether to decouple and decompose with DeDe
             rho: rho value in ADMM; 1 by default
@@ -165,8 +177,10 @@ class Problem(CpProblem):
             coeff = 1 if self._problem_type == Minimize else -1
             return t.cast(np.floating[t.Any], coeff * self.value)
 
-        if num_cpus > (os.cpu_count() or 1):
+        if num_cpus is not None and num_cpus > (os.cpu_count() or 1):
             raise ValueError(f"{num_cpus} CPUs exceeds upper limit of {os.cpu_count()}.")
+        if ray_address != "local" and num_cpus is not None:
+            raise ValueError("Cannot specify num_cpus when using non-local ray cluster.")
 
         # we want to rebuild subproblems and restart ray if
         # the rho changes, the address or changes, or the num cpus changes in local mode
@@ -183,21 +197,17 @@ class Problem(CpProblem):
             else:
                 ray.init(num_cpus=num_cpus)
 
-            # get true amount of cpus available in ray cluster
-            num_cpus = int(ray.cluster_resources().get("CPU", 1))
-
             # invalidate old settings
             # this is necessary since ray restarted, which made the old subproblems tied to the
             # old ray instance invalid
             self._subprob_cache.invalidate()
             self._subprob_cache.rho = rho
 
-            # initialize ray
-            self._subprob_cache.num_cpus = num_cpus
-
             # store subproblem in last solution
-            obj_expr_r, obj_expr_d = self._get_grouped_objectives(num_cpus)
-            self._subprob_cache.probs = self.get_subproblems(obj_expr_r, obj_expr_d, num_cpus, rho)
+            obj_expr_r, obj_expr_d = self._get_grouped_objectives(self._subprob_cache.ray_cpus)
+            self._subprob_cache.probs = self.get_subproblems(
+                obj_expr_r, obj_expr_d, self._subprob_cache.ray_cpus, rho
+            )
 
             # store parameter index in z solutions for x problems
             self._subprob_cache.param_idx_r, self._subprob_cache.param_idx_d = self.get_param_idx()
@@ -444,6 +454,9 @@ class Problem(CpProblem):
         self, num_cpus: int
     ) -> tuple[list[cp.Expression], list[cp.Expression]]:
         """Split objective into corresponding constraint groups"""
+
+        # See if the grouped objectives are already computed and cached.
+        # If so, return them to avoid redundant computation.
         if self._obj_expr_r is not None and self._obj_expr_d is not None:
             return self._obj_expr_r, self._obj_expr_d
 
