@@ -289,7 +289,7 @@ class Problem(CpProblem):
         local_sol_idx: list[list[VarInfoT]] = ray.get(
             [prob.get_local_solution_idx.remote() for prob in self._subprob_cache.probs]
         )
-        local_sol: list[NDArray[np.floating[t.Any]]] = ray.get(
+        local_sol: list[list[np.floating[t.Any]]] = ray.get(
             [prob.get_local_solution.remote() for prob in self._subprob_cache.probs]
         )
         flat_local_idx = [idx for arr in local_sol_idx for idx in arr]
