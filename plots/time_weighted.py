@@ -23,17 +23,34 @@ def test(n):
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
     start = time.time()
     result_dede = prob.solve(num_cpus=10, solver=dd.ECOS)
+    value_dede = x.value
     time_dede = time.time() - start
 
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
     start = time.time()
     result_cvxpy = cvxpy_prob.solve()
+    value_cvxpy = x.value
     time_cvxpy = time.time() - start
 
     with open("timing.txt", "a") as f:
         f.write(f"{n} {time_dede} {time_cvxpy} {result_dede} {result_cvxpy}\n")
 
+        for x1, x2 in zip(value_cvxpy.flatten(), value_dede.flatten()):
+            if x1 > 1e-5 or x2 > 1e-5:
+                f.write(f"{x1:.4f} {x2:.4f}\n")
+    
+    print("NORM IS:", np.linalg.norm(value_cvxpy.flatten() - value_dede.flatten(), 2))
+
+    with open("weights.txt", "a") as f:
+        for x1 in w.flatten():
+            f.write(f"{x1}\n")
+    with open("bn.txt", "a") as f:
+        for x1 in bn:
+            f.write(f"{x1}\n")
+    with open("bm.txt", "a") as f:
+        for x1 in bm:
+            f.write(f"{x1}\n")
+
 
 if __name__ == '__main__':
-    for i in range(500, 5000, 125):
-        test(i)
+    test(125)
