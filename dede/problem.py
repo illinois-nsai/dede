@@ -29,6 +29,14 @@ from .utils import (
 ObjectiveT = t.Union[cp.Maximize, cp.Minimize]
 ConstraintT = t.Union[Equality, Zero, Inequality]
 
+# These define parameters needed to be passed to the solvers to make them only use one thread.
+THREAD_OPTS: dict[str, dict[str, int]] = {
+    cp.GUROBI: {"Threads": 1},
+    # ECOS/ECOS_BB do not have settings for threading
+    cp.ECOS: {},
+    cp.ECOS_BB: {},
+}
+
 
 def timer(func):
     @functools.wraps(func)
@@ -317,6 +325,8 @@ class Problem(CpProblem):
 
             coeff = 1 if self._problem_type == Minimize else -1
             return t.cast(np.floating[t.Any], coeff * self.value)
+
+        kwargs.update(THREAD_OPTS.get(kwargs.get("solver", ""), {}))
 
         subproblems_invalidated = self._subprob_cache.update_cache(rho, num_cpus, ray_address)
         if subproblems_invalidated:
