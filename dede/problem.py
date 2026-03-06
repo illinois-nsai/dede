@@ -437,24 +437,26 @@ class Problem(CpProblem):
                 var.value[idx] = value
 
     @classmethod
-    def _get_constr_dict(cls, constrs: list[cp.Constraint]) -> dict[cp.Constraint, list[VarInfoT]]:
+    def _get_constr_dict(cls, constrs: list[cp.Constraint]) -> dict[int, list[VarInfoT]]:
         """Get a mapping of constraint to its var_id_pos_list."""
-        constr_to_var_id_pos_list: dict[cp.Constraint, list[VarInfoT]] = {}
+        constr_to_var_id_pos_list: dict[int, list[VarInfoT]] = {}
         for constr in constrs:
             # [constr] = get_var_id_pos_list_from_linear(constr.expr, self._solver)
-            constr_to_var_id_pos_list[constr] = get_var_id_pos_list_from_linear(constr.expr)
+            constr_to_var_id_pos_list[t.cast(int, constr.id)] = get_var_id_pos_list_from_linear(
+                constr.expr
+            )
         return constr_to_var_id_pos_list
 
     @classmethod
     def _group_constrs(
-        cls, constrs: list[cp.Constraint], constr_dict: dict[cp.Constraint, list[VarInfoT]]
+        cls, constrs: list[cp.Constraint], constr_dict: dict[int, list[VarInfoT]]
     ) -> list[list[cp.Constraint]]:
         """Group constraints into non-overlapped groups with union-find."""
         uf = UnionFind(len(constrs))
 
         var_id_pos_to_i: dict[VarInfoT, int] = {}
         for i, constr in enumerate(constrs):
-            for var_id_pos in constr_dict[constr]:
+            for var_id_pos in constr_dict[constr.id]:
                 if var_id_pos in var_id_pos_to_i:
                     uf.union(var_id_pos_to_i[var_id_pos], i)
                 var_id_pos_to_i[var_id_pos] = i
@@ -493,8 +495,8 @@ class Problem(CpProblem):
         obj_expr_d_ref = ray.put(obj_expr_d)
         constrs_r_ref = ray.put(self.constrs_gps_r)
         constrs_d_ref = ray.put(self.constrs_gps_d)
-        constr_dict_r_ref = ray.put({key.id: value for key, value in self.constr_dict_r.items()})
-        constr_dict_d_ref = ray.put({key.id: value for key, value in self.constr_dict_d.items()})
+        constr_dict_r_ref = ray.put(self.constr_dict_r)
+        constr_dict_d_ref = ray.put(self.constr_dict_d)
         var_id_pos_set_r_ref = ray.put(var_id_pos_set_r)
         var_id_pos_set_d_ref = ray.put(var_id_pos_set_d)
 
@@ -583,7 +585,7 @@ class Problem(CpProblem):
             ):
                 for j, constrs in enumerate(constrs_gps):
                     for constr in constrs:
-                        for var_id_pos in constr_dict[constr]:
+                        for var_id_pos in constr_dict[constr.id]:
                             var_id_pos_to_idx[var_id_pos].append((i, j))
 
             expr_list = expand_expr(self.objective.expr)
