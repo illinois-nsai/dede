@@ -1,3 +1,4 @@
+import functools
 import os
 import time
 import typing as t
@@ -25,6 +26,33 @@ from .utils import (
 KeyT = tuple[float, int, str]
 ObjectiveT = t.Union[cp.Maximize, cp.Minimize]
 ConstraintT = t.Union[Equality, Zero, Inequality]
+
+# These define parameters needed to be passed to the solvers to make them only use one thread.
+THREAD_OPTS: dict[str, dict[str, int]] = {
+    cp.GUROBI: {"Threads": 1},
+    # ECOS/ECOS_BB do not have settings for threading
+    cp.ECOS: {},
+    cp.ECOS_BB: {},
+}
+
+
+def timer(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        start_time = time.perf_counter()
+        result = func(*args, **kwargs)
+        end_time = time.perf_counter()
+        print(f"Executed {func.__name__} in {end_time - start_time:.4f}s")
+        return result
+
+    return wrapper
+
+
+def time_all_methods(cls):
+    for name, val in vars(cls).items():
+        if callable(val):
+            setattr(cls, name, timer(val))
+    return cls
 
 
 class SubprobCache:
@@ -68,6 +96,7 @@ class SubprobCache:
         return (rho, user_num_cpus, address)
 
 
+@time_all_methods
 class Problem(CpProblem):
     """Build a resource allocation problem."""
 
@@ -83,8 +112,6 @@ class Problem(CpProblem):
             resource_variables: list of resource constraints
             demand_variables: list of demand constraints
         """
-        start = time.time()
-
         # breakdown constraints
         constrs_r_converted = [self._convert_inequality(constr) for constr in resource_constraints]
         constrs_d_converted = [self._convert_inequality(constr) for constr in demand_constraints]
@@ -132,9 +159,6 @@ class Problem(CpProblem):
         self._obj_expr_r = None
         self._obj_expr_d = None
 
-        end = time.time()
-        print("init time:", end - start)
-
     @classmethod
     def _convert_inequality(cls, constr: ConstraintT) -> cp.Constraint:
         if isinstance(constr, Zero) or isinstance(constr, Equality):
@@ -176,6 +200,8 @@ class Problem(CpProblem):
 
             coeff = 1 if self._problem_type == Minimize else -1
             return t.cast(np.floating[t.Any], coeff * self.value)
+
+        kwargs.update(THREAD_OPTS.get(kwargs.get("solver", ""), {}))
 
         if num_cpus is not None and num_cpus > (os.cpu_count() or 1):
             raise ValueError(f"{num_cpus} CPUs exceeds upper limit of {os.cpu_count()}.")
@@ -313,17 +339,19 @@ class Problem(CpProblem):
                 var.value[idx] = value
 
     @classmethod
-    def _get_constr_dict(cls, constrs: list[cp.Constraint]) -> dict[cp.Constraint, list[VarInfoT]]:
+    def _get_constr_dict(cls, constrs: list[cp.Constraint]) -> dict[int, list[VarInfoT]]:
         """Get a mapping of constraint to its var_id_pos_list."""
-        constr_to_var_id_pos_list: dict[cp.Constraint, list[VarInfoT]] = {}
+        constr_to_var_id_pos_list: dict[int, list[VarInfoT]] = {}
         for constr in constrs:
             # [constr] = get_var_id_pos_list_from_linear(constr.expr, self._solver)
-            constr_to_var_id_pos_list[constr] = get_var_id_pos_list_from_linear(constr.expr)
+            constr_to_var_id_pos_list[t.cast(int, constr.id)] = get_var_id_pos_list_from_linear(
+                constr.expr
+            )
         return constr_to_var_id_pos_list
 
     @classmethod
     def _group_constrs(
-        cls, constrs: list[cp.Constraint], constr_dict: dict[cp.Constraint, list[VarInfoT]]
+        cls, constrs: list[cp.Constraint], constr_dict: dict[int, list[VarInfoT]]
     ) -> list[list[cp.Constraint]]:
         """Group constraints into non-overlapped groups with union-find."""
         parents: list[int] = np.arange(len(constrs)).tolist()
@@ -342,7 +370,7 @@ class Problem(CpProblem):
 
         var_id_pos_to_i: dict[VarInfoT, int] = {}
         for i, constr in enumerate(constrs):
-            for var_id_pos in constr_dict[constr]:
+            for var_id_pos in constr_dict[constr.id]:
                 if var_id_pos in var_id_pos_to_i:
                     union(var_id_pos_to_i[var_id_pos], i)
                 var_id_pos_to_i[var_id_pos] = i
@@ -376,39 +404,37 @@ class Problem(CpProblem):
         for var_id_pos in self.constr_dict_d.values():
             var_id_pos_set_d.update(var_id_pos)
 
+        # serialize expensive objects exactly once
+        obj_expr_r_ref = ray.put(obj_expr_r)
+        obj_expr_d_ref = ray.put(obj_expr_d)
+        constrs_r_ref = ray.put(self.constrs_gps_r)
+        constrs_d_ref = ray.put(self.constrs_gps_d)
+        constr_dict_r_ref = ray.put(self.constr_dict_r)
+        constr_dict_d_ref = ray.put(self.constr_dict_d)
+        var_id_pos_set_r_ref = ray.put(var_id_pos_set_r)
+        var_id_pos_set_d_ref = ray.put(var_id_pos_set_d)
+
         # build actors with subproblems
         probs: list[ray.actor.ActorProxy[SubproblemsWrap]] = []
         for cpu in range(num_cpus):
             # get constraint idx for the group
-            idx_r: list[int] = constrs_gps_idx_r[cpu::num_cpus].tolist()
-            idx_d: list[int] = constrs_gps_idx_d[cpu::num_cpus].tolist()
-            # get constraints group
-            constrs_r = [self.constrs_gps_r[j] for j in idx_r]
-            constrs_d = [self.constrs_gps_d[j] for j in idx_d]
-            # get obj groups
-            obj_r = [obj_expr_r[j] for j in idx_r]
-            obj_d = [obj_expr_d[j] for j in idx_d]
-            # get var_id_to_pos_list
-            var_id_to_pos_r = [
-                [self.constr_dict_r[constr] for constr in constrs] for constrs in constrs_r
-            ]
-            var_id_to_pos_d = [
-                [self.constr_dict_d[constr] for constr in constrs] for constrs in constrs_d
-            ]
+            idx_r: NDArray[np.signedinteger] = constrs_gps_idx_r[cpu::num_cpus]
+            idx_d: NDArray[np.signedinteger] = constrs_gps_idx_d[cpu::num_cpus]
+
             # build subproblems
             actor = ray.remote(SubproblemsWrap)
             probs.append(
                 actor.remote(
                     idx_r,
                     idx_d,
-                    obj_r,
-                    obj_d,
-                    constrs_r,
-                    constrs_d,
-                    var_id_to_pos_r,
-                    var_id_to_pos_d,
-                    var_id_pos_set_r,
-                    var_id_pos_set_d,
+                    obj_expr_r_ref,
+                    obj_expr_d_ref,
+                    constrs_r_ref,
+                    constrs_d_ref,
+                    constr_dict_r_ref,
+                    constr_dict_d_ref,
+                    var_id_pos_set_r_ref,
+                    var_id_pos_set_d_ref,
                     rho,
                 )
             )
@@ -419,9 +445,9 @@ class Problem(CpProblem):
         assert self._subprob_cache.probs is not None
 
         # map var_id_pos in the big resource solution list
-        sol_idx_r: list[list[VarInfoT]] = ray.get(
-            [prob.get_solution_idx_r.remote() for prob in self._subprob_cache.probs]
-        )
+        sol_idx_r_futures = [prob.get_solution_idx_r.remote() for prob in self._subprob_cache.probs]
+        sol_idx_l_futures = [prob.get_solution_idx_d.remote() for prob in self._subprob_cache.probs]
+        sol_idx_r: list[list[VarInfoT]] = ray.get(sol_idx_r_futures)
 
         sol_idx_dict_r: dict[VarInfoT, int] = {}
         idx = 0
@@ -431,9 +457,7 @@ class Problem(CpProblem):
                 idx += 1
 
         # map var_id_pos in the big demand solution list
-        sol_idx_d: list[list[VarInfoT]] = ray.get(
-            [prob.get_solution_idx_d.remote() for prob in self._subprob_cache.probs]
-        )
+        sol_idx_d: list[list[VarInfoT]] = ray.get(sol_idx_l_futures)
         sol_idx_dict_d: dict[VarInfoT, int] = {}
         idx = 0
         for sol_idx in sol_idx_d:
@@ -468,14 +492,14 @@ class Problem(CpProblem):
         ):
             for j, constrs in enumerate(constrs_gps):
                 for constr in constrs:
-                    for var_id_pos in constr_dict[constr]:
+                    for var_id_pos in constr_dict[constr.id]:
                         var_id_pos_to_idx[var_id_pos].append((i, j))
 
         expr_list = expand_expr(self.objective.expr)
 
         # put heavy objects in shared memory to avoid serialization overhead
         expr_ref = ray.put(expr_list)
-        dict_ref = ray.put(dict(var_id_pos_to_idx))
+        dict_ref = ray.put(var_id_pos_to_idx)
 
         # chunk the indices to split the work
         chunks = np.array_split(np.arange(len(expr_list), dtype=np.int64), num_cpus)
