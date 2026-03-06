@@ -443,9 +443,9 @@ class Problem(CpProblem):
         assert self._subprob_cache.probs is not None
 
         # map var_id_pos in the big resource solution list
-        sol_idx_r: list[list[VarInfoT]] = ray.get(
-            [prob.get_solution_idx_r.remote() for prob in self._subprob_cache.probs]
-        )
+        sol_idx_r_futures = [prob.get_solution_idx_r.remote() for prob in self._subprob_cache.probs]
+        sol_idx_l_futures = [prob.get_solution_idx_d.remote() for prob in self._subprob_cache.probs]
+        sol_idx_r: list[list[VarInfoT]] = ray.get(sol_idx_r_futures)
 
         sol_idx_dict_r: dict[VarInfoT, int] = {}
         idx = 0
@@ -455,9 +455,7 @@ class Problem(CpProblem):
                 idx += 1
 
         # map var_id_pos in the big demand solution list
-        sol_idx_d: list[list[VarInfoT]] = ray.get(
-            [prob.get_solution_idx_d.remote() for prob in self._subprob_cache.probs]
-        )
+        sol_idx_d: list[list[VarInfoT]] = ray.get(sol_idx_l_futures)
         sol_idx_dict_d: dict[VarInfoT, int] = {}
         idx = 0
         for sol_idx in sol_idx_d:
