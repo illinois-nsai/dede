@@ -499,7 +499,7 @@ class Problem(CpProblem):
 
         # put heavy objects in shared memory to avoid serialization overhead
         expr_ref = ray.put(expr_list)
-        dict_ref = ray.put(dict(var_id_pos_to_idx))
+        dict_ref = ray.put(var_id_pos_to_idx)
 
         # chunk the indices to split the work
         chunks = np.array_split(np.arange(len(expr_list), dtype=np.int64), num_cpus)
