@@ -186,7 +186,8 @@ class Problem(CpProblem):
         i, aug_lgr, aug_lgr_old = 0, 1, 2
 
         mu = 10
-        xi = 1
+        tau = 2
+        xi = 0.1
         balance_iterations = 10
         max_tau = 200
 
@@ -268,6 +269,9 @@ class Problem(CpProblem):
 
             print('iter%d: end2end time %.4f, aug_lgr=%.4f' % (
                 i, time.time() - start, aug_lgr))
+            coeff = 1 if self._problem_type == Minimize else -1
+            print(coeff * sum(ray.get([
+                prob.get_obj.remote() for prob in self._subprob_cache.probs])))
         
         end = time.time()
         print("solve time:", end - start)
@@ -317,7 +321,8 @@ class Problem(CpProblem):
         eps_primal = np.sqrt(x_dim) * eps_abs / max(np.linalg.norm(shared_r), np.linalg.norm(shared_d)) + eps_rel
         eps_dual = np.sqrt(x_dim) * eps_abs / np.linalg.norm(scaled_dual_arr) + eps_rel
 
-        return primal_res, dual_res, eps_primal, eps_dual
+        return primal_res, dual_res, 0.01, 0.01
+        #return primal_res, dual_res, eps_primal, eps_dual
     
     def get_epsilon(self):
         eps_abs = 0.01
@@ -331,6 +336,9 @@ class Problem(CpProblem):
 
         eps_primal = np.sqrt(x_dim) * eps_abs / max(np.linalg.norm(self.sol_r), np.linalg.norm(self.sol_d)) + eps_rel
         eps_dual = np.sqrt(x_dim) * eps_abs / np.linalg.norm(scaled_dual_arr) + eps_rel
+
+        eps_primal = min(eps_primal, 0.01)
+        eps_dual = min(eps_dual, 0.01)
 
         return eps_primal, eps_dual
     
