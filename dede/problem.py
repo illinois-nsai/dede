@@ -45,6 +45,21 @@ class RaySubprobCache:
         self._placement_group: t.Optional[PlacementGroup] = None
 
     def update_cache(self, rho: float, user_num_cpus: t.Optional[int], ray_address: str) -> bool:
+        """Updates the execution parameters stored in the cache.
+
+        If this results in cache invalidation, the subproblem settings need to be set again.
+
+        Args:
+            rho (float): the rho to use in optimization
+            user_num_cpus (t.Optional[int]): how many CPUs to use in optimization. None means all
+                available CPUs will be used.
+            ray_address (str): the address of the ray server to connect to.
+                Either "local" or an ip address.
+
+        Returns:
+            bool: True if the cache was invalidated as part of the update
+            (i.e., there was a change). Otherwise, False.
+        """
         # we want to rebuild subproblems and restart ray if
         # the rho changes, the address or changes, or the num cpus changes in local mode
         if not (
@@ -78,6 +93,7 @@ class RaySubprobCache:
         param_idx_r: list[list[int]],
         param_idx_d: list[list[int]],
     ) -> None:
+        """Stores subproblems in the cache (subproblems, indices of parameters)."""
         self._probs = probs
         self._param_idx_r = param_idx_r
         self._param_idx_d = param_idx_d
@@ -93,9 +109,7 @@ class RaySubprobCache:
         self._placement_group = None
 
     def _get_ray_cpus(self) -> int:
-        """Get the true amount of cpus available in the ray cluster.
-        This only differs from the user inputted when when the user input is None,
-        which indicates that all CPUs should be used."""
+        """Get the true amount of cpus available in the ray cluster."""
         if not ray.is_initialized():
             raise RuntimeError("Ray is not initialized. Cannot get number of CPUs in the cluster.")
         return int(ray.cluster_resources().get("CPU", 1))
@@ -108,6 +122,8 @@ class RaySubprobCache:
 
     @property
     def num_cpus(self) -> int:
+        """Get the number of CPUs the user requested.
+        In the case of None, defauls to all available CPUs."""
         if self._user_num_cpus is None:
             return self._get_ray_cpus()
         return self._user_num_cpus
@@ -144,6 +160,19 @@ class RaySubprobCache:
 
     @contextlib.contextmanager
     def get_distributed_pg(self, max_cpus_per_node: int) -> t.Iterator[PlacementGroup]:
+        """Returns a placement group that tries to spread
+        workers across all available nodes in the ray network.
+
+        Ideally used as a context manager to free up
+        the placement group once execution has finished.
+
+        Args:
+            max_cpus_per_node (int): how many CPUs to request per node. This may not be fulfilled
+            if some node does not have enough available CPUs.
+
+        Returns:
+            t.Iterator[PlacementGroup]: the placement group
+        """
         nodes = [node for node in ray.nodes() if node["Alive"]]
 
         bundles = [{"CPU": 1.0}] * min(max_cpus_per_node * len(nodes), self.num_cpus)
