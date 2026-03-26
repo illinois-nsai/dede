@@ -272,12 +272,9 @@ class Problem(CpProblem):
     ) -> np.floating[t.Any]:
         """Compiles and solves the original problem.
 
-        Ray must be initialized before calling this method with enable_dede=True
-        or it will run using only one CPU.
-
         Args:
-            num_cpus: number of CPUs to use; if None, use all available CPUs. If ray_address
-            is not None or ray is already initialized, this argument must be None.
+            num_cpus: number of CPUs to use; if None, use all available CPUs.
+                If more than the available number of CPUs, will error.
             ray_address: ray cluster address; if None, will use local ray instance.
             enable_dede: whether to decouple and decompose with DeDe
             rho: rho value in ADMM; 1 by default
