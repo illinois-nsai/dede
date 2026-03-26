@@ -551,6 +551,8 @@ class Problem(CpProblem):
         if self._obj_expr_r is not None and self._obj_expr_d is not None:
             return self._obj_expr_r, self._obj_expr_d
 
+        # use a placement group with strategy = SPREAD due to the diminishing returns
+        # observed with larger numbers of CPUs
         with self._subprob_cache.get_distributed_pg(4) as pg:
             var_id_pos_to_idx: dict[VarInfoT, list[tuple[int, int]]] = defaultdict(list)
             for i, constrs_gps, constr_dict in zip(
