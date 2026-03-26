@@ -274,7 +274,7 @@ class Problem(CpProblem):
             probs = self.get_subproblems(obj_expr_r, obj_expr_d, self._subprob_cache.num_cpus, rho)
 
             # store parameter index in z solutions for x problems
-            param_idx_r, param_idx_d = self.get_param_idx()
+            param_idx_r, param_idx_d = self._get_param_idx(probs)
             self._subprob_cache.set_subprobs(probs, param_idx_r, param_idx_d)
 
             # get demand solution
@@ -477,11 +477,14 @@ class Problem(CpProblem):
             )
         return probs
 
-    def get_param_idx(self) -> tuple[list[list[int]], list[list[int]]]:
+    @classmethod
+    def _get_param_idx(
+        cls, probs: list[ray.actor.ActorProxy[SubproblemsWrap]]
+    ) -> tuple[list[list[int]], list[list[int]]]:
         """Get parameter z index in last solution."""
         # map var_id_pos in the big resource solution list
         sol_idx_r: list[list[VarInfoT]] = ray.get(
-            [prob.get_solution_idx_r.remote() for prob in self._subprob_cache.probs]
+            [prob.get_solution_idx_r.remote() for prob in probs]
         )
 
         sol_idx_dict_r: dict[VarInfoT, int] = {}
@@ -493,7 +496,7 @@ class Problem(CpProblem):
 
         # map var_id_pos in the big demand solution list
         sol_idx_d: list[list[VarInfoT]] = ray.get(
-            [prob.get_solution_idx_d.remote() for prob in self._subprob_cache.probs]
+            [prob.get_solution_idx_d.remote() for prob in probs]
         )
         sol_idx_dict_d: dict[VarInfoT, int] = {}
         idx = 0
