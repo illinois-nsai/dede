@@ -8,6 +8,7 @@ import cvxpy as cp
 import numpy as np
 import ray
 import ray.actor
+import ray.exceptions
 from cvxpy.constraints.nonpos import Inequality
 from cvxpy.constraints.zero import Equality, Zero
 from cvxpy.problems.objective import Minimize
@@ -26,6 +27,41 @@ from .utils import (
 
 ObjectiveT = t.Union[cp.Maximize, cp.Minimize]
 ConstraintT = t.Union[Equality, Zero, Inequality]
+
+
+@contextlib.contextmanager
+def _get_distributed_pg(
+    max_cpus_per_node: int, timeout: float = 10.0
+) -> t.Iterator[PlacementGroup]:
+    """Returns a placement group that tries to spread
+    workers across all available nodes in the ray network.
+
+    Ideally used as a context manager to free up
+    the placement group once execution has finished.
+
+    Args:
+        max_cpus_per_node (int): how many CPUs to request per node. This is an upper bound on the
+        number of CPUs reserved.
+
+    Returns:
+        t.Iterator[PlacementGroup]: the placement group
+    """
+    nodes = [node for node in ray.nodes() if node["Alive"]]
+
+    bundles = [{"CPU": 1.0}] * min(max_cpus_per_node * len(nodes), _get_ray_cpus())
+    pg = ray.util.placement_group(bundles, strategy="SPREAD")
+    ray.get(pg.ready(), timeout=timeout)
+    try:
+        yield pg
+    finally:
+        ray.util.remove_placement_group(pg)
+
+
+def _get_ray_cpus() -> int:
+    """Get the true amount of cpus available in the ray cluster."""
+    if not ray.is_initialized():
+        raise RuntimeError("Ray is not initialized. Cannot get number of CPUs in the cluster.")
+    return int(ray.cluster_resources().get("CPU", 1))
 
 
 class RaySubprobCache:
@@ -81,11 +117,14 @@ class RaySubprobCache:
         else:
             ray.init(num_cpus=user_num_cpus)
 
-        self._placement_group = ray.util.placement_group(
-            [{"CPU": 1}] * (user_num_cpus or self._get_ray_cpus())
-        )
-
         return True
+
+    def reserve_placement_group(self, timeout: float = 10.0) -> PlacementGroup:
+        if self._placement_group is not None:
+            raise RuntimeError("Reserving another placement group when one is already reserved")
+        self._placement_group = ray.util.placement_group([{"CPU": 1}] * (self.num_cpus))
+        ray.get(self._placement_group.ready(), timeout=timeout)
+        return self._placement_group
 
     def set_subprobs(
         self,
@@ -108,12 +147,6 @@ class RaySubprobCache:
             ray.util.remove_placement_group(self._placement_group)
         self._placement_group = None
 
-    def _get_ray_cpus(self) -> int:
-        """Get the true amount of cpus available in the ray cluster."""
-        if not ray.is_initialized():
-            raise RuntimeError("Ray is not initialized. Cannot get number of CPUs in the cluster.")
-        return int(ray.cluster_resources().get("CPU", 1))
-
     @property
     def rho(self) -> float:
         if self._rho is None:
@@ -125,7 +158,7 @@ class RaySubprobCache:
         """Get the number of CPUs the user requested.
         In the case of None, defauls to all available CPUs."""
         if self._user_num_cpus is None:
-            return self._get_ray_cpus()
+            return _get_ray_cpus()
         return self._user_num_cpus
 
     @property
@@ -154,34 +187,10 @@ class RaySubprobCache:
 
     @property
     def placement_group(self) -> PlacementGroup:
+        """Get a placement group with the requested number of CPUs."""
         if self._placement_group is None:
-            raise RuntimeError("placement_group is not set")
+            raise RuntimeError("placement group is not set")
         return self._placement_group
-
-    @contextlib.contextmanager
-    def get_distributed_pg(self, max_cpus_per_node: int) -> t.Iterator[PlacementGroup]:
-        """Returns a placement group that tries to spread
-        workers across all available nodes in the ray network.
-
-        Ideally used as a context manager to free up
-        the placement group once execution has finished.
-
-        Args:
-            max_cpus_per_node (int): how many CPUs to request per node. This may not be fulfilled
-            if some node does not have enough available CPUs.
-
-        Returns:
-            t.Iterator[PlacementGroup]: the placement group
-        """
-        nodes = [node for node in ray.nodes() if node["Alive"]]
-
-        bundles = [{"CPU": 1.0}] * min(max_cpus_per_node * len(nodes), self.num_cpus)
-        pg = ray.util.placement_group(bundles, strategy="SPREAD")
-        ray.get(pg.ready())
-        try:
-            yield pg
-        finally:
-            ray.util.remove_placement_group(pg)
 
 
 class Problem(CpProblem):
@@ -297,10 +306,13 @@ class Problem(CpProblem):
         if subproblems_invalidated:
             # store subproblem in last solution
             obj_expr_r, obj_expr_d = self._get_grouped_objectives()
+            # reserve the actors needed to create the subproblems
+            self._subprob_cache.reserve_placement_group()
             probs = self.get_subproblems(obj_expr_r, obj_expr_d, self._subprob_cache.num_cpus, rho)
 
             # store parameter index in z solutions for x problems
             param_idx_r, param_idx_d = self._get_param_idx(probs)
+
             self._subprob_cache.set_subprobs(probs, param_idx_r, param_idx_d)
 
             # get demand solution
@@ -550,7 +562,7 @@ class Problem(CpProblem):
 
         # use a placement group with strategy = SPREAD due to the diminishing returns
         # observed with larger numbers of CPUs
-        with self._subprob_cache.get_distributed_pg(4) as pg:
+        with _get_distributed_pg(4) as pg:
             var_id_pos_to_idx: dict[VarInfoT, list[tuple[int, int]]] = defaultdict(list)
             for i, constrs_gps, constr_dict in zip(
                 [0, 1],
