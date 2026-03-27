@@ -8,7 +8,6 @@ import cvxpy as cp
 import numpy as np
 import ray
 import ray.actor
-import ray.exceptions
 from cvxpy.constraints.nonpos import Inequality
 from cvxpy.constraints.zero import Equality, Zero
 from cvxpy.problems.objective import Minimize
