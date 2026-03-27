@@ -1,5 +1,4 @@
 import contextlib
-import os
 import time
 import typing as t
 from collections import defaultdict
@@ -116,6 +115,9 @@ class RaySubprobCache:
             ray.init(address=ray_address)
         else:
             ray.init(num_cpus=user_num_cpus)
+
+        if user_num_cpus is not None and user_num_cpus > _get_ray_cpus():
+            raise ValueError(f"Too many CPUs requested, only have {_get_ray_cpus()} available")
 
         return True
 
@@ -298,9 +300,6 @@ class Problem(CpProblem):
 
             coeff = 1 if self._problem_type == Minimize else -1
             return t.cast(np.floating[t.Any], coeff * self.value)
-
-        if num_cpus is not None and num_cpus > (os.cpu_count() or 1):
-            raise ValueError(f"{num_cpus} CPUs exceeds upper limit of {os.cpu_count()}.")
 
         subproblems_invalidated = self._subprob_cache.update_cache(rho, num_cpus, ray_address)
         if subproblems_invalidated:
