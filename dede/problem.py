@@ -14,6 +14,7 @@ from cvxpy.problems.objective import Minimize
 from cvxpy.problems.problem import Problem as CpProblem
 from numpy.typing import NDArray
 from ray.util.placement_group import PlacementGroup
+from ray.util.scheduling_strategies import PlacementGroupSchedulingStrategy
 
 from .constraints_utils import breakdown_constr
 from .subproblems_wrap import SubproblemsWrap
@@ -494,8 +495,10 @@ class Problem(CpProblem):
             ]
             # build subproblems
             actor = ray.remote(SubproblemsWrap).options(
-                placement_group=self._subprob_cache.placement_group,
-                placement_group_bundle_index=cpu,
+                scheduling_strategy=PlacementGroupSchedulingStrategy(
+                    placement_group=self._subprob_cache.placement_group,
+                    placement_group_bundle_index=cpu,
+                )
             )
             probs.append(
                 actor.remote(
@@ -585,7 +588,10 @@ class Problem(CpProblem):
             # send the chunks to the remote function for processing
             futures = [
                 _process_obj_chunk_indices.options(
-                    placement_group=pg, placement_group_bundle_index=i
+                    scheduling_strategy=PlacementGroupSchedulingStrategy(
+                        placement_group=pg,
+                        placement_group_bundle_index=i,
+                    )
                 ).remote(
                     c,
                     expr_ref,
