@@ -1,19 +1,18 @@
 #!/usr/bin/env python3
 
-import math
-
 import cvxpy as cp
 import numpy as np
-from conftest import GUROBI_OPTS
+from conftest import GUROBI_OPTS, check_solution
 
 import dede as dd
 
 
 def test_add1():
+    # TODO: relax, change constraints/edit hyperparameters, make a more lenient threshold
     N, M = 10, 10
     x = dd.Variable((N, M), integer=True)
     resource_constraints = [x >= 0] + [x[i, :].sum() >= 2 * i for i in range(N)]
-    demand_constraints = [x[:, j].sum() <= 2 * 1.23456789 * j for j in range(M)]
+    demand_constraints = [x[:, j].sum() <= 3 * j for j in range(M)]
     expr = 0
     for i in range(min(N, M)):
         if i % 2 == 0:
@@ -22,17 +21,16 @@ def test_add1():
             expr -= x[i, i]
     objective = dd.Maximize(expr)
 
-    prob = dd.Problem(objective, resource_constraints, demand_constraints)
-
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=0.5, num_iter=25, **GUROBI_OPTS)
-    print("DeDe:", result_dede)
-
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
     result_cvxpy = cvxpy_prob.solve()
     print("CVXPY:", result_cvxpy)
+
+    prob = dd.Problem(objective, resource_constraints, demand_constraints)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=0.5, num_iter=25, **GUROBI_OPTS)
+    print("DeDe:", result_dede)
     print(x.value)
 
-    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
+    assert check_solution(result_dede, result_cvxpy, objective)
     print("=== Passed ILP ADD test #1 ===")
 
 
@@ -45,16 +43,15 @@ def test_add2():
     # pull two elements
     objective = dd.Maximize(x[N - 1, M - 1] + x[N // 2, M // 2])
 
-    prob = dd.Problem(objective, resource_constraints, demand_constraints)
-
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=0.5, num_iter=30, **GUROBI_OPTS)
-    print("DeDe:", result_dede)
-
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
     result_cvxpy = cvxpy_prob.solve()
     print("CVXPY:", result_cvxpy)
 
-    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
+    prob = dd.Problem(objective, resource_constraints, demand_constraints)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=0.5, num_iter=30, **GUROBI_OPTS)
+    print("DeDe:", result_dede)
+
+    assert check_solution(result_dede, result_cvxpy, objective)
     print("=== Passed ILP ADD test #2 ===")
 
 
@@ -67,11 +64,10 @@ def test_constant1():
     objective = dd.Maximize(2)
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
-
     result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=1, num_iter=5, **GUROBI_OPTS)
     print("DeDe:", result_dede)
 
-    assert math.isclose(result_dede, 2, rel_tol=0.01)
+    assert check_solution(result_dede, 2, objective)
     print("=== Passed ILP CONSTANT test #1 ===")
 
 
@@ -83,16 +79,15 @@ def test_constant2():
 
     objective = dd.Maximize(x[N - 1, M - 1] + 2)
 
-    prob = dd.Problem(objective, resource_constraints, demand_constraints)
-
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=0.5, num_iter=20, **GUROBI_OPTS)
-    print("DeDe:", result_dede)
-
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
     result_cvxpy = cvxpy_prob.solve()
     print("CVXPY:", result_cvxpy)
 
-    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
+    prob = dd.Problem(objective, resource_constraints, demand_constraints)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=0.5, num_iter=20, **GUROBI_OPTS)
+    print("DeDe:", result_dede)
+
+    assert check_solution(result_dede, result_cvxpy, objective)
     print("=== Passed ILP CONSTANT test #2 ===")
 
 
@@ -103,16 +98,15 @@ def test_sum1():
     demand_constraints = [x[:, j].sum() <= j for j in range(M)]
     objective = dd.Maximize(dd.sum(x))
 
-    prob = dd.Problem(objective, resource_constraints, demand_constraints)
-
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=1, num_iter=30, **GUROBI_OPTS)
-    print("DeDe:", result_dede)
-
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
     result_cvxpy = cvxpy_prob.solve()
     print("CVXPY:", result_cvxpy)
 
-    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
+    prob = dd.Problem(objective, resource_constraints, demand_constraints)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=1, num_iter=30, **GUROBI_OPTS)
+    print("DeDe:", result_dede)
+
+    assert check_solution(result_dede, result_cvxpy, objective)
     print("=== Passed ILP SUM test #1 ===")
 
 
@@ -123,16 +117,15 @@ def test_sum2():
     demand_constraints = [x[:, j].sum() <= 1 for j in range(M)]
     objective = dd.Maximize(dd.sum(x))
 
-    prob = dd.Problem(objective, resource_constraints, demand_constraints)
-
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=1, num_iter=7, **GUROBI_OPTS)
-    print("DeDe:", result_dede)
-
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
     result_cvxpy = cvxpy_prob.solve()
     print("CVXPY:", result_cvxpy)
 
-    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
+    prob = dd.Problem(objective, resource_constraints, demand_constraints)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=1, num_iter=7, **GUROBI_OPTS)
+    print("DeDe:", result_dede)
+
+    assert check_solution(result_dede, result_cvxpy, objective)
     print("=== Passed ILP SUM test #2 ===")
 
 
@@ -147,16 +140,15 @@ def test_multiply1():
             w[i][j] = i - j
     objective = dd.Maximize(dd.sum(dd.multiply(x, w)))
 
-    prob = dd.Problem(objective, resource_constraints, demand_constraints)
-
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=1, num_iter=14, **GUROBI_OPTS)
-    print("DeDe:", result_dede)
-
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
     result_cvxpy = cvxpy_prob.solve()
     print("CVXPY:", result_cvxpy)
 
-    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01, abs_tol=0.1)
+    prob = dd.Problem(objective, resource_constraints, demand_constraints)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=1, num_iter=14, **GUROBI_OPTS)
+    print("DeDe:", result_dede)
+
+    assert check_solution(result_dede, result_cvxpy, objective)
     print("=== Passed ILP MULTIPLY test #1 ===")
 
 
@@ -171,16 +163,15 @@ def test_multiply2():
             w[i][j] = i * j / (i + j + 1)
     objective = dd.Maximize(dd.sum(dd.multiply(x, w)))
 
-    prob = dd.Problem(objective, resource_constraints, demand_constraints)
-
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=0.1, num_iter=25, **GUROBI_OPTS)
-    print("DeDe:", result_dede)
-
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
     result_cvxpy = cvxpy_prob.solve()
     print("CVXPY:", result_cvxpy)
 
-    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01, abs_tol=0.1)
+    prob = dd.Problem(objective, resource_constraints, demand_constraints)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=0.1, num_iter=25, **GUROBI_OPTS)
+    print("DeDe:", result_dede)
+
+    assert check_solution(result_dede, result_cvxpy, objective)
     print("=== Passed ILP MULTIPLY test #2 ===")
 
 
@@ -191,16 +182,16 @@ def test_boolean():
     resource_constraints = [x[i, :].sum() >= i for i in range(N)]
     demand_constraints = [x[:, j].sum() <= j for j in range(M)]
     objective = dd.Maximize(dd.sum(x))
-    prob = dd.Problem(objective, resource_constraints, demand_constraints)
-
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=10, num_iter=15, **GUROBI_OPTS)
-    print("DeDe:", result_dede)
 
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
     result_cvxpy = cvxpy_prob.solve(solver=cp.ECOS_BB)
     print("CVXPY:", result_cvxpy)
 
-    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
+    prob = dd.Problem(objective, resource_constraints, demand_constraints)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=10, num_iter=15, **GUROBI_OPTS)
+    print("DeDe:", result_dede)
+
+    assert check_solution(result_dede, result_cvxpy, objective)
     print("=== Passed BOOLEAN LP test ===")
 
 

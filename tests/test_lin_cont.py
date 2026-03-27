@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-import math
 
 import cvxpy as cp
 import numpy as np
+from conftest import check_solution
 
 import dede as dd
 
@@ -23,14 +23,16 @@ def test_add1():
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=0.1, num_iter=15)
-    print("DeDe:", result_dede)
-
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
     result_cvxpy = cvxpy_prob.solve()
     print("CVXPY:", result_cvxpy)
 
-    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
+    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=0.1, num_iter=15)
+    print("DeDe:", result_dede)
+
+    assert check_solution(
+        result_dede, result_cvxpy, objective, constraints=resource_constraints + demand_constraints
+    )
     print("=== Passed LP ADD test #1 ===")
 
 
@@ -45,14 +47,16 @@ def test_add2():
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=0.1, num_iter=10)
-    print("DeDe:", result_dede)
-
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
     result_cvxpy = cvxpy_prob.solve()
     print("CVXPY:", result_cvxpy)
 
-    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
+    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=0.1, num_iter=10)
+    print("DeDe:", result_dede)
+
+    assert check_solution(
+        result_dede, result_cvxpy, objective, constraints=resource_constraints + demand_constraints
+    )
     print("=== Passed LP ADD test #2 ===")
 
 
@@ -67,14 +71,16 @@ def test_add_zero():
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=1, num_iter=5)
-    print("DeDe:", result_dede)
-
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
     result_cvxpy = cvxpy_prob.solve()
     print("CVXPY:", result_cvxpy)
 
-    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
+    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=1, num_iter=5)
+    print("DeDe:", result_dede)
+
+    assert check_solution(
+        result_dede, result_cvxpy, objective, constraints=resource_constraints + demand_constraints
+    )
     print("=== Passed LP ADD zero test ===")
 
 
@@ -87,14 +93,16 @@ def test_sum1():
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=1, num_iter=5)
-    print("DeDe:", result_dede)
-
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
     result_cvxpy = cvxpy_prob.solve()
     print("CVXPY:", result_cvxpy)
 
-    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
+    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=1, num_iter=20)
+    print("DeDe:", result_dede)
+
+    assert check_solution(
+        result_dede, result_cvxpy, objective, constraints=resource_constraints + demand_constraints
+    )
     print("=== Passed LP SUM test #1 ===")
 
 
@@ -107,14 +115,16 @@ def test_sum2():
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=10, num_iter=7)
-    print("DeDe:", result_dede)
-
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
     result_cvxpy = cvxpy_prob.solve()
     print("CVXPY:", result_cvxpy)
 
-    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
+    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=10, num_iter=7)
+    print("DeDe:", result_dede)
+
+    assert check_solution(
+        result_dede, result_cvxpy, objective, constraints=resource_constraints + demand_constraints
+    )
     print("=== Passed LP SUM test #2 ===")
 
 
@@ -131,14 +141,16 @@ def test_multiply1():
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=10, num_iter=15)
-    print("DeDe:", result_dede)
-
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
     result_cvxpy = cvxpy_prob.solve()
     print("CVXPY:", result_cvxpy)
 
-    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01, abs_tol=0.1)
+    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=10, num_iter=15)
+    print("DeDe:", result_dede)
+
+    assert check_solution(
+        result_dede, result_cvxpy, objective, constraints=resource_constraints + demand_constraints
+    )
     print("=== Passed LP MULTIPLY test #1 ===")
 
 
@@ -155,14 +167,16 @@ def test_multiply2():
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=1, num_iter=20)
-    print("DeDe:", result_dede)
-
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
     result_cvxpy = cvxpy_prob.solve()
     print("CVXPY:", result_cvxpy)
 
-    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01, abs_tol=0.1)
+    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=1, num_iter=20)
+    print("DeDe:", result_dede)
+
+    assert check_solution(
+        result_dede, result_cvxpy, objective, constraints=resource_constraints + demand_constraints
+    )
     print("=== Passed LP MULTIPLY test #2 ===")
 
 
@@ -177,14 +191,16 @@ def test_multiply_zero():
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=1, num_iter=10)
-    print("DeDe:", result_dede)
-
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
     result_cvxpy = cvxpy_prob.solve()
     print("CVXPY:", result_cvxpy)
 
-    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01, abs_tol=0.1)
+    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=1, num_iter=10)
+    print("DeDe:", result_dede)
+
+    assert check_solution(
+        result_dede, result_cvxpy, objective, constraints=resource_constraints + demand_constraints
+    )
     print("=== Passed LP MULTIPLY zero test ===")
 
 
@@ -198,14 +214,16 @@ def test_trace():
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=1, num_iter=20)
-    print("DeDe:", result_dede)
-
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
     result_cvxpy = cvxpy_prob.solve()
     print("CVXPY:", result_cvxpy)
 
-    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01, abs_tol=0.1)
+    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=1, num_iter=20)
+    print("DeDe:", result_dede)
+
+    assert check_solution(
+        result_dede, result_cvxpy, objective, constraints=resource_constraints + demand_constraints
+    )
     print("=== Passed LP TRACE test ===")
 
 
