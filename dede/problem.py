@@ -16,6 +16,7 @@ from numpy.typing import NDArray
 from .constraints_utils import breakdown_constr
 from .subproblems_wrap import SubproblemsWrap
 from .utils import (
+    UnionFind,
     VarInfoT,
     expand_expr,
     get_var_id_pos_list_from_cone,
@@ -299,30 +300,18 @@ class Problem(CpProblem):
         cls, constrs: list[cp.Constraint], constr_dict: dict[cp.Constraint, list[VarInfoT]]
     ) -> list[list[cp.Constraint]]:
         """Group constraints into non-overlapped groups with union-find."""
-        parents: list[int] = np.arange(len(constrs)).tolist()
-
-        def find(x: int) -> int:
-            if x == parents[x]:
-                return x
-            parents[x] = find(parents[x])
-            return parents[x]
-
-        def union(x1: int, x2: int) -> None:
-            parent_x1 = find(x1)
-            parent_x2 = find(x2)
-            if parent_x1 != parent_x2:
-                parents[parent_x2] = parent_x1
+        uf = UnionFind(len(constrs))
 
         var_id_pos_to_i: dict[VarInfoT, int] = {}
         for i, constr in enumerate(constrs):
             for var_id_pos in constr_dict[constr]:
                 if var_id_pos in var_id_pos_to_i:
-                    union(var_id_pos_to_i[var_id_pos], i)
+                    uf.union(var_id_pos_to_i[var_id_pos], i)
                 var_id_pos_to_i[var_id_pos] = i
 
         parent_to_constrs: dict[int, list[cp.Constraint]] = defaultdict(list)
-        for i, parent in enumerate(parents):
-            parent_to_constrs[find(parent)].append(constrs[i])
+        for i in range(len(constrs)):
+            parent_to_constrs[uf.find(i)].append(constrs[i])
         return list(parent_to_constrs.values())
 
     def get_subproblems(
