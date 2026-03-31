@@ -27,7 +27,7 @@ def check_solution(
     if constraints is not None:
         for constr in constraints:
             if np.any(constr.violation() > feas_tol):
-                print("VIOLATION", constr.violation())
+                print("constraints not satisfied (outside threshold)", constr.violation())
                 return False
 
     within_tol = math.isclose(dede_val, cvxpy_val, rel_tol=0.05, abs_tol=1e-6)
@@ -42,6 +42,6 @@ def check_solution(
         if dede_val <= cvxpy_val:
             return True
 
-    print("not in criteria")
+    print("solution not within tolerance and in the wrong direction", dede_val, cvxpy_val)
 
     return False
