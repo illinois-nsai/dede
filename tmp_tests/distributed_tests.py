@@ -48,22 +48,29 @@ def test_log(n, num_cpus):
 
 
 if __name__ == "__main__":
-    for n in np.arange(200, 2001, 200):
+    sum_multiplier = 100
+    weighted_multiplier = 30
+    log_multiplier = 10
+    for multiplier in range(1, 11):
         for num_cpus in [1, 2, 4, 8, 16, 32]:
-            print(f"Testing sum n={n}, num_cpus={num_cpus}")
-            try:
-                test_sum(n, num_cpus)
-            except Exception as e:
-                print(f"Error in test_sum with n={n}, num_cpus={num_cpus}: {e}")
+            sum_n = multiplier * sum_multiplier
+            weighted_n = multiplier * weighted_multiplier
+            log_n = multiplier * log_multiplier
 
-            print(f"Testing weighted n={n}, num_cpus={num_cpus}")
+            print(f"Testing sum n={sum_n}, num_cpus={num_cpus}")
             try:
-                test_weighted(n, num_cpus)
+                test_sum(sum_n, num_cpus)
             except Exception as e:
-                print(f"Error in test_weighted with n={n}, num_cpus={num_cpus}: {e}")
+                print(f"Error in test_sum with n={sum_n}, num_cpus={num_cpus}: {e}")
 
-            print(f"Testing log n={n} num_cpus={num_cpus}")
+            print(f"Testing weighted n={weighted_n}, num_cpus={num_cpus}")
             try:
-                test_log(n, num_cpus)
+                test_weighted(weighted_n, num_cpus)
             except Exception as e:
-                print(f"Error in test_log with n={n}: {e}")
+                print(f"Error in test_weighted with n={weighted_n}, num_cpus={num_cpus}: {e}")
+
+            print(f"Testing log n={log_n}, num_cpus={num_cpus}")
+            try:
+                test_log(log_n, num_cpus)
+            except Exception as e:
+                print(f"Error in test_log with n={log_n}, num_cpus={num_cpus}: {e}")
