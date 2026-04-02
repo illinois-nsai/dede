@@ -16,7 +16,7 @@ def test_sum(n, num_cpus):
     objective = dd.Maximize(dd.sum(x))
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
-    result_dede = prob.solve(ray_address="auto", solver=dd.ECOS)
+    result_dede = prob.solve(ray_address="auto", solver=dd.ECOS, num_cpus=num_cpus)
 
 
 def test_weighted(n, num_cpus):
@@ -32,10 +32,10 @@ def test_weighted(n, num_cpus):
     objective = dd.Minimize(dd.sum(dd.multiply(x, w)))
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
-    result_dede = prob.solve(num_cpus=num_cpus, solver=dd.ECOS)
+    result_dede = prob.solve(ray_address="auto", num_cpus=num_cpus, solver=dd.ECOS)
 
 
-def test_log(n):
+def test_log(n, num_cpus):
     N, M = n, n
     x = dd.Variable((N, M), nonneg=True)
     resource_constraints = [x[i, :].sum() >= (i + 1) * M for i in range(N)]
@@ -44,7 +44,7 @@ def test_log(n):
     objective = dd.Maximize(dd.sum([dd.log(dd.sum(x[i])) for i in range(N)]))
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
-    result_dede = prob.solve(num_cpus=10, solver=dd.SCS)
+    result_dede = prob.solve(ray_address="auto", num_cpus=num_cpus, solver=dd.SCS)
 
 
 if __name__ == "__main__":
@@ -62,8 +62,8 @@ if __name__ == "__main__":
             except Exception as e:
                 print(f"Error in test_weighted with n={n}, num_cpus={num_cpus}: {e}")
 
-            print(f"Testing log n={n}")
+            print(f"Testing log n={n} num_cpus={num_cpus}")
             try:
-                test_log(n)
+                test_log(n, num_cpus)
             except Exception as e:
                 print(f"Error in test_log with n={n}: {e}")
