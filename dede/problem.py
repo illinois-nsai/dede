@@ -359,7 +359,7 @@ class Problem(CpProblem):
         i, aug_lgr, aug_lgr_old = 0, 1, 2
         while (num_iter is not None and i < num_iter) or (
             num_iter is None
-            and i < (num_iter or 10000)
+            and i < (num_iter or 100)
             and (i < 2 or abs((aug_lgr - aug_lgr_old) / aug_lgr_old) > 0.01)
         ):
             # initialize start time, iteration, augmented Lagrangian
