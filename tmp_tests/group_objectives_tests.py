@@ -79,7 +79,7 @@ def get_pg(**kwargs) -> t.Iterator[PlacementGroup]:
 
 
 if __name__ == "__main__":
-    sum_multiplier = 100
+    sum_multiplier = 50
     weighted_multiplier = 30
     log_multiplier = 10
 
@@ -87,7 +87,7 @@ if __name__ == "__main__":
         {"num_cpus": num_cpus, "strategy": "SPREAD"} for num_cpus in [4, 8, 16, 32]
     ]
 
-    for multiplier in range(11, 31):
+    for multiplier in range(1, 31):
         for kwarg in kwargs:
             sum_n = multiplier * sum_multiplier
             weighted_n = multiplier * weighted_multiplier
