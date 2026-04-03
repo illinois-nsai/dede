@@ -566,7 +566,7 @@ class Problem(CpProblem):
         ]
         return param_idx_r, param_idx_d
 
-    def _get_grouped_objectives(self) -> tuple[list[cp.Expression], list[cp.Expression]]:
+    def _get_grouped_objectives(self, pg) -> tuple[list[cp.Expression], list[cp.Expression]]:
         """Split objective into corresponding constraint groups"""
 
         # See if the grouped objectives are already computed and cached.
@@ -576,47 +576,46 @@ class Problem(CpProblem):
 
         # use a placement group with strategy = SPREAD due to the diminishing returns
         # observed with larger numbers of CPUs
-        with _get_distributed_pg(4) as pg:
-            var_id_pos_to_idx: dict[VarInfoT, list[tuple[int, int]]] = defaultdict(list)
-            for i, constrs_gps, constr_dict in zip(
-                [0, 1],
-                [self.constrs_gps_r, self.constrs_gps_d],
-                [self.constr_dict_r, self.constr_dict_d],
-            ):
-                for j, constrs in enumerate(constrs_gps):
-                    for constr in constrs:
-                        for var_id_pos in constr_dict[constr.id]:
-                            var_id_pos_to_idx[var_id_pos].append((i, j))
+        var_id_pos_to_idx: dict[VarInfoT, list[tuple[int, int]]] = defaultdict(list)
+        for i, constrs_gps, constr_dict in zip(
+            [0, 1],
+            [self.constrs_gps_r, self.constrs_gps_d],
+            [self.constr_dict_r, self.constr_dict_d],
+        ):
+            for j, constrs in enumerate(constrs_gps):
+                for constr in constrs:
+                    for var_id_pos in constr_dict[constr.id]:
+                        var_id_pos_to_idx[var_id_pos].append((i, j))
 
-            expr_list = expand_expr(self.objective.expr)
+        expr_list = expand_expr(self.objective.expr)
 
-            # put heavy objects in shared memory to avoid serialization overhead
-            expr_ref = ray.put(expr_list)
-            dict_ref = ray.put(dict(var_id_pos_to_idx))
+        # put heavy objects in shared memory to avoid serialization overhead
+        expr_ref = ray.put(expr_list)
+        dict_ref = ray.put(dict(var_id_pos_to_idx))
 
-            # chunk the indices to split the work
-            chunks = np.array_split(np.arange(len(expr_list), dtype=np.int64), len(pg.bundle_specs))
+        # chunk the indices to split the work
+        chunks = np.array_split(np.arange(len(expr_list), dtype=np.int64), len(pg.bundle_specs))
 
-            # send the chunks to the remote function for processing
-            futures = [
-                _process_obj_chunk_indices.options(
-                    scheduling_strategy=PlacementGroupSchedulingStrategy(
-                        placement_group=pg,
-                        placement_group_bundle_index=i,
-                    )
-                ).remote(
-                    c,
-                    expr_ref,
-                    self._solver,
-                    dict_ref,
-                    len(self.constrs_gps_r),
-                    len(self.constrs_gps_d),
+        # send the chunks to the remote function for processing
+        futures = [
+            _process_obj_chunk_indices.options(
+                scheduling_strategy=PlacementGroupSchedulingStrategy(
+                    placement_group=pg,
+                    placement_group_bundle_index=i,
                 )
-                for i, c in enumerate(chunks)
-            ]
+            ).remote(
+                c,
+                expr_ref,
+                self._solver,
+                dict_ref,
+                len(self.constrs_gps_r),
+                len(self.constrs_gps_d),
+            )
+            for i, c in enumerate(chunks)
+        ]
 
-            # block on results
-            results = ray.get(futures)
+        # block on results
+        results = ray.get(futures)
 
         # reconstruct groups
         obj_r: list[cp.Expression] = []
