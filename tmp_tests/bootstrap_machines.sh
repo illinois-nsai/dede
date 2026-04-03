@@ -33,7 +33,7 @@ GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no" git clone git@github.com:illin
 cd dede
 git checkout $BRANCH
 sudo apt update
-sudo apt install -y python3.10-dev python3.10-venv
+sudo apt install -y python3.10-dev python3.10-venv tmux
 python3 -m venv .venv
 source .venv/bin/activate
 pip3 install -e .[dev]
