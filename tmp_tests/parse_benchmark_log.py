@@ -3,11 +3,12 @@ import csv
 import re
 from typing import Optional, TypedDict
 
-test_re = re.compile(r"Testing (\w+) n=(\d+),? num_cpus=(\d+)")
+test_re = re.compile(r"Testing (\w+) (.+)")
+kwarg_re = re.compile(r"(\w+)=(\S+?)(?:,|$)")
 executed_re = re.compile(r"Executed (\S+) in ([\d.]+)s")
 iter_re = re.compile(r"iter(\d+):")
 
-BenchmarkKey = tuple[str, int, int]
+BenchmarkKey = tuple[str, tuple[tuple[str, str], ...]]
 
 
 class BenchmarkData(TypedDict):
@@ -27,8 +28,11 @@ def parse_log(log_path: str) -> dict[BenchmarkKey, BenchmarkData]:
                 if current_key is not None:
                     assert current_data is not None
                     results[current_key] = current_data
-                test_type, n, num_cpus = m.group(1), int(m.group(2)), int(m.group(3))
-                current_key = (test_type, n, num_cpus)
+                test_type = m.group(1)
+                kwargs = tuple(sorted(
+                    (k, v) for k, v in kwarg_re.findall(m.group(2))
+                ))
+                current_key = (test_type, kwargs)
                 current_data = {"timings": {}, "num_iterations": 0}
                 continue
 
@@ -55,17 +59,17 @@ def parse_log(log_path: str) -> dict[BenchmarkKey, BenchmarkData]:
 
 
 def write_csv(results: dict[BenchmarkKey, BenchmarkData], out_path: str) -> None:
+    kwarg_keys = sorted({k for _, kwargs in results for k, _ in kwargs})
     timing_keys = sorted({k for data in results.values() for k in data["timings"]})
-    fieldnames = ["test_type", "n", "num_cpus", "num_iterations"] + timing_keys
+    fieldnames = ["test_type"] + kwarg_keys + ["num_iterations"] + timing_keys
 
     with open(out_path, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
-        for (test_type, n, num_cpus), data in results.items():
+        for (test_type, kwargs), data in results.items():
             row: dict[str, object] = {
                 "test_type": test_type,
-                "n": n,
-                "num_cpus": num_cpus,
+                **dict(kwargs),
                 "num_iterations": data["num_iterations"],
                 **data["timings"],
             }
