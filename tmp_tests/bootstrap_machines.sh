@@ -18,15 +18,31 @@ set -e
 BRANCH="${1:-ianz/cloudlab-experiments}"
 
 MACHINES=(
-    "yianz@ms0620.utah.cloudlab.us"
-    "yianz@ms0607.utah.cloudlab.us"
-    "yianz@ms0629.utah.cloudlab.us"
-    "yianz@ms0602.utah.cloudlab.us"
+    "yianz@pc525.emulab.net"
+    "yianz@pc432.emulab.net"
+    "yianz@pc544.emulab.net"
+    "yianz@pc502.emulab.net"
+    "yianz@pc512.emulab.net"
+    "yianz@pc485.emulab.net"
+    "yianz@pc486.emulab.net"
+    "yianz@pc531.emulab.net"
+    "yianz@pc547.emulab.net"
+    "yianz@pc433.emulab.net"
+    "yianz@pc444.emulab.net"
+    "yianz@pc438.emulab.net"
+    "yianz@pc434.emulab.net"
+    "yianz@pc520.emulab.net"
+    "yianz@pc543.emulab.net"
+    "yianz@pc423.emulab.net"
 )
 
+LOG_DIR=$(mktemp -d)
+echo "Logs: $LOG_DIR"
+
+pids=()
 for machine in "${MACHINES[@]}"; do
-    echo "=== Running on $machine ==="
-    ssh "$machine" bash -s <<EOF
+    echo "=== Launching $machine ==="
+    ssh "$machine" bash -s >"$LOG_DIR/$machine.log" 2>&1 <<EOF &
 mkdir work
 cd work
 GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no" git clone git@github.com:illinois-nsai/dede.git
@@ -39,5 +55,22 @@ source .venv/bin/activate
 pip3 install -e .[dev]
 pip3 install ray[default]
 EOF
-    echo "=== Done with $machine ==="
+    pids+=($!)
 done
+
+# Wait for all, collect exit codes
+failed=()
+for i in "${!pids[@]}"; do
+    if ! wait "${pids[$i]}"; then
+        failed+=("${MACHINES[$i]}")
+    fi
+done
+
+echo ""
+if [ ${#failed[@]} -eq 0 ]; then
+    echo "=== All machines completed successfully ==="
+else
+    echo "=== FAILED on: ${failed[*]} ==="
+    echo "Check logs in $LOG_DIR"
+    exit 1
+fi
