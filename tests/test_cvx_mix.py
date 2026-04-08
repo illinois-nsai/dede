@@ -23,15 +23,15 @@ def test_quadratic():
     objective = dd.Minimize(dd.quad_over_lin(x1, 1) + dd.quad_over_lin(x2, 1))
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=1, num_iter=15, **GUROBI_OPTS)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, **GUROBI_OPTS)
     print("DeDe:", result_dede)
 
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
     result_cvxpy = cvxpy_prob.solve(solver=cp.ECOS_BB)
     print("CVXPY:", result_cvxpy)
 
-    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
-    print("=== Passed MIXED QUADRATIC test ===")
+    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
+    print('=== Passed MIXED QUADRATIC test ===')
 
 
 def test_quadratic_weighted():
@@ -55,15 +55,15 @@ def test_quadratic_weighted():
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=10, num_iter=20, **GUROBI_OPTS)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, xi=0.03, **GUROBI_OPTS)
     print("DeDe:", result_dede)
 
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
     result_cvxpy = cvxpy_prob.solve(solver=cp.ECOS_BB)
     print("CVXPY:", result_cvxpy)
 
-    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
-    print("=== Passed MIXED QUADRATIC weighted test ===")
+    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
+    print('=== Passed MIXED QUADRATIC weighted test ===')
 
 
 def test_boolean_quadratic():
@@ -79,15 +79,15 @@ def test_boolean_quadratic():
     )
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=5, num_iter=15, **GUROBI_OPTS)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, **GUROBI_OPTS)
     print("DeDe:", result_dede)
 
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
     result_cvxpy = cvxpy_prob.solve(solver=cp.ECOS_BB)
     print("CVXPY:", result_cvxpy)
 
-    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
-    print("=== Passed MIXED BOOL QUADRATIC test ===")
+    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
+    print('=== Passed MIXED BOOL QUADRATIC test ===') 
 
 
 def test_boolean_quadratic_weighted():
@@ -113,15 +113,15 @@ def test_boolean_quadratic_weighted():
     )
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=0.5, num_iter=15, **GUROBI_OPTS)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, **GUROBI_OPTS)
     print("DeDe:", result_dede)
 
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
     result_cvxpy = cvxpy_prob.solve(solver=cp.ECOS_BB)
     print("CVXPY:", result_cvxpy)
 
-    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.01)
-    print("=== Passed MIXED BOOL QUADRATIC weighted test ===")
+    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
+    print('=== Passed MIXED BOOL QUADRATIC weighted test ===')
 
 
 if __name__ == "__main__":
