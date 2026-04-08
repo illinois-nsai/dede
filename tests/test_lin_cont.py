@@ -31,7 +31,7 @@ def test_add1():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed LP ADD test #1 ===')
+    print("=== Passed LP ADD test #1 ===")
 
 
 def test_add2():
@@ -53,7 +53,7 @@ def test_add2():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed LP ADD test #2 ===')
+    print("=== Passed LP ADD test #2 ===")
 
 
 def test_add_zero():
@@ -75,7 +75,7 @@ def test_add_zero():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed LP ADD zero test ===') 
+    print("=== Passed LP ADD zero test ===")
 
 
 def test_sum1():
@@ -95,7 +95,7 @@ def test_sum1():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed LP SUM test #1 ===')
+    print("=== Passed LP SUM test #1 ===")
 
 
 def test_sum2():
@@ -115,7 +115,7 @@ def test_sum2():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed LP SUM test #2 ===')
+    print("=== Passed LP SUM test #2 ===")
 
 
 def test_multiply1():
@@ -139,7 +139,7 @@ def test_multiply1():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed LP MULTIPLY test #1 ===')
+    print("=== Passed LP MULTIPLY test #1 ===")
 
 
 def test_multiply2():
@@ -163,7 +163,7 @@ def test_multiply2():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed LP MULTIPLY test #2 ===')
+    print("=== Passed LP MULTIPLY test #2 ===")
 
 
 def test_multiply_zero():
@@ -185,7 +185,7 @@ def test_multiply_zero():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed LP MULTIPLY zero test ===')
+    print("=== Passed LP MULTIPLY zero test ===")
 
 
 def test_trace():
@@ -206,7 +206,7 @@ def test_trace():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed LP TRACE test ===') 
+    print("=== Passed LP TRACE test ===")
 
 
 if __name__ == "__main__":

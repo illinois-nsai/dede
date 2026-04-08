@@ -28,7 +28,7 @@ def test_add():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed ILP ADD test #2 ===')
+    print("=== Passed ILP ADD test #2 ===")
 
 
 def test_constant1():
@@ -45,7 +45,7 @@ def test_constant1():
     print("DeDe:", result_dede)
 
     assert math.isclose(result_dede, 2, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed ILP CONSTANT test #1 ===') 
+    print("=== Passed ILP CONSTANT test #1 ===")
 
 
 def test_constant2():
@@ -66,7 +66,7 @@ def test_constant2():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed ILP CONSTANT test #2 ===')
+    print("=== Passed ILP CONSTANT test #2 ===")
 
 
 def test_sum1():
@@ -86,7 +86,7 @@ def test_sum1():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed ILP SUM test #1 ===')
+    print("=== Passed ILP SUM test #1 ===")
 
 
 def test_sum2():
@@ -106,7 +106,7 @@ def test_sum2():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed ILP SUM test #2 ===')
+    print("=== Passed ILP SUM test #2 ===")
 
 
 def test_multiply1():
@@ -130,7 +130,7 @@ def test_multiply1():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed ILP MULTIPLY test #1 ===')
+    print("=== Passed ILP MULTIPLY test #1 ===")
 
 
 def test_multiply2():
@@ -154,7 +154,7 @@ def test_multiply2():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed ILP MULTIPLY test #2 ===')
+    print("=== Passed ILP MULTIPLY test #2 ===")
 
 
 def test_boolean():
@@ -174,10 +174,10 @@ def test_boolean():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed BOOLEAN LP test ===')
+    print("=== Passed BOOLEAN LP test ===")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_add()
 
     test_constant1()

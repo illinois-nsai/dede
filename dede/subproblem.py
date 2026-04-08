@@ -34,7 +34,7 @@ class Subproblem(CpProblem):
         """
 
         self.id = idx
-        #self.rho = rho
+        # self.rho = rho
         self.rho = cp.Parameter(nonneg=True, value=rho)
 
         # create var for the subproblem
@@ -81,14 +81,14 @@ class Subproblem(CpProblem):
         self.f2 = self.var[: self.x_z_num] - self.param
         self.l2 = cp.Parameter(self.f2.shape, value=np.zeros(self.f2.shape))
 
-        '''
+        """
         super(Subproblem, self).__init__(
             cp.Minimize(
                 self.obj_expr_old +
                 self.rho / 2 * cp.norm(self.f1 + self.l1, "fro") ** 2 +
                 self.rho / 2 * cp.norm(self.f2 + self.l2, "fro") ** 2),
             constrs_var_attr)
-        '''
+        """
         super(Subproblem, self).__init__(
             cp.Minimize(
                 self.obj_expr_old
@@ -174,8 +174,9 @@ class Subproblem(CpProblem):
     def get_obj(self) -> np.floating[t.Any]:
         """Return value of the original objective function."""
         return self.obj_expr_old.value
-    
-    def update_rho(self, rho):
+
+    def update_rho(self, rho) -> None:
+        """Updates penalty parameter rho."""
         self.rho.value = rho
 
     def solve(

@@ -111,7 +111,7 @@ class SubproblemsWrap:
         for param_id, param in self.param_id_to_param.items():
             if param_id in param_id_to_value:
                 param.value = param_id_to_value[t.cast(int, param.id)]
-    
+
     @ray.method
     def update_rho(self, rho) -> None:
         """Update rho for all subproblems in the current actor."""

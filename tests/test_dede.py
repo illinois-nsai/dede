@@ -29,7 +29,7 @@ def test_dede():
 
     # Validate the results
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed test_dede ===')
+    print("=== Passed test_dede ===")
 
 
 def test_dede_with_param():
@@ -71,7 +71,7 @@ def test_dede_with_param():
 
     # Validate the results
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed test_dede_with_param ===')
+    print("=== Passed test_dede_with_param ===")
 
 
 if __name__ == "__main__":

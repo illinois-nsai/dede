@@ -44,7 +44,7 @@ def test_add1():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed MILP ADD test #1 ===')
+    print("=== Passed MILP ADD test #1 ===")
 
 
 def test_add2():
@@ -72,7 +72,7 @@ def test_add2():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed MILP ADD test #2 ===')
+    print("=== Passed MILP ADD test #2 ===")
 
 
 def test_sum1():
@@ -100,7 +100,7 @@ def test_sum1():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed MILP SUM test #1 ===')
+    print("=== Passed MILP SUM test #1 ===")
 
 
 def test_sum2():
@@ -126,7 +126,7 @@ def test_sum2():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed MILP SUM test #2 ===')
+    print("=== Passed MILP SUM test #2 ===")
 
 
 def test_multiply1():
@@ -158,7 +158,7 @@ def test_multiply1():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed MILP MULTIPLY test #1 ===')
+    print("=== Passed MILP MULTIPLY test #1 ===")
 
 
 def test_multiply2():
@@ -190,7 +190,7 @@ def test_multiply2():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed MILP MULTIPLY test #2 ===')
+    print("=== Passed MILP MULTIPLY test #2 ===")
 
 
 def test_boolean():
@@ -212,10 +212,10 @@ def test_boolean():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed MIXED BOOLEAN test ===')
+    print("=== Passed MIXED BOOLEAN test ===")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_add1()
     test_add2()
 

@@ -332,10 +332,12 @@ class Problem(CpProblem):
         """Compute residuals and corresponding primal/dual epsilons."""
         assert self._subprob_cache.probs is not None
 
-        sol_idx_d = ray.get([
-            prob.get_solution_idx_d.remote() for prob in self._subprob_cache.probs])
-        sol_idx_r = ray.get([
-            prob.get_solution_idx_r.remote() for prob in self._subprob_cache.probs])
+        sol_idx_d = ray.get(
+            [prob.get_solution_idx_d.remote() for prob in self._subprob_cache.probs]
+        )
+        sol_idx_r = ray.get(
+            [prob.get_solution_idx_r.remote() for prob in self._subprob_cache.probs]
+        )
         flat_idx_d = [idx for arr in sol_idx_d for idx in arr]
         flat_idx_r = [idx for arr in sol_idx_r for idx in arr]
 
@@ -372,7 +374,9 @@ class Problem(CpProblem):
         x_dim = len(shared_pos)
 
         eps_primal = (
-            np.inf if primal_denom == 0 else float(np.sqrt(x_dim) * eps_abs / primal_denom + eps_rel)
+            np.inf
+            if primal_denom == 0
+            else float(np.sqrt(x_dim) * eps_abs / primal_denom + eps_rel)
         )
         eps_dual = (
             np.inf if dual_denom == 0 else float(np.sqrt(x_dim) * eps_abs / dual_denom + eps_rel)

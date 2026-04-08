@@ -31,7 +31,7 @@ def test_quadratic():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed MIXED QUADRATIC test ===')
+    print("=== Passed MIXED QUADRATIC test ===")
 
 
 def test_quadratic_weighted():
@@ -63,7 +63,7 @@ def test_quadratic_weighted():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed MIXED QUADRATIC weighted test ===')
+    print("=== Passed MIXED QUADRATIC weighted test ===")
 
 
 def test_boolean_quadratic():
@@ -87,7 +87,7 @@ def test_boolean_quadratic():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed MIXED BOOL QUADRATIC test ===') 
+    print("=== Passed MIXED BOOL QUADRATIC test ===")
 
 
 def test_boolean_quadratic_weighted():
@@ -121,7 +121,7 @@ def test_boolean_quadratic_weighted():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed MIXED BOOL QUADRATIC weighted test ===')
+    print("=== Passed MIXED BOOL QUADRATIC weighted test ===")
 
 
 if __name__ == "__main__":

@@ -29,7 +29,7 @@ def test_log():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed CONTINUOUS LOG test ===') 
+    print("=== Passed CONTINUOUS LOG test ===")
 
 
 def test_log_weighted():
@@ -57,7 +57,7 @@ def test_log_weighted():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed CONTINUOUS LOG weighted test ===')  
+    print("=== Passed CONTINUOUS LOG weighted test ===")
 
 
 def test_quadratic():
@@ -77,7 +77,7 @@ def test_quadratic():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed CONTINUOUS QUADRATIC test ===')
+    print("=== Passed CONTINUOUS QUADRATIC test ===")
 
 
 def test_quadratic_weighted():
@@ -101,7 +101,7 @@ def test_quadratic_weighted():
     print("CVXPY:", result_cvxpy)
 
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed CONTINUOUS QUADRATIC weighted test ===')
+    print("=== Passed CONTINUOUS QUADRATIC weighted test ===")
 
 
 if __name__ == "__main__":

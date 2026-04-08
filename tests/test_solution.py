@@ -28,7 +28,7 @@ def test_lin_cont():
     print("Solution result:", result_solution)
 
     assert math.isclose(result_dede, result_solution, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed CONTINUOUS LINEAR value test ===')
+    print("=== Passed CONTINUOUS LINEAR value test ===")
 
 
 def test_cvx_cont():
@@ -55,7 +55,7 @@ def test_cvx_cont():
     print("Solution result:", result_solution)
 
     assert math.isclose(result_dede, result_solution, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed CONTINUOUS CONVEX value test ===')
+    print("=== Passed CONTINUOUS CONVEX value test ===")
 
 
 def test_lin_int():
@@ -78,7 +78,7 @@ def test_lin_int():
     print("Solution result:", result_solution)
 
     assert math.isclose(result_dede, result_solution, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed INTEGER LINEAR value test ===')
+    print("=== Passed INTEGER LINEAR value test ===")
 
 
 def test_cvx_int():
@@ -101,7 +101,7 @@ def test_cvx_int():
     print("Solution result:", result_solution)
 
     assert math.isclose(result_dede, result_solution, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed INTEGER CONVEX value test ===')
+    print("=== Passed INTEGER CONVEX value test ===")
 
 
 def test_lin_mix():
@@ -122,7 +122,7 @@ def test_lin_mix():
     print("Solution result:", result_solution)
 
     assert math.isclose(result_dede, result_solution, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed MIXED LINEAR value test ===') 
+    print("=== Passed MIXED LINEAR value test ===")
 
 
 def test_cvx_mix():
@@ -159,7 +159,7 @@ def test_cvx_mix():
     print("Solution result:", result_solution)
 
     assert math.isclose(result_dede, result_solution, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed MIXED CONVEX value test ===')
+    print("=== Passed MIXED CONVEX value test ===")
 
 
 def test_large():
@@ -180,7 +180,7 @@ def test_large():
     print("Solution result:", result_solution)
 
     assert math.isclose(result_dede, result_solution, rel_tol=0.05, abs_tol=0.5)
-    print('=== Passed LARGE value test ===')
+    print("=== Passed LARGE value test ===")
 
 
 if __name__ == "__main__":
