@@ -65,21 +65,21 @@ if __name__ == "__main__":
 
             print(f"Testing sum n={sum_n}, num_cpus={num_cpus}")
             try:
-                result, x = test_sum(sum_n, num_cpus)
+                result = test_sum(sum_n, num_cpus)
                 print(f"Result {result}")
             except Exception as e:
                 print(f"Error in test_sum with n={sum_n}, num_cpus={num_cpus}: {e}")
 
             print(f"Testing weighted n={weighted_n}, num_cpus={num_cpus}")
             try:
-                result, x = test_weighted(weighted_n, num_cpus)
+                result = test_weighted(weighted_n, num_cpus)
                 print(f"Result {result}")
             except Exception as e:
                 print(f"Error in test_weighted with n={weighted_n}, num_cpus={num_cpus}: {e}")
 
             print(f"Testing log n={log_n}, num_cpus={num_cpus}")
             try:
-                result, x = test_log(log_n, num_cpus)
+                result = test_log(log_n, num_cpus)
                 print(f"Result {result}")
             except Exception as e:
                 print(f"Error in test_log with n={log_n}, num_cpus={num_cpus}: {e}")
