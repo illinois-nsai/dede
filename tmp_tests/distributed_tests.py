@@ -18,7 +18,7 @@ def test_sum(n, num_cpus):
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
     result_dede = prob.solve(ray_address="auto", solver=dd.ECOS, num_cpus=num_cpus)
 
-    return result_dede, x
+    return result_dede
 
 
 def test_weighted(n, num_cpus):
@@ -36,7 +36,7 @@ def test_weighted(n, num_cpus):
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
     result_dede = prob.solve(ray_address="auto", num_cpus=num_cpus, solver=dd.ECOS)
 
-    return result_dede, x
+    return result_dede
 
 
 def test_log(n, num_cpus):
@@ -50,7 +50,7 @@ def test_log(n, num_cpus):
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
     result_dede = prob.solve(ray_address="auto", num_cpus=num_cpus, solver=dd.SCS)
 
-    return result_dede, x
+    return result_dede
 
 
 if __name__ == "__main__":
@@ -67,7 +67,6 @@ if __name__ == "__main__":
             try:
                 result, x = test_sum(sum_n, num_cpus)
                 print(f"Result {result}")
-                print(f"Variables x: {x.value}")
             except Exception as e:
                 print(f"Error in test_sum with n={sum_n}, num_cpus={num_cpus}: {e}")
 
@@ -75,7 +74,6 @@ if __name__ == "__main__":
             try:
                 result, x = test_weighted(weighted_n, num_cpus)
                 print(f"Result {result}")
-                print(f"Variables x: {x.value}")
             except Exception as e:
                 print(f"Error in test_weighted with n={weighted_n}, num_cpus={num_cpus}: {e}")
 
@@ -83,6 +81,5 @@ if __name__ == "__main__":
             try:
                 result, x = test_log(log_n, num_cpus)
                 print(f"Result {result}")
-                print(f"Variables x: {x.value}")
             except Exception as e:
                 print(f"Error in test_log with n={log_n}, num_cpus={num_cpus}: {e}")
