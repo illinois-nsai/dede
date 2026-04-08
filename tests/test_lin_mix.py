@@ -216,7 +216,7 @@ def test_boolean():
 
 
 if __name__ == '__main__':
-    #test_add1()
+    test_add1()
     test_add2()
 
     test_sum1()
