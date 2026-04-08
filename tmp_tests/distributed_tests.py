@@ -18,6 +18,8 @@ def test_sum(n, num_cpus):
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
     result_dede = prob.solve(ray_address="auto", solver=dd.ECOS, num_cpus=num_cpus)
 
+    return result_dede, x
+
 
 def test_weighted(n, num_cpus):
     N, M = n, n
@@ -34,6 +36,8 @@ def test_weighted(n, num_cpus):
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
     result_dede = prob.solve(ray_address="auto", num_cpus=num_cpus, solver=dd.ECOS)
 
+    return result_dede, x
+
 
 def test_log(n, num_cpus):
     N, M = n, n
@@ -46,31 +50,39 @@ def test_log(n, num_cpus):
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
     result_dede = prob.solve(ray_address="auto", num_cpus=num_cpus, solver=dd.SCS)
 
+    return result_dede, x
+
 
 if __name__ == "__main__":
-    sum_multiplier = 100
+    sum_multiplier = 80
     weighted_multiplier = 30
     log_multiplier = 10
-    for multiplier in range(11, 31):
+    for multiplier in range(31):
         for num_cpus in [1, 2, 4, 8, 16, 32]:
             sum_n = multiplier * sum_multiplier
             weighted_n = multiplier * weighted_multiplier
             log_n = multiplier * log_multiplier
 
-            # print(f"Testing sum n={sum_n}, num_cpus={num_cpus}")
-            # try:
-            #     test_sum(sum_n, num_cpus)
-            # except Exception as e:
-            #     print(f"Error in test_sum with n={sum_n}, num_cpus={num_cpus}: {e}")
+            print(f"Testing sum n={sum_n}, num_cpus={num_cpus}")
+            try:
+                result, x = test_sum(sum_n, num_cpus)
+                print(f"Result {result}")
+                print(f"Variables x: {x.value}")
+            except Exception as e:
+                print(f"Error in test_sum with n={sum_n}, num_cpus={num_cpus}: {e}")
 
             print(f"Testing weighted n={weighted_n}, num_cpus={num_cpus}")
             try:
-                test_weighted(weighted_n, num_cpus)
+                result, x = test_weighted(weighted_n, num_cpus)
+                print(f"Result {result}")
+                print(f"Variables x: {x.value}")
             except Exception as e:
                 print(f"Error in test_weighted with n={weighted_n}, num_cpus={num_cpus}: {e}")
 
             print(f"Testing log n={log_n}, num_cpus={num_cpus}")
             try:
-                test_log(log_n, num_cpus)
+                result, x = test_log(log_n, num_cpus)
+                print(f"Result {result}")
+                print(f"Variables x: {x.value}")
             except Exception as e:
                 print(f"Error in test_log with n={log_n}, num_cpus={num_cpus}: {e}")
