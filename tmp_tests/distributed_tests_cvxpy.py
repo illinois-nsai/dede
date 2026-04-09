@@ -4,6 +4,7 @@ import sys
 
 NUM_CPUS = "4"
 os.environ["OMP_NUM_THREADS"] = NUM_CPUS
+os.environ["OPENBLAS_NUM_THREADS"] = NUM_CPUS
 
 import cvxpy as cp
 import numpy as np
