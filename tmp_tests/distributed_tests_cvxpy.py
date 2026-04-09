@@ -64,7 +64,7 @@ if __name__ == "__main__":
     weighted_multiplier = 30
     log_multiplier = 10
 
-    for multiplier in range(31):
+    for multiplier in range(20, 31):
         for num_cpus in [1, 2, 4, 8, 16, 32, 64]:
             # num_cpus loop kept for structure, though cvxpy's solve interface
             # doesn't take num_cpus as a direct argument for parallelism.
