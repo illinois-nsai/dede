@@ -1,7 +1,8 @@
 import os
 import sys
+import time
 
-NUM_CPUS = "8"
+NUM_CPUS = "1"
 os.environ["OMP_NUM_THREADS"] = NUM_CPUS
 os.environ["OPENBLAS_NUM_THREADS"] = NUM_CPUS
 os.environ["RAYON_NUM_THREADS"] = NUM_CPUS
@@ -21,8 +22,11 @@ def test_sum(n):
     objective = cp.Maximize(cp.sum(x))
 
     prob = cp.Problem(objective, resource_constraints + demand_constraints)
-    # CVXPY solvers generally manage threading internally via their own libraries (like OpenBLAS)
+    start = time.perf_counter()
     result_cvxpy = prob.solve(solver=cp.CLARABEL)
+    end = time.perf_counter()
+    print(f"Executed solve in {end - start}s")
+
     return result_cvxpy
 
 
@@ -39,22 +43,27 @@ def test_weighted(n):
     objective = cp.Minimize(cp.sum(cp.multiply(x, w)))
 
     prob = cp.Problem(objective, resource_constraints + demand_constraints)
+    start = time.perf_counter()
     result_cvxpy = prob.solve(solver=cp.CLARABEL)
+    end = time.perf_counter()
+    print(f"Executed solve in {end - start}s")
     return result_cvxpy
 
 
 def test_log(n):
     N, M = n, n
     x = cp.Variable((N, M), nonneg=True)
-    t = cp.Variable(N)
-
     resource_constraints = [cp.sum(x[i, :]) >= (i + 1) * M for i in range(N)]
     demand_constraints = [cp.sum(x[:, j]) <= (j + 1) * N for j in range(M)]
-    log_constraints = [t[i] <= cp.log(cp.sum(x[i, :])) for i in range(N)]
 
-    objective = cp.Maximize(cp.sum(t))
-    prob = cp.Problem(objective, resource_constraints + demand_constraints + log_constraints)
+    # Using cp.sum on a list comprehension to match original structure
+    objective = cp.Maximize(cp.sum([cp.log(cp.sum(x[i, :])) for i in range(N)]))
+
+    prob = cp.Problem(objective, resource_constraints + demand_constraints)
+    start = time.perf_counter()
     result_cvxpy = prob.solve(solver=cp.SCS)
+    end = time.perf_counter()
+    print(f"Executed solve in {end - start}s")
     return result_cvxpy
 
 
