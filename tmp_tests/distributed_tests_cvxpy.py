@@ -17,7 +17,7 @@ def test_sum(n, num_cpus):
 
     prob = cp.Problem(objective, resource_constraints + demand_constraints)
     # CVXPY solvers generally manage threading internally via their own libraries (like OpenBLAS)
-    result_cvxpy = prob.solve(solver=cp.GUROBI, Threads=num_cpus)
+    result_cvxpy = prob.solve(solver=cp.GUROBI, solver_opts={"Threads": num_cpus})
     return result_cvxpy
 
 
@@ -34,21 +34,22 @@ def test_weighted(n, num_cpus):
     objective = cp.Minimize(cp.sum(cp.multiply(x, w)))
 
     prob = cp.Problem(objective, resource_constraints + demand_constraints)
-    result_cvxpy = prob.solve(solver=cp.GUROBI, Threads=num_cpus)
+    result_cvxpy = prob.solve(solver=cp.GUROBI, solver_opts={"Threads": num_cpus})
     return result_cvxpy
 
 
 def test_log(n, num_cpus):
     N, M = n, n
     x = cp.Variable((N, M), nonneg=True)
+    t = cp.Variable(N)
+
     resource_constraints = [cp.sum(x[i, :]) >= (i + 1) * M for i in range(N)]
     demand_constraints = [cp.sum(x[:, j]) <= (j + 1) * N for j in range(M)]
+    log_constraints = [t[i] <= cp.log(cp.sum(x[i, :])) for i in range(N)]
 
-    # Using cp.sum on a list comprehension to match original structure
-    objective = cp.Maximize(cp.sum([cp.log(cp.sum(x[i, :])) for i in range(N)]))
-
-    prob = cp.Problem(objective, resource_constraints + demand_constraints)
-    result_cvxpy = prob.solve(solver=cp.GUROBI, Threads=num_cpus)
+    objective = cp.Maximize(cp.sum(t))
+    prob = cp.Problem(objective, resource_constraints + demand_constraints + log_constraints)
+    result_cvxpy = prob.solve(solver=cp.GUROBI, solver_opts={"Threads": num_cpus})
     return result_cvxpy
 
 
