@@ -2,7 +2,7 @@ import argparse
 import os
 import sys
 
-NUM_CPUS = "32"
+NUM_CPUS = "8"
 os.environ["OMP_NUM_THREADS"] = NUM_CPUS
 os.environ["OPENBLAS_NUM_THREADS"] = NUM_CPUS
 os.environ["RAYON_NUM_THREADS"] = NUM_CPUS
