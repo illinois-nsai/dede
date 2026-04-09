@@ -1,5 +1,9 @@
 import argparse
+import os
 import sys
+
+NUM_CPUS = "32"
+os.environ["OMP_NUM_THREADS"] = NUM_CPUS
 
 import cvxpy as cp
 import numpy as np
@@ -17,7 +21,7 @@ def test_sum(n, num_cpus):
 
     prob = cp.Problem(objective, resource_constraints + demand_constraints)
     # CVXPY solvers generally manage threading internally via their own libraries (like OpenBLAS)
-    result_cvxpy = prob.solve(solver=cp.GUROBI, Threads=num_cpus, verbose=True)
+    result_cvxpy = prob.solve(solver=cp.CLARABEL)
     return result_cvxpy
 
 
@@ -34,7 +38,7 @@ def test_weighted(n, num_cpus):
     objective = cp.Minimize(cp.sum(cp.multiply(x, w)))
 
     prob = cp.Problem(objective, resource_constraints + demand_constraints)
-    result_cvxpy = prob.solve(solver=cp.GUROBI, Threads=num_cpus, verbose=True)
+    result_cvxpy = prob.solve(solver=cp.CLARABEL)
     return result_cvxpy
 
 
@@ -49,7 +53,7 @@ def test_log(n, num_cpus):
 
     objective = cp.Maximize(cp.sum(t))
     prob = cp.Problem(objective, resource_constraints + demand_constraints + log_constraints)
-    result_cvxpy = prob.solve(solver=cp.GUROBI, Threads=num_cpus, verbose=True)
+    result_cvxpy = prob.solve(solver=cp.SCS)
     return result_cvxpy
 
 
@@ -65,7 +69,7 @@ if __name__ == "__main__":
     weighted_multiplier = 30
     log_multiplier = 10
 
-    for multiplier in range(5, 31):
+    for multiplier in range(11, 31):
         for num_cpus in [64]:
             # num_cpus loop kept for structure, though cvxpy's solve interface
             # doesn't take num_cpus as a direct argument for parallelism.
