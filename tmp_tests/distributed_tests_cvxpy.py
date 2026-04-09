@@ -49,7 +49,7 @@ def test_log(n, num_cpus):
 
     objective = cp.Maximize(cp.sum(t))
     prob = cp.Problem(objective, resource_constraints + demand_constraints + log_constraints)
-    result_cvxpy = prob.solve(solver=cp.GUROBI, solver_opts={"Threads": num_cpus})
+    result_cvxpy = prob.solve(solver=cp.GUROBI, solver_opts={"Threads": num_cpus, "OutputFlag": 1})
     return result_cvxpy
 
 
