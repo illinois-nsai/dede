@@ -6,12 +6,8 @@ import numpy as np
 
 sys.setrecursionlimit(10000)
 
-GUROBI_OPTS = {
-    "Threads": 72,  # per process; pair with numactl for 2 processes
-}
 
-
-def test_sum(n):
+def test_sum(n, num_cpus):
     N, M = n, n
     x = cp.Variable((N, M), nonneg=True)
     resource_constraints = [cp.sum(x[i, :]) >= i for i in range(N)]
@@ -21,11 +17,11 @@ def test_sum(n):
 
     prob = cp.Problem(objective, resource_constraints + demand_constraints)
     # CVXPY solvers generally manage threading internally via their own libraries (like OpenBLAS)
-    result_cvxpy = prob.solve(solver=cp.GUROBI, **GUROBI_OPTS)
-    return result_cvxpy, x
+    result_cvxpy = prob.solve(solver=cp.GUROBI, Threads=num_cpus)
+    return result_cvxpy
 
 
-def test_weighted(n):
+def test_weighted(n, num_cpus):
     N, M = n, n
     x = cp.Variable((N, M), nonneg=True)
     w = 9 * np.random.uniform(0, 1, (N, M)) + 1
@@ -38,11 +34,11 @@ def test_weighted(n):
     objective = cp.Minimize(cp.sum(cp.multiply(x, w)))
 
     prob = cp.Problem(objective, resource_constraints + demand_constraints)
-    result_cvxpy = prob.solve(solver=cp.GUROBI, **GUROBI_OPTS)
-    return result_cvxpy, x
+    result_cvxpy = prob.solve(solver=cp.GUROBI, Threads=num_cpus)
+    return result_cvxpy
 
 
-def test_log(n):
+def test_log(n, num_cpus):
     N, M = n, n
     x = cp.Variable((N, M), nonneg=True)
     resource_constraints = [cp.sum(x[i, :]) >= (i + 1) * M for i in range(N)]
@@ -52,8 +48,8 @@ def test_log(n):
     objective = cp.Maximize(cp.sum([cp.log(cp.sum(x[i, :])) for i in range(N)]))
 
     prob = cp.Problem(objective, resource_constraints + demand_constraints)
-    result_cvxpy = prob.solve(solver=cp.GUROBI, **GUROBI_OPTS)
-    return result_cvxpy, x
+    result_cvxpy = prob.solve(solver=cp.GUROBI, Threads=num_cpus)
+    return result_cvxpy
 
 
 if __name__ == "__main__":
@@ -69,32 +65,30 @@ if __name__ == "__main__":
     log_multiplier = 10
 
     for multiplier in range(31):
-        # num_cpus loop kept for structure, though cvxpy's solve interface
-        # doesn't take num_cpus as a direct argument for parallelism.
-        sum_n = multiplier * sum_multiplier
-        weighted_n = multiplier * weighted_multiplier
-        log_n = multiplier * log_multiplier
+        for num_cpus in [1, 2, 4, 8, 16, 32, 64]:
+            # num_cpus loop kept for structure, though cvxpy's solve interface
+            # doesn't take num_cpus as a direct argument for parallelism.
+            sum_n = multiplier * sum_multiplier
+            weighted_n = multiplier * weighted_multiplier
+            log_n = multiplier * log_multiplier
 
-        print(f"Testing sum n={sum_n}, num_cpus={NUM_CPUS}")
-        try:
-            result, x = test_sum(sum_n)
-            print(f"Result {result}")
-            print(f"Variables x: {x.value}")
-        except Exception as e:
-            print(f"Error in test_sum with n={sum_n}, num_cpus={NUM_CPUS}: {e}")
+            print(f"Testing sum n={sum_n}, num_cpus={num_cpus}")
+            try:
+                result = test_sum(sum_n, num_cpus)
+                print(f"Result {result}")
+            except Exception as e:
+                print(f"Error in test_sum with n={sum_n}, num_cpus={num_cpus}: {e}")
 
-        print(f"Testing weighted n={weighted_n}, num_cpus={NUM_CPUS}")
-        try:
-            result, x = test_weighted(weighted_n)
-            print(f"Result {result}")
-            print(f"Variables x: {x.value}")
-        except Exception as e:
-            print(f"Error in test_weighted with n={weighted_n}, num_cpus={NUM_CPUS}: {e}")
+            print(f"Testing weighted n={weighted_n}, num_cpus={num_cpus}")
+            try:
+                result = test_weighted(weighted_n, num_cpus)
+                print(f"Result {result}")
+            except Exception as e:
+                print(f"Error in test_weighted with n={weighted_n}, num_cpus={num_cpus}: {e}")
 
-        print(f"Testing log n={log_n}, num_cpus={NUM_CPUS}")
-        try:
-            result, x = test_log(log_n)
-            print(f"Result {result}")
-            print(f"Variables x: {x.value}")
-        except Exception as e:
-            print(f"Error in test_log with n={log_n}, num_cpus={NUM_CPUS}: {e}")
+            print(f"Testing log n={log_n}, num_cpus={num_cpus}")
+            try:
+                result = test_log(log_n, num_cpus)
+                print(f"Result {result}")
+            except Exception as e:
+                print(f"Error in test_log with n={log_n}, num_cpus={num_cpus}: {e}")
