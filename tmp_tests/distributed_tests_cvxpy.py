@@ -1,19 +1,14 @@
 import argparse
-import os
 import sys
-
-NUM_CPUS = "4"
-
-os.environ["OMP_NUM_THREADS"] = NUM_CPUS
-os.environ["MKL_NUM_THREADS"] = NUM_CPUS
-os.environ["OPENBLAS_NUM_THREADS"] = NUM_CPUS
-os.environ["VECLIB_MAXIMUM_THREADS"] = NUM_CPUS
-os.environ["NUMEXPR_NUM_THREADS"] = NUM_CPUS
 
 import cvxpy as cp
 import numpy as np
 
 sys.setrecursionlimit(10000)
+
+GUROBI_OPTS = {
+    "Threads": 72,  # per process; pair with numactl for 2 processes
+}
 
 
 def test_sum(n):
@@ -26,7 +21,7 @@ def test_sum(n):
 
     prob = cp.Problem(objective, resource_constraints + demand_constraints)
     # CVXPY solvers generally manage threading internally via their own libraries (like OpenBLAS)
-    result_cvxpy = prob.solve(solver=cp.ECOS)
+    result_cvxpy = prob.solve(solver=cp.GUROBI, **GUROBI_OPTS)
     return result_cvxpy, x
 
 
@@ -43,7 +38,7 @@ def test_weighted(n):
     objective = cp.Minimize(cp.sum(cp.multiply(x, w)))
 
     prob = cp.Problem(objective, resource_constraints + demand_constraints)
-    result_cvxpy = prob.solve(solver=cp.ECOS)
+    result_cvxpy = prob.solve(solver=cp.GUROBI, **GUROBI_OPTS)
     return result_cvxpy, x
 
 
@@ -57,7 +52,7 @@ def test_log(n):
     objective = cp.Maximize(cp.sum([cp.log(cp.sum(x[i, :])) for i in range(N)]))
 
     prob = cp.Problem(objective, resource_constraints + demand_constraints)
-    result_cvxpy = prob.solve(solver=cp.SCS)
+    result_cvxpy = prob.solve(solver=cp.GUROBI, **GUROBI_OPTS)
     return result_cvxpy, x
 
 
