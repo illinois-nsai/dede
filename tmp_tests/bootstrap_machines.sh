@@ -45,9 +45,17 @@ pids=()
 for machine in "${MACHINES[@]}"; do
     echo "=== Launching $machine ==="
     ssh "$machine" bash -s >"$LOG_DIR/$machine.log" 2>&1 <<EOF &
-cd work/dede
+mkdir work
+cd work
+GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no" git clone git@github.com:illinois-nsai/dede.git
+cd dede
+git checkout $BRANCH
+sudo apt update
+sudo apt install -y python3.10-dev python3.10-venv tmux
+python3 -m venv .venv
 source .venv/bin/activate
-ray start --address='155.98.38.125:6379'
+pip3 install -e .[dev]
+pip3 install ray[default]
 EOF
     pids+=($!)
 done
