@@ -16,7 +16,7 @@ def test_sum(n, num_cpus):
     objective = dd.Maximize(dd.sum(x))
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
-    result_dede = prob.solve(ray_address="auto", solver=dd.GUROBI, num_cpus=num_cpus)
+    result_dede = prob.solve(ray_address="auto", solver=dd.CLARABEL, num_cpus=num_cpus)
 
     return result_dede
 
@@ -34,7 +34,7 @@ def test_weighted(n, num_cpus):
     objective = dd.Minimize(dd.sum(dd.multiply(x, w)))
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
-    result_dede = prob.solve(ray_address="auto", num_cpus=num_cpus, solver=dd.GUROBI)
+    result_dede = prob.solve(ray_address="auto", num_cpus=num_cpus, solver=dd.CLARABEL)
 
     return result_dede
 
