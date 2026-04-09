@@ -1,9 +1,5 @@
 import argparse
-import os
 import sys
-
-NUM_CPUS = "64"
-os.environ["OMP_NUM_THREADS"] = NUM_CPUS
 
 import cvxpy as cp
 import numpy as np
@@ -21,7 +17,7 @@ def test_sum(n, num_cpus):
 
     prob = cp.Problem(objective, resource_constraints + demand_constraints)
     # CVXPY solvers generally manage threading internally via their own libraries (like OpenBLAS)
-    result_cvxpy = prob.solve(solver=cp.CLARABEL)
+    result_cvxpy = prob.solve(solver=cp.CLARABEL, max_threads=4)
     return result_cvxpy
 
 
@@ -38,7 +34,7 @@ def test_weighted(n, num_cpus):
     objective = cp.Minimize(cp.sum(cp.multiply(x, w)))
 
     prob = cp.Problem(objective, resource_constraints + demand_constraints)
-    result_cvxpy = prob.solve(solver=cp.CLARABEL)
+    result_cvxpy = prob.solve(solver=cp.CLARABEL, max_threads=4)
     return result_cvxpy
 
 
