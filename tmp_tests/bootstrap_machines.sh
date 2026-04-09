@@ -13,6 +13,7 @@
 # DO NOT expose the dashboard host to the public, see the ShadowRay attack
 # head node: ray start --head --port=6379 --dashboard-host=127.0.0.1 --dashboard-port=8265
 # worker node: ray start --address='<HEAD_NODE_IP>:6379'
+# forward the port to the local machine by running ssh -L 5000:localhost:8265 user@host
 
 set -e
 
@@ -44,17 +45,9 @@ pids=()
 for machine in "${MACHINES[@]}"; do
     echo "=== Launching $machine ==="
     ssh "$machine" bash -s >"$LOG_DIR/$machine.log" 2>&1 <<EOF &
-mkdir work
-cd work
-GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no" git clone git@github.com:illinois-nsai/dede.git
-cd dede
-git checkout $BRANCH
-sudo apt update
-sudo apt install -y python3.10-dev python3.10-venv tmux
-python3 -m venv .venv
+cd work/dede
 source .venv/bin/activate
-pip3 install -e .[dev]
-pip3 install ray[default]
+ray start --address='155.98.38.125:6379'
 EOF
     pids+=($!)
 done
