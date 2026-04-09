@@ -11,15 +11,15 @@ setup(
     url="https://github.com/illinois-nsai/dede",
     packages=find_packages(),
     install_requires=[
-        "cvxpy",
-        "numpy",
+        "cvxpy>=1.4.0, <=1.4.3",
+        "numpy>=1.26.0, <=1.26.4",
         "ray",
     ],
     extras_require={
         "dev": [
             "pytest",
             "pytest-xdist",
-            "gurobipy",
+            "gurobipy==12.0.3",
             "ruff",
             "ipykernel",
             "matplotlib",
