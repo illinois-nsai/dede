@@ -2,7 +2,7 @@ import argparse
 import os
 import sys
 
-NUM_CPUS = "32"
+NUM_CPUS = "64"
 os.environ["OMP_NUM_THREADS"] = NUM_CPUS
 
 import cvxpy as cp
