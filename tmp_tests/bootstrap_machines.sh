@@ -10,7 +10,8 @@
 #         ForwardAgent yes
 #         StrictHostKeyChecking no
 #
-# head node: ray start --head --port=6379 --dashboard-host=0.0.0.0 --dashboard-port=8265
+# DO NOT expose the dashboard host to the public, see the ShadowRay attack
+# head node: ray start --head --port=6379 --dashboard-host=127.0.0.1 --dashboard-port=8265
 # worker node: ray start --address='<HEAD_NODE_IP>:6379'
 
 set -e
