@@ -57,25 +57,25 @@ if __name__ == "__main__":
     sum_multiplier = 80
     weighted_multiplier = 30
     log_multiplier = 10
-    for multiplier in range(11, 31):
-        for num_cpus in [32]:
+    for multiplier in range(1, 31):
+        for num_cpus in [1, 2, 4, 8, 16, 32, 64, 128]:
             sum_n = multiplier * sum_multiplier
             weighted_n = multiplier * weighted_multiplier
             log_n = multiplier * log_multiplier
 
-            # print(f"Testing sum n={sum_n}, num_cpus={num_cpus}")
-            # try:
-            #     result = test_sum(sum_n, num_cpus)
-            #     print(f"Result {result}")
-            # except Exception as e:
-            #     print(f"Error in test_sum with n={sum_n}, num_cpus={num_cpus}: {e}")
+            print(f"Testing sum n={sum_n}, num_cpus={num_cpus}")
+            try:
+                result = test_sum(sum_n, num_cpus)
+                print(f"Result {result}")
+            except Exception as e:
+                print(f"Error in test_sum with n={sum_n}, num_cpus={num_cpus}: {e}")
 
-            # print(f"Testing weighted n={weighted_n}, num_cpus={num_cpus}")
-            # try:
-            #     result = test_weighted(weighted_n, num_cpus)
-            #     print(f"Result {result}")
-            # except Exception as e:
-            #     print(f"Error in test_weighted with n={weighted_n}, num_cpus={num_cpus}: {e}")
+            print(f"Testing weighted n={weighted_n}, num_cpus={num_cpus}")
+            try:
+                result = test_weighted(weighted_n, num_cpus)
+                print(f"Result {result}")
+            except Exception as e:
+                print(f"Error in test_weighted with n={weighted_n}, num_cpus={num_cpus}: {e}")
 
             print(f"Testing log n={log_n}, num_cpus={num_cpus}")
             try:
