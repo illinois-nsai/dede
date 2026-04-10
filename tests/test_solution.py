@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 
-import math
-
 import numpy as np
-from conftest import GUROBI_OPTS
+from conftest import GUROBI_OPTS, check_solution
 
 import dede as dd
 
@@ -20,14 +18,13 @@ def test_lin_cont():
     objective = dd.Maximize(dd.sum(dd.multiply(x, w)))
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
-
     result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=1, num_iter=20)
     print("Returned result:", result_dede)
 
     result_solution = np.sum(np.multiply(x.value, w))
     print("Solution result:", result_solution)
 
-    assert math.isclose(result_dede, result_solution, rel_tol=0.01)
+    assert check_solution(result_dede, result_solution, objective)
     print("=== Passed CONTINUOUS LINEAR value test ===")
 
 
@@ -47,14 +44,13 @@ def test_cvx_cont():
     objective = dd.Maximize(expr)
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
-
     result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=1, num_iter=50)
     print("Returned result:", result_dede)
 
     result_solution = np.sum(np.multiply(w, np.log(x.value)))
     print("Solution result:", result_solution)
 
-    assert math.isclose(result_dede, result_solution, rel_tol=0.01)
+    assert check_solution(result_dede, result_solution, objective)
     print("=== Passed CONTINUOUS CONVEX value test ===")
 
 
@@ -70,14 +66,13 @@ def test_lin_int():
     objective = dd.Maximize(dd.sum(dd.multiply(x, w)))
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
-
     result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=0.1, num_iter=25, **GUROBI_OPTS)
     print("Returned result:", result_dede)
 
     result_solution = np.sum(np.multiply(x.value, w))
     print("Solution result:", result_solution)
 
-    assert math.isclose(result_dede, result_solution, rel_tol=0.01)
+    assert check_solution(result_dede, result_solution, objective)
     print("=== Passed INTEGER LINEAR value test ===")
 
 
@@ -100,7 +95,7 @@ def test_cvx_int():
     result_solution = np.sum(np.multiply(x.value, w) ** 2)
     print("Solution result:", result_solution)
 
-    assert math.isclose(result_dede, result_solution, rel_tol=0.01)
+    assert check_solution(result_dede, result_solution, objective)
     print("=== Passed INTEGER CONVEX value test ===")
 
 
@@ -121,7 +116,7 @@ def test_lin_mix():
     result_solution = np.sum(x1.value) + np.sum(x2.value) + np.sum(x3.value)
     print("Solution result:", result_solution)
 
-    assert math.isclose(result_dede, result_solution, rel_tol=0.01)
+    assert check_solution(result_dede, result_solution, objective)
     print("=== Passed MIXED LINEAR value test ===")
 
 
@@ -158,7 +153,7 @@ def test_cvx_mix():
     )
     print("Solution result:", result_solution)
 
-    assert math.isclose(result_dede, result_solution, rel_tol=0.01)
+    assert check_solution(result_dede, result_solution, objective)
     print("=== Passed MIXED CONVEX value test ===")
 
 
@@ -172,14 +167,13 @@ def test_large():
     objective = dd.Maximize(dd.sum(x1) + dd.sum(x2))
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
-
     result_dede = prob.solve(num_cpus=4, solver=dd.GUROBI, rho=1, num_iter=15, **GUROBI_OPTS)
     print("Returned result:", result_dede)
 
     result_solution = np.sum(x1.value) + np.sum(x2.value)
     print("Solution result:", result_solution)
 
-    assert math.isclose(result_dede, result_solution, rel_tol=0.01)
+    assert check_solution(result_dede, result_solution, objective)
     print("=== Passed LARGE value test ===")
 
 
