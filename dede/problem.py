@@ -1,4 +1,4 @@
-import os
+import contextlib
 import time
 import typing as t
 from collections import defaultdict
@@ -12,6 +12,8 @@ from cvxpy.constraints.zero import Equality, Zero
 from cvxpy.problems.objective import Minimize
 from cvxpy.problems.problem import Problem as CpProblem
 from numpy.typing import NDArray
+from ray.util.placement_group import PlacementGroup
+from ray.util.scheduling_strategies import PlacementGroupSchedulingStrategy
 
 from .constraints_utils import breakdown_constr
 from .subproblems_wrap import SubproblemsWrap
@@ -23,36 +25,175 @@ from .utils import (
     get_var_id_pos_list_from_linear,
 )
 
-KeyT = tuple[float, int]
 ObjectiveT = t.Union[cp.Maximize, cp.Minimize]
 ConstraintT = t.Union[Equality, Zero, Inequality]
 
 
-class SubprobCache:
+@contextlib.contextmanager
+def _get_distributed_pg(
+    max_cpus_per_node: int, timeout: float = 10.0
+) -> t.Iterator[PlacementGroup]:
+    """Returns a placement group that tries to spread
+    workers across all available nodes in the ray network.
+
+    Ideally used as a context manager to free up
+    the placement group once execution has finished.
+
+    Args:
+        max_cpus_per_node (int): how many CPUs to request per node. This is an upper bound on the
+        number of CPUs reserved.
+
+    Returns:
+        t.Iterator[PlacementGroup]: the placement group
+    """
+    nodes = [node for node in ray.nodes() if node["Alive"]]
+
+    bundles = [{"CPU": 1.0}] * min(max_cpus_per_node * len(nodes), _get_ray_cpus())
+    pg = ray.util.placement_group(bundles, strategy="SPREAD")
+    ray.get(pg.ready(), timeout=timeout)
+    try:
+        yield pg
+    finally:
+        ray.util.remove_placement_group(pg)
+
+
+def _get_ray_cpus() -> int:
+    """Get the true amount of cpus available in the ray cluster."""
+    if not ray.is_initialized():
+        raise RuntimeError("Ray is not initialized. Cannot get number of CPUs in the cluster.")
+    return int(ray.cluster_resources().get("CPU", 1))
+
+
+class RaySubprobCache:
     """Cache subproblems."""
 
     def __init__(self):
-        self.rho: t.Optional[float] = None
-        self.num_cpus: t.Optional[int] = None
-        self.probs: t.Optional[list[ray.actor.ActorProxy[SubproblemsWrap]]] = None
-        self.param_idx_r: list[list[int]] = []
-        self.param_idx_d: list[list[int]] = []
+        # these three fields reflect user-passed arguments
+        self._rho: t.Optional[float] = None
+        # this does not necessarily reflect the true number of cpus
+        # in the ray cluster if the user inputted None (i.e., use max)
+        self._user_num_cpus: t.Optional[int] = None
+        self._address: t.Optional[str] = None
 
-    def invalidate(self):
-        self.rho = None
-        self.num_cpus = None
-        self.probs = None
-        self.param_idx_r, self.param_idx_d = [], []
+        self._probs: t.Optional[list[ray.actor.ActorProxy[SubproblemsWrap]]] = None
+        self._param_idx_r: list[list[int]] = []
+        self._param_idx_d: list[list[int]] = []
+        self._placement_group: t.Optional[PlacementGroup] = None
+
+    def update_cache(self, rho: float, user_num_cpus: t.Optional[int], ray_address: str) -> bool:
+        """Updates the execution parameters stored in the cache.
+
+        If this results in cache invalidation, the subproblem settings need to be set again.
+
+        Args:
+            rho (float): the rho to use in optimization
+            user_num_cpus (t.Optional[int]): how many CPUs to use in optimization. None means all
+                available CPUs will be used.
+            ray_address (str): the address of the ray server to connect to.
+                Either "local" or an ip address.
+
+        Returns:
+            bool: True if the cache was invalidated as part of the update
+            (i.e., there was a change). Otherwise, False.
+        """
+        # we want to rebuild subproblems and restart ray if
+        # the rho changes, the address or changes, or the num cpus changes in local mode
+        if not (
+            rho != self._rho
+            or ray_address != self._address
+            or (ray_address == "local" and user_num_cpus != self._user_num_cpus)
+            or not ray.is_initialized()
+        ):
+            return False
+
+        self._invalidate()
+        self._rho = rho
+        self._user_num_cpus = user_num_cpus
+        self._address = ray_address
+
+        ray.shutdown()
+        if ray_address != "local":
+            ray.init(address=ray_address)
+        else:
+            ray.init(num_cpus=user_num_cpus)
+
+        if user_num_cpus is not None and user_num_cpus > _get_ray_cpus():
+            raise ValueError(f"Too many CPUs requested, only have {_get_ray_cpus()} available")
+
+        return True
+
+    def reserve_placement_group(self, timeout: float = 10.0) -> PlacementGroup:
+        if self._placement_group is not None:
+            raise RuntimeError("Reserving another placement group when one is already reserved")
+        self._placement_group = ray.util.placement_group([{"CPU": 1}] * (self.num_cpus))
+        ray.get(self._placement_group.ready(), timeout=timeout)
+        return self._placement_group
+
+    def set_subprobs(
+        self,
+        probs: list[ray.actor.ActorProxy[SubproblemsWrap]],
+        param_idx_r: list[list[int]],
+        param_idx_d: list[list[int]],
+    ) -> None:
+        """Stores subproblems in the cache (subproblems, indices of parameters)."""
+        self._probs = probs
+        self._param_idx_r = param_idx_r
+        self._param_idx_d = param_idx_d
+
+    def _invalidate(self):
+        self._rho = None
+        self._user_num_cpus = None
+        self._address = None
+        self._probs = None
+        self._param_idx_r, self._param_idx_d = [], []
+        if self._placement_group is not None and ray.is_initialized():
+            ray.util.remove_placement_group(self._placement_group)
+        self._placement_group = None
 
     @property
-    def key(self) -> t.Optional[KeyT]:
-        if self.rho is None or self.num_cpus is None:
-            return None
-        return (self.rho, self.num_cpus)
+    def rho(self) -> float:
+        if self._rho is None:
+            raise RuntimeError("rho is not set")
+        return self._rho
 
-    @classmethod
-    def make_key(cls, rho: float, num_cpus: int) -> KeyT:
-        return (rho, num_cpus)
+    @property
+    def num_cpus(self) -> int:
+        """Get the number of CPUs the user requested.
+        In the case of None, defauls to all available CPUs."""
+        if self._user_num_cpus is None:
+            return _get_ray_cpus()
+        return self._user_num_cpus
+
+    @property
+    def address(self) -> str:
+        if self._address is None:
+            raise RuntimeError("address is not set")
+        return self._address
+
+    @property
+    def probs(self) -> list[ray.actor.ActorProxy[SubproblemsWrap]]:
+        if self._probs is None:
+            raise RuntimeError("probs is not set")
+        return self._probs
+
+    @property
+    def param_idx_r(self) -> list[list[int]]:
+        if not self._param_idx_r:
+            raise RuntimeError("param_idx_r is not set")
+        return self._param_idx_r
+
+    @property
+    def param_idx_d(self) -> list[list[int]]:
+        if not self._param_idx_d:
+            raise RuntimeError("param_idx_d is not set")
+        return self._param_idx_d
+
+    @property
+    def placement_group(self) -> PlacementGroup:
+        """Get a placement group with the requested number of CPUs."""
+        if self._placement_group is None:
+            raise RuntimeError("placement group is not set")
+        return self._placement_group
 
 
 class Problem(CpProblem):
@@ -80,7 +221,7 @@ class Problem(CpProblem):
         self._constrs_d = breakdown_constr(constrs_d_converted, 1)
 
         # init subprob cache
-        self._subprob_cache = SubprobCache()
+        self._subprob_cache = RaySubprobCache()
 
         # keep track of original problem type
         self._problem_type = type(objective)
@@ -116,8 +257,9 @@ class Problem(CpProblem):
         self.constrs_gps_r = self._group_constrs(self._constrs_r, self.constr_dict_r)
         self.constrs_gps_d = self._group_constrs(self._constrs_d, self.constr_dict_d)
 
-        # get objective groups
-        self._obj_expr_r, self._obj_expr_d = self.group_objective()
+        self._obj_expr_r = None
+        self._obj_expr_d = None
+
         end = time.time()
         print("init time:", end - start)
 
@@ -132,18 +274,22 @@ class Problem(CpProblem):
 
     def solve(
         self,
-        enable_dede: bool = True,
         num_cpus: t.Optional[int] = None,
-        rho: t.Optional[float] = None,
+        ray_address: str = "local",
+        enable_dede: bool = True,
+        rho: float = 1.0,
         num_iter: t.Optional[int] = None,
         *args,
         **kwargs,
     ) -> np.floating[t.Any]:
         """Compiles and solves the original problem.
+
         Args:
+            num_cpus: number of CPUs to use; if None, use all available CPUs.
+                If more than the available number of CPUs, will error.
+            ray_address: ray cluster address; if None, will use local ray instance.
             enable_dede: whether to decouple and decompose with DeDe
-            num_cpus: number of CPUs to use; all the CPUs available if None
-            rho: rho value in ADMM; 1 if None
+            rho: rho value in ADMM; 1 by default
             num_iter: ADMM iterations; stop under < 1% improvement if None
         """
         # solve the original problem
@@ -156,41 +302,21 @@ class Problem(CpProblem):
             coeff = 1 if self._problem_type == Minimize else -1
             return t.cast(np.floating[t.Any], coeff * self.value)
 
-        # initialize num_cpus, rho
-        if num_cpus is None:
-            if self._subprob_cache.num_cpus is None:
-                num_cpus = os.cpu_count() or 1
-            else:
-                num_cpus = self._subprob_cache.num_cpus
-        if rho is None:
-            if self._subprob_cache.rho is None:
-                rho = 1
-            else:
-                rho = self._subprob_cache.rho
-        # check whether num_cpus is more than all available
-        if num_cpus > (os.cpu_count() or 1):
-            raise ValueError(f"{num_cpus} CPUs exceeds upper limit of {os.cpu_count()}.")
-
-        # check whether settings has been changed
-        key = self._subprob_cache.make_key(rho, num_cpus)
-        if key != self._subprob_cache.key:
-            # invalidate old settings
-            self._subprob_cache.invalidate()
-            self._subprob_cache.rho = rho
-            # initialize ray
-            ray.shutdown()
-            self._subprob_cache.num_cpus = num_cpus
-            ray.init(num_cpus=num_cpus)
+        subproblems_invalidated = self._subprob_cache.update_cache(rho, num_cpus, ray_address)
+        if subproblems_invalidated:
             # store subproblem in last solution
-            self._subprob_cache.probs = self.get_subproblems(num_cpus, rho)
-            # store parameter index in z solutions for x problems
-            self._subprob_cache.param_idx_r, self._subprob_cache.param_idx_d = self.get_param_idx()
-            # get demand solution
-            self.sol_d = np.hstack(
-                ray.get([prob.get_solution_d.remote() for prob in self._subprob_cache.probs])
-            )
+            obj_expr_r, obj_expr_d = self._get_grouped_objectives()
+            # reserve the actors needed to create the subproblems
+            self._subprob_cache.reserve_placement_group()
+            probs = self.get_subproblems(obj_expr_r, obj_expr_d, self._subprob_cache.num_cpus, rho)
 
-        assert self._subprob_cache.probs is not None
+            # store parameter index in z solutions for x problems
+            param_idx_r, param_idx_d = self._get_param_idx(probs)
+
+            self._subprob_cache.set_subprobs(probs, param_idx_r, param_idx_d)
+
+            # get demand solution
+            self.sol_d = np.hstack(ray.get([prob.get_solution_d.remote() for prob in probs]))
 
         # update parameter values
         param_id_to_value = {
@@ -258,12 +384,10 @@ class Problem(CpProblem):
         for var in self.variables():
             var.value = np.zeros(var.shape)
 
-        assert self._subprob_cache.probs is not None
-
         local_sol_idx: list[list[VarInfoT]] = ray.get(
             [prob.get_local_solution_idx.remote() for prob in self._subprob_cache.probs]
         )
-        local_sol: list[NDArray[np.floating[t.Any]]] = ray.get(
+        local_sol: list[list[np.floating[t.Any]]] = ray.get(
             [prob.get_local_solution.remote() for prob in self._subprob_cache.probs]
         )
         flat_local_idx = [idx for arr in local_sol_idx for idx in arr]
@@ -315,7 +439,11 @@ class Problem(CpProblem):
         return list(parent_to_constrs.values())
 
     def get_subproblems(
-        self, num_cpus: int, rho: float
+        self,
+        obj_expr_r: list[cp.Expression],
+        obj_expr_d: list[cp.Expression],
+        num_cpus: int,
+        rho: float,
     ) -> list[ray.actor.ActorProxy[SubproblemsWrap]]:
         """Return objective and constraints assignments for subproblems."""
 
@@ -344,8 +472,8 @@ class Problem(CpProblem):
             constrs_r = [self.constrs_gps_r[j] for j in idx_r]
             constrs_d = [self.constrs_gps_d[j] for j in idx_d]
             # get obj groups
-            obj_r = [self._obj_expr_r[j] for j in idx_r]
-            obj_d = [self._obj_expr_d[j] for j in idx_d]
+            obj_r = [obj_expr_r[j] for j in idx_r]
+            obj_d = [obj_expr_d[j] for j in idx_d]
             # get var_id_to_pos_list
             var_id_to_pos_r = [
                 [self.constr_dict_r[constr] for constr in constrs] for constrs in constrs_r
@@ -354,7 +482,12 @@ class Problem(CpProblem):
                 [self.constr_dict_d[constr] for constr in constrs] for constrs in constrs_d
             ]
             # build subproblems
-            actor = ray.remote(SubproblemsWrap)
+            actor = ray.remote(SubproblemsWrap).options(
+                scheduling_strategy=PlacementGroupSchedulingStrategy(
+                    placement_group=self._subprob_cache.placement_group,
+                    placement_group_bundle_index=cpu,
+                )
+            )
             probs.append(
                 actor.remote(
                     idx_r,
@@ -372,13 +505,14 @@ class Problem(CpProblem):
             )
         return probs
 
-    def get_param_idx(self) -> tuple[list[list[int]], list[list[int]]]:
+    @classmethod
+    def _get_param_idx(
+        cls, probs: list[ray.actor.ActorProxy[SubproblemsWrap]]
+    ) -> tuple[list[list[int]], list[list[int]]]:
         """Get parameter z index in last solution."""
-        assert self._subprob_cache.probs is not None
-
         # map var_id_pos in the big resource solution list
         sol_idx_r: list[list[VarInfoT]] = ray.get(
-            [prob.get_solution_idx_r.remote() for prob in self._subprob_cache.probs]
+            [prob.get_solution_idx_r.remote() for prob in probs]
         )
 
         sol_idx_dict_r: dict[VarInfoT, int] = {}
@@ -390,7 +524,7 @@ class Problem(CpProblem):
 
         # map var_id_pos in the big demand solution list
         sol_idx_d: list[list[VarInfoT]] = ray.get(
-            [prob.get_solution_idx_d.remote() for prob in self._subprob_cache.probs]
+            [prob.get_solution_idx_d.remote() for prob in probs]
         )
         sol_idx_dict_d: dict[VarInfoT, int] = {}
         idx = 0
@@ -408,40 +542,119 @@ class Problem(CpProblem):
         ]
         return param_idx_r, param_idx_d
 
-    def group_objective(self) -> tuple[list[cp.Expression], list[cp.Expression]]:
+    def _get_grouped_objectives(self) -> tuple[list[cp.Expression], list[cp.Expression]]:
         """Split objective into corresponding constraint groups"""
-        var_id_pos_to_idx: dict[VarInfoT, list[tuple[int, int]]] = defaultdict(list)
-        for i, constrs_gps, constr_dict in zip(
-            [0, 1],
-            [self.constrs_gps_r, self.constrs_gps_d],
-            [self.constr_dict_r, self.constr_dict_d],
-        ):
-            for j, constrs in enumerate(constrs_gps):
-                for constr in constrs:
-                    for var_id_pos in constr_dict[constr]:
-                        var_id_pos_to_idx[var_id_pos].append((i, j))
 
-        obj_r: list[cp.Expression] = [cp.Constant(0) for _ in self.constrs_gps_r]
-        obj_d: list[cp.Expression] = [cp.Constant(0) for _ in self.constrs_gps_d]
-        for obj in expand_expr(self.objective.expr):
-            var_id_pos_list = get_var_id_pos_list_from_cone(obj, self._solver)
-            if not var_id_pos_list:
-                if len(obj_r) > 0:
-                    obj_r[0] += obj
-                elif len(obj_d) > 0:
-                    obj_d[0] += obj
-                continue
+        # See if the grouped objectives are already computed and cached.
+        # If so, return them to avoid redundant computation.
+        if self._obj_expr_r is not None and self._obj_expr_d is not None:
+            return self._obj_expr_r, self._obj_expr_d
 
-            id_set = set(var_id_pos_to_idx[var_id_pos_list[0]])
-            for var_id_pos in var_id_pos_list[1:]:
-                id_set = id_set & set(var_id_pos_to_idx[var_id_pos])
-            if not id_set:
-                raise ValueError("Objective not separable.")
+        # use a placement group with strategy = SPREAD due to the diminishing returns
+        # observed with larger numbers of CPUs
+        with _get_distributed_pg(4) as pg:
+            var_id_pos_to_idx: dict[VarInfoT, list[tuple[int, int]]] = defaultdict(list)
+            for i, constrs_gps, constr_dict in zip(
+                [0, 1],
+                [self.constrs_gps_r, self.constrs_gps_d],
+                [self.constr_dict_r, self.constr_dict_d],
+            ):
+                for j, constrs in enumerate(constrs_gps):
+                    for constr in constrs:
+                        for var_id_pos in constr_dict[constr]:
+                            var_id_pos_to_idx[var_id_pos].append((i, j))
 
-            idx = list(id_set)[0]
-            if idx[0] == 0:
-                obj_r[idx[1]] += obj
-            else:
-                obj_d[idx[1]] += obj
+            expr_list = expand_expr(self.objective.expr)
 
-        return obj_r, obj_d
+            # put heavy objects in shared memory to avoid serialization overhead
+            expr_ref = ray.put(expr_list)
+            dict_ref = ray.put(dict(var_id_pos_to_idx))
+
+            # chunk the indices to split the work
+            chunks = np.array_split(np.arange(len(expr_list), dtype=np.int64), len(pg.bundle_specs))
+
+            # send the chunks to the remote function for processing
+            futures = [
+                _process_obj_chunk_indices.options(
+                    scheduling_strategy=PlacementGroupSchedulingStrategy(
+                        placement_group=pg,
+                        placement_group_bundle_index=i,
+                    )
+                ).remote(
+                    c,
+                    expr_ref,
+                    self._solver,
+                    dict_ref,
+                    len(self.constrs_gps_r),
+                    len(self.constrs_gps_d),
+                )
+                for i, c in enumerate(chunks)
+            ]
+
+            # block on results
+            results = ray.get(futures)
+
+        # reconstruct groups
+        obj_r: list[cp.Expression] = []
+        for g_idx in range(len(self.constrs_gps_r)):
+            # Gather all expression objects using the returned indices
+            group_terms = [expr_list[i] for res in results for i in res[0][g_idx]]
+            obj_r.append(
+                t.cast(cp.Expression, cp.sum(group_terms) if group_terms else cp.Constant(0))
+            )
+
+        obj_d: list[cp.Expression] = []
+        for g_idx in range(len(self.constrs_gps_d)):
+            group_terms = [expr_list[i] for res in results for i in res[1][g_idx]]
+            obj_d.append(
+                t.cast(cp.Expression, cp.sum(group_terms) if group_terms else cp.Constant(0))
+            )
+
+        self._obj_expr_r, self._obj_expr_d = obj_r, obj_d
+
+        return self._obj_expr_r, self._obj_expr_d
+
+
+@ray.remote
+def _process_obj_chunk_indices(
+    indices: NDArray[np.int64],
+    expr_list_ref: list[cp.Expression],
+    solver: str,
+    var_id_pos_to_idx: dict[VarInfoT, list[tuple[int, int]]],
+    num_r: int,
+    num_d: int,
+) -> tuple[list[list[int]], list[list[int]]]:
+    """
+    Returns only integer indices of the expressions.
+    """
+    # Local accumulation of INDICES
+    local_r_idx: list[list[int]] = [[] for _ in range(num_r)]
+    local_d_idx: list[list[int]] = [[] for _ in range(num_d)]
+
+    for idx in indices:
+        # Access the object from the shared reference
+        obj = expr_list_ref[idx]
+
+        var_id_pos_list = get_var_id_pos_list_from_cone(obj, solver)
+
+        if not var_id_pos_list:
+            if num_r > 0:
+                local_r_idx[0].append(idx)
+            elif num_d > 0:
+                local_d_idx[0].append(idx)
+            continue
+
+        id_set = set(var_id_pos_to_idx[var_id_pos_list[0]])
+        for var_id_pos in var_id_pos_list[1:]:
+            id_set &= set(var_id_pos_to_idx[var_id_pos])
+
+        if not id_set:
+            raise ValueError(f"Objective term at index {idx} is not separable.")
+
+        target: tuple[int, int] = list(id_set)[0]
+        if target[0] == 0:
+            local_r_idx[target[1]].append(idx)
+        else:
+            local_d_idx[target[1]].append(idx)
+
+    return local_r_idx, local_d_idx

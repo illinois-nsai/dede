@@ -100,7 +100,7 @@ class SubproblemsWrap:
         return [idx for prob in probs for idx in prob.get_local_solution_idx()]
 
     @ray.method
-    def get_local_solution(self) -> list[NDArray[np.floating[t.Any]]]:
+    def get_local_solution(self) -> list[np.floating[t.Any]]:
         """Get concatenated solution of all local-only variables."""
         probs = self.probs_r + self.probs_d
         return [sol for prob in probs for sol in prob.get_local_solution()]
