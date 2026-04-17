@@ -320,8 +320,8 @@ class Problem(CpProblem):
             rho: rho value in ADMM; 1 by default
             num_iter: ADMM iterations; stop under residual tolerances if None
             xi: normalized residual balancing scale; 0.1 by default
-            mu: residual imbalance threshold; 10 by default 
-            balance_iterations: residual balancing frequency; 10 by default 
+            mu: residual imbalance threshold; 10 by default
+            balance_iterations: residual balancing frequency; 10 by default
         """
         # solve the original problem
         if not enable_dede:
