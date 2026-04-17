@@ -11,7 +11,8 @@
 #         StrictHostKeyChecking no
 #
 # DO NOT expose the dashboard host to the public, see the ShadowRay attack
-# head node: ray start --head --port=6379 --dashboard-host=127.0.0.1 --dashboard-port=8265
+# If on cloudlab, make sure to only use the local subnet (use ip addr show), then use iptables to block all
+# head node: ray start --head --port=6379 --node-ip-address <local ip> --dashboard-host=127.0.0.1 --dashboard-port=8265
 # worker node: ray start --address='<HEAD_NODE_IP>:6379'
 # forward the port to the local machine by running ssh -L 5000:localhost:8265 user@host
 
@@ -20,22 +21,7 @@ set -e
 BRANCH="${1:-ianz/cloudlab-experiments}"
 
 MACHINES=(
-    "yianz@pc525.emulab.net"
-    "yianz@pc432.emulab.net"
-    "yianz@pc544.emulab.net"
-    "yianz@pc502.emulab.net"
-    "yianz@pc512.emulab.net"
-    "yianz@pc485.emulab.net"
-    "yianz@pc486.emulab.net"
-    "yianz@pc531.emulab.net"
-    "yianz@pc547.emulab.net"
-    "yianz@pc433.emulab.net"
-    "yianz@pc444.emulab.net"
-    "yianz@pc438.emulab.net"
-    "yianz@pc434.emulab.net"
-    "yianz@pc520.emulab.net"
-    "yianz@pc543.emulab.net"
-    "yianz@pc423.emulab.net"
+    "yianz@clnode280.clemson.cloudlab.us"
 )
 
 LOG_DIR=$(mktemp -d)
@@ -45,6 +31,10 @@ pids=()
 for machine in "${MACHINES[@]}"; do
     echo "=== Launching $machine ==="
     ssh "$machine" bash -s >"$LOG_DIR/$machine.log" 2>&1 <<EOF &
+# cd work/dede
+# source .venv/bin/activate
+# ray start --address='10.10.1.1:6379'
+
 mkdir work
 cd work
 GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no" git clone git@github.com:illinois-nsai/dede.git
@@ -56,6 +46,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip3 install -e .[dev]
 pip3 install ray[default]
+# echo 0 | sudo tee /sys/devices/system/cpu/cpufreq/boost || true
 EOF
     pids+=($!)
 done

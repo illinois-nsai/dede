@@ -45,7 +45,7 @@ def test_log(n, num_cpus):
     resource_constraints = [x[i, :].sum() >= (i + 1) * M for i in range(N)]
     demand_constraints = [x[:, j].sum() <= (j + 1) * N for j in range(M)]
 
-    objective = dd.Maximize(dd.sum([dd.log(dd.sum(x[i])) for i in range(N)]))
+    objective = dd.Maximize(dd.sum([dd.log(dd.sum(x[i, :])) for i in range(N)]))
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
     result_dede = prob.solve(ray_address="auto", num_cpus=num_cpus, solver=dd.SCS)

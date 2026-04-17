@@ -7,6 +7,7 @@ test_re = re.compile(r"Testing (\w+) (.+)")
 kwarg_re = re.compile(r"(\w+)=(\S+?)(?:,|$)")
 executed_re = re.compile(r"Executed (\S+) in ([\d.]+)s")
 iter_re = re.compile(r"iter(\d+):")
+result_re = re.compile(r"Result\s+(\S+)")
 
 BenchmarkKey = tuple[str, tuple[tuple[str, str], ...]]
 
@@ -14,6 +15,7 @@ BenchmarkKey = tuple[str, tuple[tuple[str, str], ...]]
 class BenchmarkData(TypedDict):
     timings: dict[str, float]
     num_iterations: int
+    result: Optional[str]
 
 
 def parse_log(log_path: str) -> dict[BenchmarkKey, BenchmarkData]:
@@ -33,7 +35,7 @@ def parse_log(log_path: str) -> dict[BenchmarkKey, BenchmarkData]:
                     (k, v) for k, v in kwarg_re.findall(m.group(2))
                 ))
                 current_key = (test_type, kwargs)
-                current_data = {"timings": {}, "num_iterations": 0}
+                current_data = {"timings": {}, "num_iterations": 0, "result": None}
                 continue
 
             if current_key is None:
@@ -50,6 +52,11 @@ def parse_log(log_path: str) -> dict[BenchmarkKey, BenchmarkData]:
                 current_data["num_iterations"] = max(
                     current_data["num_iterations"], int(m.group(1))
                 )
+                continue
+
+            m = result_re.search(line)
+            if m:
+                current_data["result"] = m.group(1)
 
     if current_key is not None:
         assert current_data is not None
@@ -61,7 +68,7 @@ def parse_log(log_path: str) -> dict[BenchmarkKey, BenchmarkData]:
 def write_csv(results: dict[BenchmarkKey, BenchmarkData], out_path: str) -> None:
     kwarg_keys = sorted({k for _, kwargs in results for k, _ in kwargs})
     timing_keys = sorted({k for data in results.values() for k in data["timings"]})
-    fieldnames = ["test_type"] + kwarg_keys + ["num_iterations"] + timing_keys
+    fieldnames = ["test_type"] + kwarg_keys + ["num_iterations"] + timing_keys + ["result"]
 
     with open(out_path, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
@@ -72,6 +79,7 @@ def write_csv(results: dict[BenchmarkKey, BenchmarkData], out_path: str) -> None
                 **dict(kwargs),
                 "num_iterations": data["num_iterations"],
                 **data["timings"],
+                "result": data["result"],
             }
             writer.writerow(row)
 
