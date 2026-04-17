@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-import math
 
 import cvxpy as cp
 import numpy as np
+from conftest import check_solution
 
 import dede as dd
 
@@ -19,16 +19,18 @@ def test_log():
     expr = dd.sum(dd.log(x))
     objective = dd.Maximize(expr)
 
+    cvxpy_prob = cp.Problem(objective, constraints=resource_constraints + demand_constraints)
+    result_cvxpy = cvxpy_prob.solve()
+    print("CVXPY:", result_cvxpy)
+
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
     result_dede = prob.solve(num_cpus=2, solver=dd.SCS)
     print("DeDe:", result_dede)
 
-    cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
-    result_cvxpy = cvxpy_prob.solve()
-    print("CVXPY:", result_cvxpy)
-
-    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
+    assert check_solution(
+        result_dede, result_cvxpy, objective, constraints=resource_constraints + demand_constraints
+    )
     print("=== Passed CONTINUOUS LOG test ===")
 
 
@@ -56,7 +58,9 @@ def test_log_weighted():
     result_cvxpy = cvxpy_prob.solve()
     print("CVXPY:", result_cvxpy)
 
-    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
+    assert check_solution(
+        result_dede, result_cvxpy, objective, constraints=resource_constraints + demand_constraints
+    )
     print("=== Passed CONTINUOUS LOG weighted test ===")
 
 
@@ -76,7 +80,9 @@ def test_quadratic():
     result_cvxpy = cvxpy_prob.solve(solver=cp.ECOS_BB)
     print("CVXPY:", result_cvxpy)
 
-    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
+    assert check_solution(
+        result_dede, result_cvxpy, objective, constraints=resource_constraints + demand_constraints
+    )
     print("=== Passed CONTINUOUS QUADRATIC test ===")
 
 
@@ -100,7 +106,9 @@ def test_quadratic_weighted():
     result_cvxpy = cvxpy_prob.solve(solver=cp.ECOS_BB)
     print("CVXPY:", result_cvxpy)
 
-    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
+    assert check_solution(
+        result_dede, result_cvxpy, objective, resource_constraints + demand_constraints
+    )
     print("=== Passed CONTINUOUS QUADRATIC weighted test ===")
 
 

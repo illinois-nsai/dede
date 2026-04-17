@@ -2,6 +2,8 @@
 
 import math
 
+from conftest import check_solution
+
 import dede as dd
 
 
@@ -21,14 +23,16 @@ def test_dede():
     # Construct the problem
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    # Solve the problem with DeDe on 4 CPU cores
-    result_dede = prob.solve(num_cpus=4, solver=dd.ECOS)
-
     # Solve the problem with cvxpy
     result_cvxpy = prob.solve(enable_dede=False)
 
+    # Solve the problem with DeDe on 4 CPU cores
+    result_dede = prob.solve(num_cpus=4, solver=dd.ECOS, num_iter=100)
+
     # Validate the results
-    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
+    assert check_solution(
+        result_dede, result_cvxpy, objective, constraints=resource_constraints + demand_constraints
+    )
     print("=== Passed test_dede ===")
 
 
@@ -51,11 +55,11 @@ def test_dede_with_param():
     # Construct the problem
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    # Solve the problem with DeDe on 4 CPU cores
-    result_dede = prob.solve(num_cpus=4, solver=dd.ECOS)
-
     # Solve the problem with cvxpy
     result_cvxpy = prob.solve(enable_dede=False)
+
+    # Solve the problem with DeDe on 4 CPU cores
+    result_dede = prob.solve(num_cpus=4, solver=dd.ECOS)
 
     # Validate the results
     assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
@@ -63,14 +67,16 @@ def test_dede_with_param():
     # Change parameter value and re-solve
     param.value += 1
 
-    # Solve the problem with DeDe on 4 CPU cores
-    result_dede = prob.solve(num_cpus=4, solver=dd.ECOS)
-
     # Solve the problem with cvxpy
     result_cvxpy = prob.solve(enable_dede=False)
 
+    # Solve the problem with DeDe on 4 CPU cores
+    result_dede = prob.solve(num_cpus=4, solver=dd.ECOS)
+
     # Validate the results
-    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
+    assert check_solution(
+        result_dede, result_cvxpy, objective, constraints=resource_constraints + demand_constraints
+    )
     print("=== Passed test_dede_with_param ===")
 
 

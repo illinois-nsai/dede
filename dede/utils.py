@@ -255,6 +255,29 @@ def get_var_id_pos_list_from_cone(expr: cp.Expression, solver: str) -> list[VarI
     return var_id_pos_list
 
 
+class UnionFind:
+    def __init__(self, n: int) -> None:
+        # roots are defined by self.parents[i] == i
+        self.parents: list[int] = list(range(n))
+        self.sizes: list[int] = [1] * n
+
+    def find(self, x: int) -> int:
+        if x != self.parents[x]:
+            self.parents[x] = self.find(self.parents[x])
+        return self.parents[x]
+
+    def union(self, x1: int, x2: int) -> None:
+        p1, p2 = self.find(x1), self.find(x2)
+        if p1 == p2:
+            return
+
+        # union the smaller tree into the larger tree
+        if self.sizes[p1] < self.sizes[p2]:
+            p1, p2 = p2, p1
+        self.parents[p2] = p1
+        self.sizes[p1] += self.sizes[p2]
+
+
 def heapsched_rt(lrts: list[float], k: int) -> float:
     """Return a mathematical parallel runtime with k cpus for incoming jobs."""
     h: list[float] = []

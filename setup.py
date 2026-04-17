@@ -16,7 +16,7 @@ setup(
         "scipy>=1.12,<1.14",
         "ray",
     ],
-    extras_require={"dev": ["pytest", "pytest-xdist", "gurobipy==12.0.3", "ruff"]},
+    extras_require={"dev": ["pytest", "pytest-xdist", "gurobipy", "ruff"]},
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

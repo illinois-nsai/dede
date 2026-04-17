@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 
-import math
-
 import cvxpy as cp
 import numpy as np
-from conftest import GUROBI_OPTS
+from conftest import GUROBI_OPTS, check_solution
 
 import dede as dd
 
@@ -34,16 +32,15 @@ def test_add1():
             expr -= x2[i - N1, i]
     objective = dd.Maximize(expr)
 
-    prob = dd.Problem(objective, resource_constraints, demand_constraints)
-
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, xi=3.0, **GUROBI_OPTS)
-    print("DeDe:", result_dede)
-
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
     result_cvxpy = cvxpy_prob.solve()
     print("CVXPY:", result_cvxpy)
 
-    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
+    prob = dd.Problem(objective, resource_constraints, demand_constraints)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, xi=3, **GUROBI_OPTS)
+    print("DeDe:", result_dede)
+
+    assert check_solution(result_dede, result_cvxpy, objective)
     print("=== Passed MILP ADD test #1 ===")
 
 
@@ -62,16 +59,15 @@ def test_add2():
     demand_constraints = [x1[:, j].sum() + x2[:, j].sum() <= j for j in range(M)]
     objective = dd.Maximize(x1[0, 0] + x1[0, M - 1] + x2[N2 - 1, 0] + x2[N2 - 1, M - 1])
 
-    prob = dd.Problem(objective, resource_constraints, demand_constraints)
-
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, **GUROBI_OPTS)
-    print("DeDe:", result_dede)
-
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
     result_cvxpy = cvxpy_prob.solve()
     print("CVXPY:", result_cvxpy)
 
-    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
+    prob = dd.Problem(objective, resource_constraints, demand_constraints)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, **GUROBI_OPTS)
+    print("DeDe:", result_dede)
+
+    assert check_solution(result_dede, result_cvxpy, objective)
     print("=== Passed MILP ADD test #2 ===")
 
 
@@ -90,16 +86,15 @@ def test_sum1():
     demand_constraints = [x1[:, j].sum() + x2[:, j].sum() <= 2.3456 * j for j in range(M)]
     objective = dd.Maximize(dd.sum(x1) + dd.sum(x2))
 
-    prob = dd.Problem(objective, resource_constraints, demand_constraints)
-
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, **GUROBI_OPTS)
-    print("DeDe:", result_dede)
-
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
     result_cvxpy = cvxpy_prob.solve()
     print("CVXPY:", result_cvxpy)
 
-    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
+    prob = dd.Problem(objective, resource_constraints, demand_constraints)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, **GUROBI_OPTS)
+    print("DeDe:", result_dede)
+
+    assert check_solution(result_dede, result_cvxpy, objective)
     print("=== Passed MILP SUM test #1 ===")
 
 
@@ -116,16 +111,15 @@ def test_sum2():
     demand_constraints = [x1[:, j].sum() + x2[:, j].sum() <= 1 for j in range(M)]
     objective = dd.Maximize(dd.sum(x1) + dd.sum(x2))
 
-    prob = dd.Problem(objective, resource_constraints, demand_constraints)
-
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, **GUROBI_OPTS)
-    print("DeDe:", result_dede)
-
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
     result_cvxpy = cvxpy_prob.solve()
     print("CVXPY:", result_cvxpy)
 
-    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
+    prob = dd.Problem(objective, resource_constraints, demand_constraints)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, **GUROBI_OPTS)
+    print("DeDe:", result_dede)
+
+    assert check_solution(result_dede, result_cvxpy, objective)
     print("=== Passed MILP SUM test #2 ===")
 
 
@@ -148,16 +142,15 @@ def test_multiply1():
             w[i][j] = i - j
     objective = dd.Maximize(dd.sum(dd.multiply(x1, w[:N1])) + dd.sum(dd.multiply(x2, w[N1:])))
 
-    prob = dd.Problem(objective, resource_constraints, demand_constraints)
-
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, xi=0.3, **GUROBI_OPTS)
-    print("DeDe:", result_dede)
-
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
     result_cvxpy = cvxpy_prob.solve()
     print("CVXPY:", result_cvxpy)
 
-    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
+    prob = dd.Problem(objective, resource_constraints, demand_constraints)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, xi=0.3, **GUROBI_OPTS)
+    print("DeDe:", result_dede)
+
+    assert check_solution(result_dede, result_cvxpy, objective)
     print("=== Passed MILP MULTIPLY test #1 ===")
 
 
@@ -180,16 +173,15 @@ def test_multiply2():
             w[i][j] = i * j / (i + j + 1)
     objective = dd.Maximize(dd.sum(dd.multiply(x1, w[:N1])) + dd.sum(dd.multiply(x2, w[N1:])))
 
-    prob = dd.Problem(objective, resource_constraints, demand_constraints)
-
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, **GUROBI_OPTS)
-    print("DeDe:", result_dede)
-
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
     result_cvxpy = cvxpy_prob.solve()
     print("CVXPY:", result_cvxpy)
 
-    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
+    prob = dd.Problem(objective, resource_constraints, demand_constraints)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, **GUROBI_OPTS)
+    print("DeDe:", result_dede)
+
+    assert check_solution(result_dede, result_cvxpy, objective)
     print("=== Passed MILP MULTIPLY test #2 ===")
 
 
@@ -202,16 +194,16 @@ def test_boolean():
     resource_constraints = [x2.sum() <= 12.3456] + [x3.sum() <= 10]
     demand_constraints = [x1[j] + x2[j] + x3[j] >= 4 for j in range(M)]
     objective = dd.Maximize(dd.sum(x1) + dd.sum(x2) + dd.sum(x3))
-    prob = dd.Problem(objective, resource_constraints, demand_constraints)
-
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, **GUROBI_OPTS)
-    print("DeDe:", result_dede)
 
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
     result_cvxpy = cvxpy_prob.solve(solver=cp.ECOS_BB)
     print("CVXPY:", result_cvxpy)
 
-    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
+    prob = dd.Problem(objective, resource_constraints, demand_constraints)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, **GUROBI_OPTS)
+    print("DeDe:", result_dede)
+
+    assert check_solution(result_dede, result_cvxpy, objective)
     print("=== Passed MIXED BOOLEAN test ===")
 
 

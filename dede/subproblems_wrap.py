@@ -15,18 +15,29 @@ class SubproblemsWrap:
 
     def __init__(
         self,
-        idx_r: list[int],
-        idx_d: list[int],
-        obj_gps_r: t.Sequence[cp.Expression],
-        obj_gps_d: t.Sequence[cp.Expression],
-        constrs_gps_r: list[list[cp.Constraint]],
-        constrs_gps_d: list[list[cp.Constraint]],
-        var_id_to_pos_gps_r: list[list[list[VarInfoT]]],
-        var_id_to_pos_gps_d: list[list[list[VarInfoT]]],
+        idx_r: NDArray[np.signedinteger],
+        idx_d: NDArray[np.signedinteger],
+        obj_gps_r_full: t.Sequence[cp.Expression],
+        obj_gps_d_full: t.Sequence[cp.Expression],
+        constrs_gps_r_full: list[list[cp.Constraint]],
+        constrs_gps_d_full: list[list[cp.Constraint]],
+        constr_dict_r: dict[int, list[VarInfoT]],
+        constr_dict_d: dict[int, list[VarInfoT]],
         var_id_pos_set_r: set[VarInfoT],
         var_id_pos_set_d: set[VarInfoT],
         rho: float,
     ):
+        obj_gps_r: list[cp.Expression] = [obj_gps_r_full[i] for i in idx_r]
+        obj_gps_d: list[cp.Expression] = [obj_gps_d_full[i] for i in idx_d]
+        constrs_gps_r: list[list[cp.Constraint]] = [constrs_gps_r_full[i] for i in idx_r]
+        constrs_gps_d: list[list[cp.Constraint]] = [constrs_gps_d_full[i] for i in idx_d]
+        var_id_to_pos_gps_r = [
+            [constr_dict_r[constr.id] for constr in constrs] for constrs in constrs_gps_r
+        ]
+        var_id_to_pos_gps_d = [
+            [constr_dict_d[constr.id] for constr in constrs] for constrs in constrs_gps_d
+        ]
+
         # sort subproblem for better data locality
         self.probs_r: list[Subproblem] = []
         i: int
@@ -100,7 +111,7 @@ class SubproblemsWrap:
         return [idx for prob in probs for idx in prob.get_local_solution_idx()]
 
     @ray.method
-    def get_local_solution(self) -> list[NDArray[np.floating[t.Any]]]:
+    def get_local_solution(self) -> list[np.floating[t.Any]]:
         """Get concatenated solution of all local-only variables."""
         probs = self.probs_r + self.probs_d
         return [sol for prob in probs for sol in prob.get_local_solution()]

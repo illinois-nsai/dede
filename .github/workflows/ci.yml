@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, normalized_rb ]
   pull_request:
     branches: [ main ]
 
