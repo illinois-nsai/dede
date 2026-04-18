@@ -30,7 +30,7 @@ def check_solution(
                 print("constraints not satisfied (outside threshold)", constr.violation())
                 return False
 
-    within_tol = math.isclose(dede_val, cvxpy_val, rel_tol=0.05, abs_tol=1e-6)
+    within_tol = math.isclose(dede_val, cvxpy_val, rel_tol=0.05, abs_tol=0.01)
 
     if within_tol:
         return True

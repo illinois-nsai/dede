@@ -21,7 +21,7 @@ def test_add():
     print("CVXPY:", result_cvxpy)
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, xi=0.1, **GUROBI_OPTS)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, xi=1.0, **GUROBI_OPTS)
     print("DeDe:", result_dede)
 
     assert check_solution(result_dede, result_cvxpy, objective)
