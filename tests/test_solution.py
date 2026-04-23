@@ -188,8 +188,8 @@ def test_nested_log():
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
     result_dede = prob.solve(num_cpus=2, solver=dd.ECOS)
 
-    cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints, solver=dd.ECOs)
-    result_cvxpy = cvxpy_prob.solve()
+    cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
+    result_cvxpy = cvxpy_prob.solve(solver=dd.ECOS)
 
     assert check_solution(result_dede, result_cvxpy, objective)
 
