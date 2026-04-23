@@ -58,8 +58,14 @@ def expand_expr(expr: cp.Expression) -> list[cp.Expression]:
         return [Sum(new_expr) for new_expr in expand_expr(expr.args[0])]
     # (sum_{ij}X^2_{ij})/y
     elif isinstance(expr, quad_over_lin):
+        if len(expr.args[0].shape) == 0:
+            # don't element-wise expand a scalar since that is different semantically
+            return [expr]
         return [quad_over_lin(new_expr, expr.args[1]) for new_expr in expand_expr(expr.args[0])]
     elif isinstance(expr, log):
+        if len(expr.args[0].shape) == 0:
+            # don't element-wise expand a scalar since that is different semantically
+            return [expr]
         return [log(new_expr) for new_expr in expand_expr(expr.args[0])]
     elif isinstance(expr, trace):
         return [expr.args[0][i, i] for i in range(expr.args[0].shape[0])]

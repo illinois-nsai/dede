@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import cvxpy as cp
 import numpy as np
 from conftest import GUROBI_OPTS, check_solution
 
@@ -175,6 +176,22 @@ def test_large():
 
     assert check_solution(result_dede, result_solution, objective)
     print("=== Passed LARGE value test ===")
+
+
+def test_nested_log():
+    N, M = 2, 2
+    x = dd.Variable((N, M), nonneg=True)
+    resource_constraints = [x[i, :].sum() >= (i + 1) * M for i in range(N)]
+    demand_constraints = [x[:, j].sum() <= (j + 1) * N for j in range(M)]
+    objective = dd.Maximize(sum([dd.log(dd.sum(x[i, :])) for i in range(N)]))
+
+    prob = dd.Problem(objective, resource_constraints, demand_constraints)
+    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS)
+
+    cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints, solver=dd.ECOs)
+    result_cvxpy = cvxpy_prob.solve()
+
+    assert check_solution(result_dede, result_cvxpy, objective)
 
 
 if __name__ == "__main__":
