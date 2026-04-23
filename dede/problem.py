@@ -129,7 +129,7 @@ class RaySubprobCache:
         if not (
             rho != self._rho
             or ray_address != self._address
-            or (ray_address == "local" and user_num_cpus != self._user_num_cpus)
+            or (user_num_cpus != self._user_num_cpus)
             or not ray.is_initialized()
         ):
             return False
