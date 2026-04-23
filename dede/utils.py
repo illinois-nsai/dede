@@ -261,6 +261,44 @@ def get_var_id_pos_list_from_cone(expr: cp.Expression, solver: str) -> list[VarI
     return var_id_pos_list
 
 
+def get_var_id_pos_list_from_tree(expr: cp.Expression) -> list[VarInfoT]:
+    """Return (var_id, pos) pairs for every variable occurrence in the expression tree.
+
+    Handles any expression (affine or non-affine) by generic recursion into `args`,
+    stopping at Variable or index(Variable, ...) leaves. No canonicalization required.
+    """
+    result: set[VarInfoT] = set()
+
+    def walk(e: t.Any) -> None:
+        if isinstance(e, Variable):
+            if e.shape == ():
+                result.add(VarInfoT(e.id, 0))
+            else:
+                for idx in np.ndindex(e.shape):
+                    pos = int(np.ravel_multi_index(idx[::-1], e.shape[::-1]))
+                    result.add(VarInfoT(e.id, pos))
+            return
+
+        if isinstance(e, index) and isinstance(e.args[0], Variable):
+            var = e.args[0]
+            for idx in get_indices_from_index(e):
+                pos = int(np.ravel_multi_index(idx[::-1], var.shape[::-1]))
+                result.add(VarInfoT(var.id, pos))
+            return
+
+        if isinstance(e, (Constant, Parameter)):
+            return
+
+        if not hasattr(e, "args"):
+            return
+
+        for arg in e.args:
+            walk(arg)
+
+    walk(expr)
+    return sorted(result)
+
+
 class UnionFind:
     def __init__(self, n: int) -> None:
         # roots are defined by self.parents[i] == i

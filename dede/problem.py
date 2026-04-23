@@ -737,7 +737,6 @@ class Problem(CpProblem):
                 ).remote(
                     c,
                     expr_ref,
-                    self._solver,
                     dict_ref,
                     len(self.constrs_gps_r),
                     len(self.constrs_gps_d),
@@ -773,7 +772,6 @@ class Problem(CpProblem):
 def _process_obj_chunk_indices(
     indices: NDArray[np.int64],
     expr_list_ref: list[cp.Expression],
-    solver: str,
     var_id_pos_to_idx: dict[VarInfoT, list[tuple[int, int]]],
     num_r: int,
     num_d: int,
@@ -789,7 +787,7 @@ def _process_obj_chunk_indices(
         # Access the object from the shared reference
         obj = expr_list_ref[idx]
 
-        var_id_pos_list = get_var_id_pos_list_from_cone(obj, solver)
+        var_id_pos_list = get_var_id_pos_list_from_cone(obj)
 
         if not var_id_pos_list:
             if num_r > 0:
