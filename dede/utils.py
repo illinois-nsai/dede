@@ -34,7 +34,7 @@ def expand_expr(expr: cp.Expression) -> list[cp.Expression]:
         expr: expression to expand
     """
     if isinstance(expr, (Variable, index, Constant, Parameter)):
-        if expr.is_scalar():
+        if len(expr.shape) == 0:
             return [expr]
         return [arg for arg in expr]
     elif isinstance(expr, NegExpression):
@@ -45,13 +45,13 @@ def expand_expr(expr: cp.Expression) -> list[cp.Expression]:
             expr_list += expand_expr(arg)
         return expr_list
     elif isinstance(expr, multiply):
-        if expr.is_scalar():
+        if len(expr.shape) == 0:
             return [expr]
         left_list = expand_expr(expr.args[0])
         right_list = expand_expr(expr.args[1])
         return [multiply(left, right) for left, right in zip(left_list, right_list)]
     elif isinstance(expr, MulExpression):
-        if expr.is_scalar():
+        if len(expr.shape) == 0:
             return [expr]
         return [expr[i] for i in range(expr.shape[0])]
     elif isinstance(expr, Sum):
@@ -60,8 +60,6 @@ def expand_expr(expr: cp.Expression) -> list[cp.Expression]:
     elif isinstance(expr, quad_over_lin):
         return [quad_over_lin(new_expr, expr.args[1]) for new_expr in expand_expr(expr.args[0])]
     elif isinstance(expr, log):
-        if expr.is_scalar():
-            return [expr]
         return [log(new_expr) for new_expr in expand_expr(expr.args[0])]
     elif isinstance(expr, trace):
         return [expr.args[0][i, i] for i in range(expr.args[0].shape[0])]
