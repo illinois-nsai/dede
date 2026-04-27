@@ -124,6 +124,12 @@ class SubproblemsWrap:
                 param.value = param_id_to_value[t.cast(int, param.id)]
 
     @ray.method
+    def update_rho(self, rho) -> None:
+        """Update rho for all subproblems in the current actor."""
+        for prob in self.probs_r + self.probs_d:
+            prob.update_rho(rho)
+
+    @ray.method
     def solve_r(
         self, param_values: NDArray[np.floating[t.Any]], *args, **kwargs
     ) -> np.floating[t.Any]:

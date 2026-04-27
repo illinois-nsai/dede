@@ -59,7 +59,10 @@ Key differences in DeDe:
   - `enable_dede`: enables DeDe if `True`; defaults to `cvxpy` if `False`.
   - `num_cpus`: number of CPU cores (defaults to all available cores).
   - `rho`: ADMM parameter acting like a ``learning rate''.
-  - `num_iter`: maximum number of iterations; if not specified, DeDe stops if the accuracy improvement falls below 1%.
+  - `num_iter`: maximum number of iterations; if not specified, DeDe stops when the primal and dual residuals meet the termination tolerances.
+  - `xi`: residual-balancing scale for adaptive `rho`; `0.1` is the default and performs best across a variety of cases, while `0.01`-`0.3` is the most robust general tuning range (smaller favors primal feasibility, larger favors dual feasibility).
+  - `mu`: residual-imbalance threshold for adaptive `rho`; larger values make `rho` updates less aggressive.
+  - `balance_iterations`: how often DeDe checks residuals and updates `rho`; larger values make adaptation less frequent.
 
 > ⚠️ **Work in progress:**
 >

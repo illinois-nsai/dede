@@ -19,7 +19,8 @@ def test_lin_cont():
     objective = dd.Maximize(dd.sum(dd.multiply(x, w)))
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
-    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=1, num_iter=20)
+
+    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS)
     print("Returned result:", result_dede)
 
     result_solution = np.sum(np.multiply(x.value, w))
@@ -45,7 +46,8 @@ def test_cvx_cont():
     objective = dd.Maximize(expr)
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
-    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=1, num_iter=50)
+
+    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS)
     print("Returned result:", result_dede)
 
     result_solution = np.sum(np.multiply(w, np.log(x.value)))
@@ -67,7 +69,8 @@ def test_lin_int():
     objective = dd.Maximize(dd.sum(dd.multiply(x, w)))
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=0.1, num_iter=25, **GUROBI_OPTS)
+
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, **GUROBI_OPTS)
     print("Returned result:", result_dede)
 
     result_solution = np.sum(np.multiply(x.value, w))
@@ -90,7 +93,7 @@ def test_cvx_int():
     objective = dd.Minimize(dd.quad_over_lin(dd.multiply(x, w), 1))
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=50, num_iter=20, **GUROBI_OPTS)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, xi=0.03, **GUROBI_OPTS)
     print("Returned result:", result_dede)
 
     result_solution = np.sum(np.multiply(x.value, w) ** 2)
@@ -111,7 +114,7 @@ def test_lin_mix():
     objective = dd.Maximize(dd.sum(x1) + dd.sum(x2) + dd.sum(x3))
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=1, num_iter=15, **GUROBI_OPTS)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, **GUROBI_OPTS)
     print("Returned result:", result_dede)
 
     result_solution = np.sum(x1.value) + np.sum(x2.value) + np.sum(x3.value)
@@ -144,7 +147,7 @@ def test_cvx_mix():
     )
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=0.5, num_iter=15, **GUROBI_OPTS)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, **GUROBI_OPTS)
     print("Returned result:", result_dede)
 
     result_solution = (
@@ -168,7 +171,8 @@ def test_large():
     objective = dd.Maximize(dd.sum(x1) + dd.sum(x2))
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
-    result_dede = prob.solve(num_cpus=4, solver=dd.GUROBI, rho=1, num_iter=15, **GUROBI_OPTS)
+
+    result_dede = prob.solve(num_cpus=4, solver=dd.GUROBI, **GUROBI_OPTS)
     print("Returned result:", result_dede)
 
     result_solution = np.sum(x1.value) + np.sum(x2.value)

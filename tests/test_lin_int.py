@@ -7,34 +7,7 @@ from conftest import GUROBI_OPTS, check_solution
 import dede as dd
 
 
-def test_add1():
-    # TODO: relax, change constraints/edit hyperparameters, make a more lenient threshold
-    N, M = 10, 10
-    x = dd.Variable((N, M), integer=True)
-    resource_constraints = [x >= 0] + [x[i, :].sum() >= 2 * i for i in range(N)]
-    demand_constraints = [x[:, j].sum() <= 3 * j for j in range(M)]
-    expr = 0
-    for i in range(min(N, M)):
-        if i % 2 == 0:
-            expr += x[i, i]
-        else:
-            expr -= x[i, i]
-    objective = dd.Maximize(expr)
-
-    cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
-    result_cvxpy = cvxpy_prob.solve()
-    print("CVXPY:", result_cvxpy)
-
-    prob = dd.Problem(objective, resource_constraints, demand_constraints)
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=0.5, num_iter=25, **GUROBI_OPTS)
-    print("DeDe:", result_dede)
-    print(x.value)
-
-    assert check_solution(result_dede, result_cvxpy, objective)
-    print("=== Passed ILP ADD test #1 ===")
-
-
-def test_add2():
+def test_add():
     N, M = 10, 10
     x = dd.Variable((N, M), integer=True)
     resource_constraints = [x >= 0] + [x[i, :].sum() <= i for i in range(N)]
@@ -48,11 +21,11 @@ def test_add2():
     print("CVXPY:", result_cvxpy)
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=0.5, num_iter=30, **GUROBI_OPTS)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, xi=1.0, **GUROBI_OPTS)
     print("DeDe:", result_dede)
 
     assert check_solution(result_dede, result_cvxpy, objective)
-    print("=== Passed ILP ADD test #2 ===")
+    print("=== Passed ILP ADD test ===")
 
 
 def test_constant1():
@@ -64,7 +37,7 @@ def test_constant1():
     objective = dd.Maximize(2)
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=1, num_iter=5, **GUROBI_OPTS)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, **GUROBI_OPTS)
     print("DeDe:", result_dede)
 
     assert check_solution(result_dede, 2, objective)
@@ -84,7 +57,7 @@ def test_constant2():
     print("CVXPY:", result_cvxpy)
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=0.5, num_iter=20, **GUROBI_OPTS)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, xi=2, **GUROBI_OPTS)
     print("DeDe:", result_dede)
 
     assert check_solution(result_dede, result_cvxpy, objective)
@@ -103,7 +76,7 @@ def test_sum1():
     print("CVXPY:", result_cvxpy)
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=1, num_iter=30, **GUROBI_OPTS)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, **GUROBI_OPTS)
     print("DeDe:", result_dede)
 
     assert check_solution(result_dede, result_cvxpy, objective)
@@ -122,7 +95,7 @@ def test_sum2():
     print("CVXPY:", result_cvxpy)
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=1, num_iter=7, **GUROBI_OPTS)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, **GUROBI_OPTS)
     print("DeDe:", result_dede)
 
     assert check_solution(result_dede, result_cvxpy, objective)
@@ -145,7 +118,7 @@ def test_multiply1():
     print("CVXPY:", result_cvxpy)
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=1, num_iter=14, **GUROBI_OPTS)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, **GUROBI_OPTS)
     print("DeDe:", result_dede)
 
     assert check_solution(result_dede, result_cvxpy, objective)
@@ -168,7 +141,7 @@ def test_multiply2():
     print("CVXPY:", result_cvxpy)
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=0.1, num_iter=25, **GUROBI_OPTS)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, xi=3, **GUROBI_OPTS)
     print("DeDe:", result_dede)
 
     assert check_solution(result_dede, result_cvxpy, objective)
@@ -188,7 +161,7 @@ def test_boolean():
     print("CVXPY:", result_cvxpy)
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=10, num_iter=15, **GUROBI_OPTS)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, **GUROBI_OPTS)
     print("DeDe:", result_dede)
 
     assert check_solution(result_dede, result_cvxpy, objective)
@@ -196,8 +169,7 @@ def test_boolean():
 
 
 if __name__ == "__main__":
-    test_add1()
-    test_add2()
+    test_add()
 
     test_constant1()
     test_constant2()

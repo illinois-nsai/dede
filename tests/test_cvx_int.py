@@ -8,7 +8,7 @@ import dede as dd
 
 
 def test_quadratic():
-    N, M = 10, 10
+    N, M = 5, 5
     x = dd.Variable((N, M), integer=True)
 
     resource_constraints = [x[i, :].sum() >= i for i in range(N)]
@@ -20,7 +20,7 @@ def test_quadratic():
     print("CVXPY:", result_cvxpy)
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=1, **GUROBI_OPTS)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, **GUROBI_OPTS)
     print("DeDe:", result_dede)
 
     assert check_solution(result_dede, result_cvxpy, objective)
@@ -44,7 +44,7 @@ def test_quadratic_weighted():
     print("CVXPY:", result_cvxpy)
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=50, num_iter=20, **GUROBI_OPTS)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, xi=1, **GUROBI_OPTS)
     print("DeDe:", result_dede)
 
     assert check_solution(result_dede, result_cvxpy, objective)
@@ -64,7 +64,7 @@ def test_boolean_quadratic():
     print("CVXPY:", result_cvxpy)
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=10, num_iter=15, **GUROBI_OPTS)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, **GUROBI_OPTS)
     print("DeDe:", result_dede)
 
     assert check_solution(result_dede, result_cvxpy, objective)

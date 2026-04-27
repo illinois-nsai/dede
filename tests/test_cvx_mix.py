@@ -26,7 +26,7 @@ def test_quadratic():
     result_cvxpy = cvxpy_prob.solve(solver=cp.ECOS_BB)
     print("CVXPY:", result_cvxpy)
 
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=1, num_iter=15, **GUROBI_OPTS)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, **GUROBI_OPTS)
     print("DeDe:", result_dede)
 
     assert check_solution(result_dede, result_cvxpy, objective)
@@ -54,7 +54,7 @@ def test_quadratic_weighted():
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=10, num_iter=20, **GUROBI_OPTS)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, xi=0.03, **GUROBI_OPTS)
     print("DeDe:", result_dede)
 
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
@@ -78,7 +78,7 @@ def test_boolean_quadratic():
     )
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=5, num_iter=15, **GUROBI_OPTS)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, **GUROBI_OPTS)
     print("DeDe:", result_dede)
 
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)
@@ -112,7 +112,7 @@ def test_boolean_quadratic_weighted():
     )
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
 
-    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, rho=0.5, num_iter=15, **GUROBI_OPTS)
+    result_dede = prob.solve(num_cpus=2, solver=dd.GUROBI, **GUROBI_OPTS)
     print("DeDe:", result_dede)
 
     cvxpy_prob = cp.Problem(objective, resource_constraints + demand_constraints)

@@ -303,6 +303,9 @@ class Problem(CpProblem):
         enable_dede: bool = True,
         rho: float = 1.0,
         num_iter: t.Optional[int] = None,
+        xi: t.Optional[float] = None,
+        mu: t.Optional[float] = None,
+        balance_iterations: t.Optional[int] = None,
         *args,
         **kwargs,
     ) -> np.floating[t.Any]:
@@ -313,8 +316,12 @@ class Problem(CpProblem):
                 If more than the available number of CPUs, will error.
             ray_address: ray cluster address; if None, will use local ray instance.
             enable_dede: whether to decouple and decompose with DeDe
+            num_cpus: number of CPUs to use; all the CPUs available if None
             rho: rho value in ADMM; 1 by default
-            num_iter: ADMM iterations; stop under < 1% improvement if None
+            num_iter: ADMM iterations; stop under residual tolerances if None
+            xi: normalized residual balancing scale; 0.1 by default
+            mu: residual imbalance threshold; 10 by default
+            balance_iterations: residual balancing frequency; 10 by default
         """
         # solve the original problem
         if not enable_dede:
@@ -354,48 +361,113 @@ class Problem(CpProblem):
         )
 
         # solve problem
-        # use num_iter if specifed
-        # otherwise, stop under < 1% improvement or reach 10000 upper limit
-        i, aug_lgr, aug_lgr_old = 0, 1, 2
-        while (num_iter is not None and i < num_iter) or (
-            num_iter is None
-            and i < (num_iter or 10000)
-            and (i < 2 or abs((aug_lgr - aug_lgr_old) / aug_lgr_old) > 0.01)
-        ):
-            # initialize start time, iteration, augmented Lagrangian
-            start, i, aug_lgr_old, aug_lgr = time.time(), i + 1, aug_lgr, 0
+        # use num_iter if specified
+        # otherwise, stop under residual tolerances or reach 10000 upper limit
+        i = 0
+
+        mu = 10 if mu is None else mu
+        xi = 0.1 if xi is None else xi
+        balance_iterations = 10 if balance_iterations is None else balance_iterations
+        max_tau = 200
+        min_rho = 0.05
+        max_rho = 100
+
+        if xi <= 0 or mu <= 0:
+            raise ValueError("xi and mu must be positive.")
+        if balance_iterations < 1:
+            raise ValueError("balance_iterations must be at least 1.")
+
+        self.sol_d_old = self.sol_d.copy()
+        self.scaled_dual: dict[VarInfoT, float] = {}
+
+        start = time.time()
+        terminate_flag = False
+        while (num_iter is not None and i < num_iter) or (num_iter is None and i < 10000):
+            if i > 0 and i % balance_iterations == 0:
+                primal_res, dual_res, eps_primal, eps_dual = (
+                    self.get_relative_residuals_and_epsilon()
+                )
+                rho_update = "hold"
+
+                if num_iter is None and primal_res <= eps_primal and dual_res <= eps_dual:
+                    if not terminate_flag:
+                        terminate_flag = True
+                    else:
+                        break
+                else:
+                    terminate_flag = False
+
+                if not terminate_flag:
+                    tau = max_tau
+                    ratio = np.inf
+                    if dual_res > 0:
+                        ratio = np.sqrt((1 / xi) * primal_res / dual_res)
+                    if primal_res == 0 and dual_res == 0:
+                        ratio = 1
+                    if 1 <= ratio < max_tau:
+                        tau = ratio
+                    elif 1 / max_tau < ratio < 1:
+                        tau = np.sqrt(xi * dual_res / primal_res)
+
+                    if primal_res > xi * mu * dual_res:
+                        rho *= tau
+                        if rho >= max_rho:
+                            rho = max_rho
+                            print("Maximum rho reached. Consider adjusting xi up.")
+
+                        for prob in self._subprob_cache.probs:
+                            prob.update_rho.remote(rho)
+                        rho_update = f"up x{tau:.3e}"
+                    elif dual_res > (1 / xi) * mu * primal_res:
+                        rho /= tau
+                        if rho <= min_rho:
+                            rho = min_rho
+                            print("Minimum rho reached. Consider adjusting xi down")
+
+                        for prob in self._subprob_cache.probs:
+                            prob.update_rho.remote(rho)
+                        rho_update = f"down /{tau:.3e}"
+
+                print(
+                    f"iter {i}: "
+                    f"primal {primal_res:.3e}/{eps_primal:.3e}, "
+                    f"dual {dual_res:.3e}/{eps_dual:.3e}, "
+                    f"rho {rho:.3e}, "
+                    f"update {rho_update}, "
+                    f"terminate_flag={terminate_flag}"
+                )
+
+            self.sol_d_old = self.sol_d.copy()
+            i += 1
 
             # resource allocation
-            aug_lgr += sum(
-                ray.get(
-                    [
-                        prob.solve_r.remote(self.sol_d[param_idx], *args, **kwargs)
-                        for prob, param_idx in zip(
-                            self._subprob_cache.probs, self._subprob_cache.param_idx_r
-                        )
-                    ]
-                )
+            ray.get(
+                [
+                    prob.solve_r.remote(self.sol_d[param_idx], *args, **kwargs)
+                    for prob, param_idx in zip(
+                        self._subprob_cache.probs, self._subprob_cache.param_idx_r
+                    )
+                ]
             )
             self.sol_r: NDArray[np.floating[t.Any]] = np.hstack(
                 ray.get([prob.get_solution_r.remote() for prob in self._subprob_cache.probs])
             )
 
             # demand allocation
-            aug_lgr += sum(
-                ray.get(
-                    [
-                        prob.solve_d.remote(self.sol_r[param_idx], *args, **kwargs)
-                        for prob, param_idx in zip(
-                            self._subprob_cache.probs, self._subprob_cache.param_idx_d
-                        )
-                    ]
-                )
+            ray.get(
+                [
+                    prob.solve_d.remote(self.sol_r[param_idx], *args, **kwargs)
+                    for prob, param_idx in zip(
+                        self._subprob_cache.probs, self._subprob_cache.param_idx_d
+                    )
+                ]
             )
             self.sol_d: NDArray[np.floating[t.Any]] = np.hstack(
                 ray.get([prob.get_solution_d.remote() for prob in self._subprob_cache.probs])
             )
 
-            print("iter%d: end2end time %.4f, aug_lgr=%.4f" % (i, time.time() - start, aug_lgr))
+        end = time.time()
+        print("DeDe Solve Time:", end - start)
 
         self.populate_vars_with_solution()
         coeff = 1 if self._problem_type == Minimize else -1
@@ -403,6 +475,64 @@ class Problem(CpProblem):
             np.floating[t.Any],
             coeff * sum(ray.get([prob.get_obj.remote() for prob in self._subprob_cache.probs])),
         )
+
+    def get_relative_residuals_and_epsilon(
+        self,
+    ) -> tuple[float, float, float, float]:
+        """Compute residuals and corresponding primal/dual epsilons."""
+        assert self._subprob_cache.probs is not None
+
+        sol_idx_d = ray.get(
+            [prob.get_solution_idx_d.remote() for prob in self._subprob_cache.probs]
+        )
+        sol_idx_r = ray.get(
+            [prob.get_solution_idx_r.remote() for prob in self._subprob_cache.probs]
+        )
+        flat_idx_d = [idx for arr in sol_idx_d for idx in arr]
+        flat_idx_r = [idx for arr in sol_idx_r for idx in arr]
+
+        map_r = {k: float(v) for k, v in zip(flat_idx_r, self.sol_r)}
+        map_d = {k: float(v) for k, v in zip(flat_idx_d, self.sol_d)}
+        map_d_old = {k: float(v) for k, v in zip(flat_idx_d, self.sol_d_old)}
+
+        shared_pos = sorted(set(map_r.keys()) & set(map_d.keys()))
+        for pos in shared_pos:
+            self.scaled_dual[pos] = self.scaled_dual.get(pos, 0) + map_r[pos] - map_d[pos]
+
+        shared_r = np.array([map_r[pos] for pos in shared_pos])
+        shared_d = np.array([map_d[pos] for pos in shared_pos])
+        primal_num = np.linalg.norm(shared_r - shared_d)
+        primal_denom = max(np.linalg.norm(shared_r), np.linalg.norm(shared_d))
+
+        shared_d_old = np.array([map_d_old[pos] for pos in shared_pos])
+        scaled_dual_arr = np.array(list(self.scaled_dual.values()))
+        dual_num = np.linalg.norm(shared_d - shared_d_old)
+        dual_denom = np.linalg.norm(scaled_dual_arr)
+
+        if primal_denom == 0:
+            primal_res = 0 if primal_num == 0 else np.inf
+        else:
+            primal_res = float(primal_num / primal_denom)
+
+        if dual_denom == 0:
+            dual_res = 0 if dual_num == 0 else np.inf
+        else:
+            dual_res = float(dual_num / dual_denom)
+
+        eps_abs = 0.005
+        eps_rel = 0.005
+        x_dim = len(shared_pos)
+
+        eps_primal = (
+            np.inf
+            if primal_denom == 0
+            else float(np.sqrt(x_dim) * eps_abs / primal_denom + eps_rel)
+        )
+        eps_dual = (
+            np.inf if dual_denom == 0 else float(np.sqrt(x_dim) * eps_abs / dual_denom + eps_rel)
+        )
+
+        return primal_res, dual_res, eps_primal, eps_dual
 
     def populate_vars_with_solution(self) -> None:
         """Fills problem variables with computed solutions."""
