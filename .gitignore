@@ -1,11 +1,8 @@
 *.sw*
 *.pyc
-*.log
-*.txt
 *.ipynb_checkpoints
 *.sol
 *.lp
-*.csv
 *.pkl
-*.json
 .vscode
+dede.egg-info/

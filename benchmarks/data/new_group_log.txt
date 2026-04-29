@@ -1,0 +1,1015 @@
+2026-04-28 21:46:06,335	INFO job_manager.py:587 -- Runtime env is setting up.
+Running entrypoint for job raysubmit_PRs4q6btqV8eFdTr: python3 distributed_tests.py
+Testing sum n=50, num_cpus=1
+Executed __init__ in 0.0954s
+2026-04-28 21:46:09,615	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-04-28 21:46:09,622	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-04-28 21:46:09,672	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+/users/yianz/work/dede/.venv/lib/python3.10/site-packages/ray/_private/worker.py:2051: FutureWarning: Tip: In future versions of Ray, Ray will no longer override accelerator visible devices env var if num_gpus=0 or num_gpus=None (default). To enable this behavior and turn off this error message, set RAY_ACCEL_ENV_VAR_OVERRIDE_ON_ZERO=0
+  warnings.warn(
+Executed _get_grouped_objectives in 2.3639s
+Result 0
+Testing weighted n=50, num_cpus=1
+Executed __init__ in 0.1132s
+Executed _get_grouped_objectives in 2.1704s
+Result 0
+Testing log n=50, num_cpus=1
+Executed __init__ in 0.1092s
+Executed _get_grouped_objectives in 0.1528s
+Result 0
+Testing sum n=50, num_cpus=2
+Executed __init__ in 0.1680s
+Executed _get_grouped_objectives in 0.9138s
+Result 0
+Testing weighted n=50, num_cpus=2
+Executed __init__ in 0.1900s
+Executed _get_grouped_objectives in 0.1587s
+Result 0
+Testing log n=50, num_cpus=2
+Executed __init__ in 0.1379s
+Executed _get_grouped_objectives in 0.9649s
+Result 0
+Testing sum n=50, num_cpus=4
+Executed __init__ in 0.1485s
+Executed _get_grouped_objectives in 2.3643s
+Result 0
+Testing weighted n=50, num_cpus=4
+Executed __init__ in 0.1477s
+Executed _get_grouped_objectives in 0.2775s
+Result 0
+Testing log n=50, num_cpus=4
+Executed __init__ in 0.1177s
+Executed _get_grouped_objectives in 2.2212s
+Result 0
+Testing sum n=50, num_cpus=8
+Executed __init__ in 0.1533s
+Executed _get_grouped_objectives in 1.0402s
+Result 0
+Testing weighted n=50, num_cpus=8
+Executed __init__ in 0.1872s
+Executed _get_grouped_objectives in 1.0064s
+Result 0
+Testing log n=50, num_cpus=8
+Executed __init__ in 0.2055s
+Executed _get_grouped_objectives in 0.2665s
+Result 0
+Testing sum n=50, num_cpus=16
+Executed __init__ in 0.1184s
+Executed _get_grouped_objectives in 2.5870s
+Result 0
+Testing weighted n=50, num_cpus=16
+Executed __init__ in 0.1965s
+Executed _get_grouped_objectives in 1.3109s
+Result 0
+Testing log n=50, num_cpus=16
+Executed __init__ in 0.1021s
+Executed _get_grouped_objectives in 3.6572s
+Result 0
+Testing sum n=50, num_cpus=32
+Executed __init__ in 0.1201s
+Executed _get_grouped_objectives in 1.5495s
+Result 0
+Testing weighted n=50, num_cpus=32
+Executed __init__ in 0.2902s
+Executed _get_grouped_objectives in 3.6042s
+Result 0
+Testing log n=50, num_cpus=32
+Executed __init__ in 0.1033s
+Executed _get_grouped_objectives in 0.2201s
+Result 0
+Testing sum n=50, num_cpus=64
+Executed __init__ in 0.1030s
+Executed _get_grouped_objectives in 4.0137s
+Result 0
+Testing weighted n=50, num_cpus=64
+Executed __init__ in 0.1059s
+Executed _get_grouped_objectives in 3.6890s
+Result 0
+Testing log n=50, num_cpus=64
+Executed __init__ in 0.1209s
+Executed _get_grouped_objectives in 3.5379s
+Result 0
+Testing sum n=100, num_cpus=1
+Executed __init__ in 0.3367s
+Executed _get_grouped_objectives in 2.3737s
+Result 0
+Testing weighted n=100, num_cpus=1
+Executed __init__ in 0.3539s
+Executed _get_grouped_objectives in 0.4408s
+Result 0
+Testing log n=100, num_cpus=1
+Executed __init__ in 0.2959s
+Executed _get_grouped_objectives in 0.4247s
+Result 0
+Testing sum n=100, num_cpus=2
+Executed __init__ in 0.2785s
+Executed _get_grouped_objectives in 0.4552s
+Result 0
+Testing weighted n=100, num_cpus=2
+Executed __init__ in 0.3753s
+Executed _get_grouped_objectives in 1.1791s
+Result 0
+Testing log n=100, num_cpus=2
+Executed __init__ in 0.2627s
+Executed _get_grouped_objectives in 0.4362s
+Result 0
+Testing sum n=100, num_cpus=4
+Executed __init__ in 0.2784s
+Executed _get_grouped_objectives in 2.4415s
+Result 0
+Testing weighted n=100, num_cpus=4
+Executed __init__ in 0.3238s
+Executed _get_grouped_objectives in 0.4617s
+Result 0
+Testing log n=100, num_cpus=4
+Executed __init__ in 0.2746s
+Executed _get_grouped_objectives in 0.4935s
+Result 0
+Testing sum n=100, num_cpus=8
+Executed __init__ in 0.2706s
+Executed _get_grouped_objectives in 1.5074s
+Result 0
+Testing weighted n=100, num_cpus=8
+Executed __init__ in 0.3665s
+Executed _get_grouped_objectives in 0.4606s
+Result 0
+Testing log n=100, num_cpus=8
+Executed __init__ in 0.3576s
+Executed _get_grouped_objectives in 1.1810s
+Result 0
+Testing sum n=100, num_cpus=16
+Executed __init__ in 0.3165s
+Executed _get_grouped_objectives in 3.9447s
+Result 0
+Testing weighted n=100, num_cpus=16
+Executed __init__ in 0.3162s
+Executed _get_grouped_objectives in 3.8137s
+Result 0
+Testing log n=100, num_cpus=16
+Executed __init__ in 0.2797s
+Executed _get_grouped_objectives in 4.0666s
+Result 0
+Testing sum n=100, num_cpus=32
+Executed __init__ in 0.2897s
+Executed _get_grouped_objectives in 4.1134s
+Result 0
+Testing weighted n=100, num_cpus=32
+Executed __init__ in 0.2696s
+Executed _get_grouped_objectives in 3.9695s
+Result 0
+Testing log n=100, num_cpus=32
+Executed __init__ in 0.3011s
+Executed _get_grouped_objectives in 4.0481s
+Result 0
+Testing sum n=100, num_cpus=64
+Executed __init__ in 0.2627s
+Executed _get_grouped_objectives in 4.1828s
+Result 0
+Testing weighted n=100, num_cpus=64
+Executed __init__ in 0.3295s
+Executed _get_grouped_objectives in 4.0641s
+Result 0
+Testing log n=100, num_cpus=64
+Executed __init__ in 0.3335s
+Executed _get_grouped_objectives in 3.9895s
+Result 0
+Testing sum n=150, num_cpus=1
+Executed __init__ in 0.5196s
+Executed _get_grouped_objectives in 0.9414s
+Result 0
+Testing weighted n=150, num_cpus=1
+Executed __init__ in 0.6039s
+Executed _get_grouped_objectives in 0.9212s
+Result 0
+Testing log n=150, num_cpus=1
+Executed __init__ in 0.5609s
+Executed _get_grouped_objectives in 0.9153s
+Result 0
+Testing sum n=150, num_cpus=2
+Executed __init__ in 0.6134s
+Executed _get_grouped_objectives in 0.8794s
+Result 0
+Testing weighted n=150, num_cpus=2
+Executed __init__ in 0.5650s
+Executed _get_grouped_objectives in 0.8099s
+Result 0
+Testing log n=150, num_cpus=2
+Executed __init__ in 0.5670s
+Executed _get_grouped_objectives in 0.8357s
+Result 0
+Testing sum n=150, num_cpus=4
+Executed __init__ in 0.5947s
+Executed _get_grouped_objectives in 2.6901s
+Result 0
+Testing weighted n=150, num_cpus=4
+Executed __init__ in 0.5665s
+Executed _get_grouped_objectives in 0.8555s
+Result 0
+Testing log n=150, num_cpus=4
+Executed __init__ in 0.5624s
+Executed _get_grouped_objectives in 0.7612s
+Result 0
+Testing sum n=150, num_cpus=8
+Executed __init__ in 0.6023s
+Executed _get_grouped_objectives in 0.9295s
+Result 0
+Testing weighted n=150, num_cpus=8
+Executed __init__ in 0.5894s
+Executed _get_grouped_objectives in 0.8277s
+Result 0
+Testing log n=150, num_cpus=8
+Executed __init__ in 0.6010s
+Executed _get_grouped_objectives in 0.9673s
+Result 0
+Testing sum n=150, num_cpus=16
+Executed __init__ in 0.6273s
+Executed _get_grouped_objectives in 4.2919s
+Result 0
+Testing weighted n=150, num_cpus=16
+Executed __init__ in 0.6056s
+Executed _get_grouped_objectives in 4.3805s
+Result 0
+Testing log n=150, num_cpus=16
+Executed __init__ in 0.5894s
+Executed _get_grouped_objectives in 4.2743s
+Result 0
+Testing sum n=150, num_cpus=32
+Executed __init__ in 0.6183s
+Executed _get_grouped_objectives in 4.6772s
+Result 0
+Testing weighted n=150, num_cpus=32
+Executed __init__ in 0.6025s
+Executed _get_grouped_objectives in 4.3780s
+Result 0
+Testing log n=150, num_cpus=32
+Executed __init__ in 0.6100s
+Executed _get_grouped_objectives in 4.6340s
+Result 0
+Testing sum n=150, num_cpus=64
+Executed __init__ in 0.6142s
+Executed _get_grouped_objectives in 4.6655s
+Result 0
+Testing weighted n=150, num_cpus=64
+Executed __init__ in 0.5765s
+Executed _get_grouped_objectives in 4.7206s
+Result 0
+Testing log n=150, num_cpus=64
+Executed __init__ in 0.5932s
+Executed _get_grouped_objectives in 4.7418s
+Result 0
+Testing sum n=200, num_cpus=1
+Executed __init__ in 0.9143s
+Executed _get_grouped_objectives in 1.4424s
+Result 0
+Testing weighted n=200, num_cpus=1
+Executed __init__ in 0.9602s
+Executed _get_grouped_objectives in 1.3333s
+Result 0
+Testing log n=200, num_cpus=1
+Executed __init__ in 0.9060s
+Executed _get_grouped_objectives in 1.4771s
+Result 0
+Testing sum n=200, num_cpus=2
+Executed __init__ in 0.9450s
+Executed _get_grouped_objectives in 1.3496s
+Result 0
+Testing weighted n=200, num_cpus=2
+Executed __init__ in 0.9930s
+Executed _get_grouped_objectives in 1.3244s
+Result 0
+Testing log n=200, num_cpus=2
+Executed __init__ in 1.0086s
+Executed _get_grouped_objectives in 1.2726s
+Result 0
+Testing sum n=200, num_cpus=4
+Executed __init__ in 0.9127s
+Executed _get_grouped_objectives in 1.2906s
+Result 0
+Testing weighted n=200, num_cpus=4
+Executed __init__ in 0.9008s
+Executed _get_grouped_objectives in 1.2401s
+Result 0
+Testing log n=200, num_cpus=4
+Executed __init__ in 0.9499s
+Executed _get_grouped_objectives in 1.3040s
+Result 0
+Testing sum n=200, num_cpus=8
+Executed __init__ in 0.8921s
+Executed _get_grouped_objectives in 1.3440s
+Result 0
+Testing weighted n=200, num_cpus=8
+Executed __init__ in 0.8863s
+Executed _get_grouped_objectives in 1.2474s
+Result 0
+Testing log n=200, num_cpus=8
+Executed __init__ in 0.8847s
+Executed _get_grouped_objectives in 1.1871s
+Result 0
+Testing sum n=200, num_cpus=16
+Executed __init__ in 0.8839s
+Executed _get_grouped_objectives in 4.7343s
+Result 0
+Testing weighted n=200, num_cpus=16
+Executed __init__ in 0.8731s
+Executed _get_grouped_objectives in 4.7590s
+Result 0
+Testing log n=200, num_cpus=16
+Executed __init__ in 0.8926s
+Executed _get_grouped_objectives in 4.7188s
+Result 0
+Testing sum n=200, num_cpus=32
+Executed __init__ in 0.9089s
+Executed _get_grouped_objectives in 5.0047s
+Result 0
+Testing weighted n=200, num_cpus=32
+Executed __init__ in 0.9383s
+Executed _get_grouped_objectives in 4.8116s
+Result 0
+Testing log n=200, num_cpus=32
+Executed __init__ in 0.9239s
+Executed _get_grouped_objectives in 4.8114s
+Result 0
+Testing sum n=200, num_cpus=64
+Executed __init__ in 1.0008s
+Executed _get_grouped_objectives in 5.2000s
+Result 0
+Testing weighted n=200, num_cpus=64
+Executed __init__ in 0.8946s
+Executed _get_grouped_objectives in 5.2972s
+Result 0
+Testing log n=200, num_cpus=64
+Executed __init__ in 0.9997s
+Executed _get_grouped_objectives in 5.2001s
+Result 0
+Testing sum n=250, num_cpus=1
+Executed __init__ in 1.3456s
+Executed _get_grouped_objectives in 2.3178s
+Result 0
+Testing weighted n=250, num_cpus=1
+Executed __init__ in 1.3346s
+Executed _get_grouped_objectives in 2.2743s
+Result 0
+Testing log n=250, num_cpus=1
+Executed __init__ in 1.3924s
+Executed _get_grouped_objectives in 2.3241s
+Result 0
+Testing sum n=250, num_cpus=2
+Executed __init__ in 1.3543s
+Executed _get_grouped_objectives in 2.0617s
+Result 0
+Testing weighted n=250, num_cpus=2
+Executed __init__ in 1.3455s
+Executed _get_grouped_objectives in 2.0664s
+Result 0
+Testing log n=250, num_cpus=2
+Executed __init__ in 1.3525s
+Executed _get_grouped_objectives in 1.9979s
+Result 0
+Testing sum n=250, num_cpus=4
+Executed __init__ in 1.3631s
+Executed _get_grouped_objectives in 1.9615s
+Result 0
+Testing weighted n=250, num_cpus=4
+Executed __init__ in 1.3433s
+Executed _get_grouped_objectives in 2.0408s
+Result 0
+Testing log n=250, num_cpus=4
+Executed __init__ in 1.3719s
+Executed _get_grouped_objectives in 1.9095s
+Result 0
+Testing sum n=250, num_cpus=8
+Executed __init__ in 1.3463s
+Executed _get_grouped_objectives in 2.0573s
+Result 0
+Testing weighted n=250, num_cpus=8
+Executed __init__ in 1.3540s
+Executed _get_grouped_objectives in 2.0603s
+Result 0
+Testing log n=250, num_cpus=8
+Executed __init__ in 1.2894s
+Executed _get_grouped_objectives in 1.9771s
+Result 0
+Testing sum n=250, num_cpus=16
+Executed __init__ in 1.3394s
+Executed _get_grouped_objectives in 5.7852s
+Result 0
+Testing weighted n=250, num_cpus=16
+Executed __init__ in 1.2969s
+Executed _get_grouped_objectives in 5.7106s
+Result 0
+Testing log n=250, num_cpus=16
+Executed __init__ in 1.3757s
+Executed _get_grouped_objectives in 5.7263s
+Result 0
+Testing sum n=250, num_cpus=32
+Executed __init__ in 1.3592s
+Executed _get_grouped_objectives in 5.6240s
+Result 0
+Testing weighted n=250, num_cpus=32
+Executed __init__ in 1.4132s
+Executed _get_grouped_objectives in 5.6367s
+Result 0
+Testing log n=250, num_cpus=32
+Executed __init__ in 1.3673s
+Executed _get_grouped_objectives in 5.8920s
+Result 0
+Testing sum n=250, num_cpus=64
+Executed __init__ in 1.3945s
+Executed _get_grouped_objectives in 5.9304s
+Result 0
+Testing weighted n=250, num_cpus=64
+Executed __init__ in 1.3504s
+Executed _get_grouped_objectives in 6.0359s
+Result 0
+Testing log n=250, num_cpus=64
+Executed __init__ in 1.2853s
+Executed _get_grouped_objectives in 6.3171s
+Result 0
+Testing sum n=300, num_cpus=1
+Executed __init__ in 1.8872s
+Executed _get_grouped_objectives in 3.0687s
+Result 0
+Testing weighted n=300, num_cpus=1
+Executed __init__ in 1.8535s
+Executed _get_grouped_objectives in 3.1889s
+Result 0
+Testing log n=300, num_cpus=1
+Executed __init__ in 1.8528s
+Executed _get_grouped_objectives in 3.1064s
+Result 0
+Testing sum n=300, num_cpus=2
+Executed __init__ in 1.9984s
+Executed _get_grouped_objectives in 2.8673s
+Result 0
+Testing weighted n=300, num_cpus=2
+Executed __init__ in 1.9322s
+Executed _get_grouped_objectives in 3.0699s
+Result 0
+Testing log n=300, num_cpus=2
+Executed __init__ in 1.9351s
+Executed _get_grouped_objectives in 2.8245s
+Result 0
+Testing sum n=300, num_cpus=4
+Executed __init__ in 2.0043s
+Executed _get_grouped_objectives in 2.7367s
+Result 0
+Testing weighted n=300, num_cpus=4
+Executed __init__ in 1.9549s
+Executed _get_grouped_objectives in 2.8841s
+Result 0
+Testing log n=300, num_cpus=4
+Executed __init__ in 1.9355s
+Executed _get_grouped_objectives in 2.7424s
+Result 0
+Testing sum n=300, num_cpus=8
+Executed __init__ in 1.9259s
+Executed _get_grouped_objectives in 2.8074s
+Result 0
+Testing weighted n=300, num_cpus=8
+Executed __init__ in 1.8726s
+Executed _get_grouped_objectives in 2.9805s
+Result 0
+Testing log n=300, num_cpus=8
+Executed __init__ in 1.8720s
+Executed _get_grouped_objectives in 2.6759s
+Result 0
+Testing sum n=300, num_cpus=16
+Executed __init__ in 1.9261s
+Executed _get_grouped_objectives in 6.5215s
+Result 0
+Testing weighted n=300, num_cpus=16
+Executed __init__ in 1.9388s
+Executed _get_grouped_objectives in 6.6992s
+Result 0
+Testing log n=300, num_cpus=16
+Executed __init__ in 1.8710s
+Executed _get_grouped_objectives in 6.7139s
+Result 0
+Testing sum n=300, num_cpus=32
+Executed __init__ in 1.8792s
+Executed _get_grouped_objectives in 6.7443s
+Result 0
+Testing weighted n=300, num_cpus=32
+Executed __init__ in 1.9183s
+Executed _get_grouped_objectives in 6.5948s
+Result 0
+Testing log n=300, num_cpus=32
+Executed __init__ in 1.9430s
+Executed _get_grouped_objectives in 6.4700s
+Result 0
+Testing sum n=300, num_cpus=64
+Executed __init__ in 1.8824s
+Executed _get_grouped_objectives in 7.0731s
+Result 0
+Testing weighted n=300, num_cpus=64
+Executed __init__ in 1.8596s
+Executed _get_grouped_objectives in 7.0413s
+Result 0
+Testing log n=300, num_cpus=64
+Executed __init__ in 1.8504s
+Executed _get_grouped_objectives in 7.0362s
+Result 0
+Testing sum n=350, num_cpus=1
+Executed __init__ in 2.6548s
+Executed _get_grouped_objectives in 4.4107s
+Result 0
+Testing weighted n=350, num_cpus=1
+Executed __init__ in 2.6457s
+Executed _get_grouped_objectives in 4.5204s
+Result 0
+Testing log n=350, num_cpus=1
+Executed __init__ in 2.5630s
+Executed _get_grouped_objectives in 4.1193s
+Result 0
+Testing sum n=350, num_cpus=2
+Executed __init__ in 2.5387s
+Executed _get_grouped_objectives in 3.7269s
+Result 0
+Testing weighted n=350, num_cpus=2
+Executed __init__ in 2.5130s
+Executed _get_grouped_objectives in 3.8094s
+Result 0
+Testing log n=350, num_cpus=2
+Executed __init__ in 2.5936s
+Executed _get_grouped_objectives in 3.7787s
+Result 0
+Testing sum n=350, num_cpus=4
+Executed __init__ in 2.6465s
+Executed _get_grouped_objectives in 3.5351s
+Result 0
+Testing weighted n=350, num_cpus=4
+Executed __init__ in 2.6672s
+Executed _get_grouped_objectives in 3.6680s
+Result 0
+Testing log n=350, num_cpus=4
+Executed __init__ in 2.5763s
+Executed _get_grouped_objectives in 3.5663s
+Result 0
+Testing sum n=350, num_cpus=8
+Executed __init__ in 2.5094s
+Executed _get_grouped_objectives in 3.6974s
+Result 0
+Testing weighted n=350, num_cpus=8
+Executed __init__ in 2.5893s
+Executed _get_grouped_objectives in 3.6884s
+Result 0
+Testing log n=350, num_cpus=8
+Executed __init__ in 2.4999s
+Executed _get_grouped_objectives in 3.7797s
+Result 0
+Testing sum n=350, num_cpus=16
+Executed __init__ in 2.6481s
+Executed _get_grouped_objectives in 8.1473s
+Result 0
+Testing weighted n=350, num_cpus=16
+Executed __init__ in 2.5343s
+Executed _get_grouped_objectives in 7.9308s
+Result 0
+Testing log n=350, num_cpus=16
+Executed __init__ in 2.6174s
+Executed _get_grouped_objectives in 7.9750s
+Result 0
+Testing sum n=350, num_cpus=32
+Executed __init__ in 2.6601s
+Executed _get_grouped_objectives in 8.4450s
+Result 0
+Testing weighted n=350, num_cpus=32
+Executed __init__ in 2.5360s
+Executed _get_grouped_objectives in 7.8305s
+Result 0
+Testing log n=350, num_cpus=32
+Executed __init__ in 2.5417s
+Executed _get_grouped_objectives in 8.1159s
+Result 0
+Testing sum n=350, num_cpus=64
+Executed __init__ in 2.5304s
+Executed _get_grouped_objectives in 7.8391s
+Result 0
+Testing weighted n=350, num_cpus=64
+Executed __init__ in 2.5026s
+Executed _get_grouped_objectives in 7.9456s
+Result 0
+Testing log n=350, num_cpus=64
+Executed __init__ in 2.5457s
+Executed _get_grouped_objectives in 8.3764s
+Result 0
+Testing sum n=400, num_cpus=1
+Executed __init__ in 3.2104s
+Executed _get_grouped_objectives in 5.6888s
+Result 0
+Testing weighted n=400, num_cpus=1
+Executed __init__ in 3.1852s
+Executed _get_grouped_objectives in 5.7885s
+Result 0
+Testing log n=400, num_cpus=1
+Executed __init__ in 3.3760s
+Executed _get_grouped_objectives in 5.4685s
+Result 0
+Testing sum n=400, num_cpus=2
+Executed __init__ in 3.3045s
+Executed _get_grouped_objectives in 4.9469s
+Result 0
+Testing weighted n=400, num_cpus=2
+Executed __init__ in 3.1694s
+Executed _get_grouped_objectives in 4.9793s
+Result 0
+Testing log n=400, num_cpus=2
+Executed __init__ in 3.3025s
+Executed _get_grouped_objectives in 4.8085s
+Result 0
+Testing sum n=400, num_cpus=4
+Executed __init__ in 3.2937s
+Executed _get_grouped_objectives in 4.6107s
+Result 0
+Testing weighted n=400, num_cpus=4
+Executed __init__ in 3.2598s
+Executed _get_grouped_objectives in 4.9145s
+Result 0
+Testing log n=400, num_cpus=4
+Executed __init__ in 3.2358s
+Executed _get_grouped_objectives in 4.6840s
+Result 0
+Testing sum n=400, num_cpus=8
+Executed __init__ in 3.2015s
+Executed _get_grouped_objectives in 4.9444s
+Result 0
+Testing weighted n=400, num_cpus=8
+Executed __init__ in 3.2774s
+Executed _get_grouped_objectives in 4.8494s
+Result 0
+Testing log n=400, num_cpus=8
+Executed __init__ in 3.1988s
+Executed _get_grouped_objectives in 4.6165s
+Result 0
+Testing sum n=400, num_cpus=16
+Executed __init__ in 3.1875s
+Executed _get_grouped_objectives in 9.1417s
+Result 0
+Testing weighted n=400, num_cpus=16
+Executed __init__ in 3.2578s
+Executed _get_grouped_objectives in 9.5365s
+Result 0
+Testing log n=400, num_cpus=16
+Executed __init__ in 3.3399s
+Executed _get_grouped_objectives in 9.4676s
+Result 0
+Testing sum n=400, num_cpus=32
+Executed __init__ in 3.1784s
+Executed _get_grouped_objectives in 9.2643s
+Result 0
+Testing weighted n=400, num_cpus=32
+Executed __init__ in 3.3826s
+Executed _get_grouped_objectives in 9.6149s
+Result 0
+Testing log n=400, num_cpus=32
+Executed __init__ in 3.4228s
+Executed _get_grouped_objectives in 8.8281s
+Result 0
+Testing sum n=400, num_cpus=64
+Executed __init__ in 3.4503s
+Executed _get_grouped_objectives in 9.7409s
+Result 0
+Testing weighted n=400, num_cpus=64
+Executed __init__ in 3.3012s
+Executed _get_grouped_objectives in 9.1362s
+Result 0
+Testing log n=400, num_cpus=64
+Executed __init__ in 3.2196s
+Executed _get_grouped_objectives in 9.2086s
+Result 0
+Testing sum n=450, num_cpus=1
+Executed __init__ in 4.0541s
+Executed _get_grouped_objectives in 7.2382s
+Result 0
+Testing weighted n=450, num_cpus=1
+Executed __init__ in 4.0128s
+Executed _get_grouped_objectives in 7.0824s
+Result 0
+Testing log n=450, num_cpus=1
+Executed __init__ in 4.0938s
+Executed _get_grouped_objectives in 7.1046s
+Result 0
+Testing sum n=450, num_cpus=2
+Executed __init__ in 3.9440s
+Executed _get_grouped_objectives in 6.6962s
+Result 0
+Testing weighted n=450, num_cpus=2
+Executed __init__ in 4.1588s
+Executed _get_grouped_objectives in 6.2999s
+Result 0
+Testing log n=450, num_cpus=2
+Executed __init__ in 4.0084s
+Executed _get_grouped_objectives in 6.4725s
+Result 0
+Testing sum n=450, num_cpus=4
+Executed __init__ in 4.1995s
+Executed _get_grouped_objectives in 5.9893s
+Result 0
+Testing weighted n=450, num_cpus=4
+Executed __init__ in 4.0342s
+Executed _get_grouped_objectives in 6.0896s
+Result 0
+Testing log n=450, num_cpus=4
+Executed __init__ in 4.2384s
+Executed _get_grouped_objectives in 6.0511s
+Result 0
+Testing sum n=450, num_cpus=8
+Executed __init__ in 4.1827s
+Executed _get_grouped_objectives in 6.2162s
+Result 0
+Testing weighted n=450, num_cpus=8
+Executed __init__ in 4.1654s
+Executed _get_grouped_objectives in 6.7024s
+Result 0
+Testing log n=450, num_cpus=8
+Executed __init__ in 3.9968s
+Executed _get_grouped_objectives in 6.0224s
+Result 0
+Testing sum n=450, num_cpus=16
+Executed __init__ in 4.0820s
+Executed _get_grouped_objectives in 10.6513s
+Result 0
+Testing weighted n=450, num_cpus=16
+Executed __init__ in 4.1081s
+Executed _get_grouped_objectives in 10.9205s
+Result 0
+Testing log n=450, num_cpus=16
+Executed __init__ in 4.1245s
+Executed _get_grouped_objectives in 10.4592s
+Result 0
+Testing sum n=450, num_cpus=32
+Executed __init__ in 4.0242s
+Executed _get_grouped_objectives in 10.7786s
+Result 0
+Testing weighted n=450, num_cpus=32
+Executed __init__ in 4.1012s
+Executed _get_grouped_objectives in 11.0113s
+Result 0
+Testing log n=450, num_cpus=32
+Executed __init__ in 4.1032s
+Executed _get_grouped_objectives in 10.8170s
+Result 0
+Testing sum n=450, num_cpus=64
+Executed __init__ in 4.0158s
+Executed _get_grouped_objectives in 10.7922s
+Result 0
+Testing weighted n=450, num_cpus=64
+Executed __init__ in 4.0019s
+Executed _get_grouped_objectives in 11.4096s
+Result 0
+Testing log n=450, num_cpus=64
+Executed __init__ in 4.0130s
+Executed _get_grouped_objectives in 11.2790s
+Result 0
+Testing sum n=500, num_cpus=1
+Executed __init__ in 4.8593s
+Executed _get_grouped_objectives in 8.6106s
+Result 0
+Testing weighted n=500, num_cpus=1
+Executed __init__ in 4.9328s
+Executed _get_grouped_objectives in 8.4460s
+Result 0
+Testing log n=500, num_cpus=1
+Executed __init__ in 4.9862s
+Executed _get_grouped_objectives in 8.3780s
+Result 0
+Testing sum n=500, num_cpus=2
+Executed __init__ in 4.9640s
+Executed _get_grouped_objectives in 7.5869s
+Result 0
+Testing weighted n=500, num_cpus=2
+Executed __init__ in 5.0323s
+Executed _get_grouped_objectives in 7.6645s
+Result 0
+Testing log n=500, num_cpus=2
+Executed __init__ in 5.0625s
+Executed _get_grouped_objectives in 7.7158s
+Result 0
+Testing sum n=500, num_cpus=4
+Executed __init__ in 4.8682s
+Executed _get_grouped_objectives in 7.2111s
+Result 0
+Testing weighted n=500, num_cpus=4
+Executed __init__ in 5.0032s
+Executed _get_grouped_objectives in 7.1623s
+Result 0
+Testing log n=500, num_cpus=4
+Executed __init__ in 4.9570s
+Executed _get_grouped_objectives in 7.3356s
+Result 0
+Testing sum n=500, num_cpus=8
+Executed __init__ in 4.8975s
+Executed _get_grouped_objectives in 7.3321s
+Result 0
+Testing weighted n=500, num_cpus=8
+Executed __init__ in 5.0006s
+Executed _get_grouped_objectives in 7.8080s
+Result 0
+Testing log n=500, num_cpus=8
+Executed __init__ in 5.0176s
+Executed _get_grouped_objectives in 7.3569s
+Result 0
+Testing sum n=500, num_cpus=16
+Executed __init__ in 5.0150s
+Executed _get_grouped_objectives in 12.6722s
+Result 0
+Testing weighted n=500, num_cpus=16
+Executed __init__ in 5.1009s
+Executed _get_grouped_objectives in 12.6201s
+Result 0
+Testing log n=500, num_cpus=16
+Executed __init__ in 4.9393s
+Executed _get_grouped_objectives in 12.7753s
+Result 0
+Testing sum n=500, num_cpus=32
+Executed __init__ in 5.0309s
+Executed _get_grouped_objectives in 12.7325s
+Result 0
+Testing weighted n=500, num_cpus=32
+Executed __init__ in 4.9570s
+Executed _get_grouped_objectives in 12.7829s
+Result 0
+Testing log n=500, num_cpus=32
+Executed __init__ in 4.9357s
+Executed _get_grouped_objectives in 11.5368s
+Result 0
+Testing sum n=500, num_cpus=64
+Executed __init__ in 4.8489s
+Executed _get_grouped_objectives in 13.0854s
+Result 0
+Testing weighted n=500, num_cpus=64
+Executed __init__ in 5.0788s
+Executed _get_grouped_objectives in 12.3190s
+Result 0
+Testing log n=500, num_cpus=64
+Executed __init__ in 4.8059s
+Executed _get_grouped_objectives in 12.3072s
+Result 0
+Testing sum n=550, num_cpus=1
+Executed __init__ in 5.8109s
+Executed _get_grouped_objectives in 10.6657s
+Result 0
+Testing weighted n=550, num_cpus=1
+Executed __init__ in 6.0074s
+Executed _get_grouped_objectives in 10.2632s
+Result 0
+Testing log n=550, num_cpus=1
+Executed __init__ in 5.9711s
+Executed _get_grouped_objectives in 10.0152s
+Result 0
+Testing sum n=550, num_cpus=2
+Executed __init__ in 6.0515s
+Executed _get_grouped_objectives in 9.0667s
+Result 0
+Testing weighted n=550, num_cpus=2
+Executed __init__ in 5.8852s
+Executed _get_grouped_objectives in 9.0875s
+Result 0
+Testing log n=550, num_cpus=2
+Executed __init__ in 5.9624s
+Executed _get_grouped_objectives in 9.0053s
+Result 0
+Testing sum n=550, num_cpus=4
+Executed __init__ in 5.9604s
+Executed _get_grouped_objectives in 9.0234s
+Result 0
+Testing weighted n=550, num_cpus=4
+Executed __init__ in 5.9943s
+Executed _get_grouped_objectives in 8.8117s
+Result 0
+Testing log n=550, num_cpus=4
+Executed __init__ in 5.9838s
+Executed _get_grouped_objectives in 8.5463s
+Result 0
+Testing sum n=550, num_cpus=8
+Executed __init__ in 6.0128s
+Executed _get_grouped_objectives in 8.9514s
+Result 0
+Testing weighted n=550, num_cpus=8
+Executed __init__ in 6.0633s
+Executed _get_grouped_objectives in 8.8717s
+Result 0
+Testing log n=550, num_cpus=8
+Executed __init__ in 6.0268s
+Executed _get_grouped_objectives in 8.8049s
+Result 0
+Testing sum n=550, num_cpus=16
+Executed __init__ in 5.9843s
+Executed _get_grouped_objectives in 14.3509s
+Result 0
+Testing weighted n=550, num_cpus=16
+Executed __init__ in 6.0480s
+Executed _get_grouped_objectives in 14.7737s
+Result 0
+Testing log n=550, num_cpus=16
+Executed __init__ in 6.0722s
+Executed _get_grouped_objectives in 14.8846s
+Result 0
+Testing sum n=550, num_cpus=32
+Executed __init__ in 5.9740s
+Executed _get_grouped_objectives in 14.4604s
+Result 0
+Testing weighted n=550, num_cpus=32
+Executed __init__ in 5.9055s
+Executed _get_grouped_objectives in 15.0573s
+Result 0
+Testing log n=550, num_cpus=32
+Executed __init__ in 6.0026s
+Executed _get_grouped_objectives in 15.0574s
+Result 0
+Testing sum n=550, num_cpus=64
+Executed __init__ in 5.8045s
+Executed _get_grouped_objectives in 14.6223s
+Result 0
+Testing weighted n=550, num_cpus=64
+Executed __init__ in 5.9459s
+Executed _get_grouped_objectives in 15.4006s
+Result 0
+Testing log n=550, num_cpus=64
+Executed __init__ in 6.0676s
+Executed _get_grouped_objectives in 14.9503s
+Result 0
+Testing sum n=600, num_cpus=1
+Executed __init__ in 7.1987s
+Executed _get_grouped_objectives in 12.2652s
+Result 0
+Testing weighted n=600, num_cpus=1
+Executed __init__ in 7.0478s
+Executed _get_grouped_objectives in 12.6471s
+Result 0
+Testing log n=600, num_cpus=1
+Executed __init__ in 6.9145s
+Executed _get_grouped_objectives in 12.5740s
+Result 0
+Testing sum n=600, num_cpus=2
+Executed __init__ in 6.8741s
+Executed _get_grouped_objectives in 11.1210s
+Result 0
+Testing weighted n=600, num_cpus=2
+Executed __init__ in 6.8676s
+Executed _get_grouped_objectives in 11.2011s
+Result 0
+Testing log n=600, num_cpus=2
+Executed __init__ in 7.1222s
+Executed _get_grouped_objectives in 10.7321s
+Result 0
+Testing sum n=600, num_cpus=4
+Executed __init__ in 7.0743s
+Executed _get_grouped_objectives in 10.1727s
+Result 0
+Testing weighted n=600, num_cpus=4
+Executed __init__ in 7.0746s
+Executed _get_grouped_objectives in 10.1420s
+Result 0
+Testing log n=600, num_cpus=4
+Executed __init__ in 6.9963s
+Executed _get_grouped_objectives in 10.1828s
+Result 0
+Testing sum n=600, num_cpus=8
+Executed __init__ in 7.3392s
+Executed _get_grouped_objectives in 10.6408s
+Result 0
+Testing weighted n=600, num_cpus=8
+Executed __init__ in 7.1239s
+Executed _get_grouped_objectives in 10.5182s
+Result 0
+Testing log n=600, num_cpus=8
+Executed __init__ in 7.0759s
+Executed _get_grouped_objectives in 10.3853s
+Result 0
+Testing sum n=600, num_cpus=16
+Executed __init__ in 7.1427s
+Executed _get_grouped_objectives in 16.5965s
+Result 0
+Testing weighted n=600, num_cpus=16
+Executed __init__ in 6.9714s
+Executed _get_grouped_objectives in 16.8263s
+Result 0
+Testing log n=600, num_cpus=16
+Executed __init__ in 7.2948s
+Executed _get_grouped_objectives in 16.9706s
+Result 0
+Testing sum n=600, num_cpus=32
+Executed __init__ in 7.1103s
+Executed _get_grouped_objectives in 17.0623s
+Result 0
+Testing weighted n=600, num_cpus=32
+Executed __init__ in 7.0582s
+Executed _get_grouped_objectives in 17.2592s
+Result 0
+Testing log n=600, num_cpus=32
+Executed __init__ in 7.0472s
+Executed _get_grouped_objectives in 17.3124s
+Result 0
+Testing sum n=600, num_cpus=64
+Executed __init__ in 7.1934s
+Executed _get_grouped_objectives in 15.9652s
+Result 0
+Testing weighted n=600, num_cpus=64
+Executed __init__ in 7.0500s
+Executed _get_grouped_objectives in 15.9293s
+Result 0
+Testing log n=600, num_cpus=64
+Executed __init__ in 7.2067s
+Executed _get_grouped_objectives in 16.9276s
+Result 0

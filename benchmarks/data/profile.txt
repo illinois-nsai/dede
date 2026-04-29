@@ -1,9 +1,6 @@
 Executed __init__ in 0.7296s
 Executed _get_grouped_objectives in 2.4818s
 Executed get_subproblems in 3.1675s
-[36m(ProfiledSubproblemsWrap pid=3718998)[0m Set parameter Username
-[36m(ProfiledSubproblemsWrap pid=3718998)[0m Set parameter LicenseID to value 2773890
-[36m(ProfiledSubproblemsWrap pid=3718998)[0m Academic license - for non-commercial use only - expires 2027-02-02
 Executed get_relative_residuals_and_epsilon in 0.3504s
 iter 10: primal 3.078e-03/1.259e-02, dual 3.644e-01/2.472e+00, rho 2.907e-01, update down /3.441e+00, terminate_flag=False
 DeDe Solve Time: 35.79727005958557
@@ -4190,8 +4187,3 @@ Line #      Hits         Time  Per Hit   % Time  Line Contents
    159       101          0.0      0.0      0.5          for prob in self.probs_r + self.probs_d:
    160       100          2.5      0.0     99.3              obj += prob.get_obj()
    161         1          0.0      0.0      0.2          return t.cast(np.floating[t.Any], obj)
-
-
-[36m(ProfiledSubproblemsWrap pid=3718999)[0m Set parameter Username[32m [repeated 7x across cluster] (Ray deduplicates logs by default. Set RAY_DEDUP_LOGS=0 to disable log deduplication, or see https://docs.ray.io/en/master/ray-observability/user-guides/configure-logging.html#log-deduplication for more options.)[0m
-[36m(ProfiledSubproblemsWrap pid=3718999)[0m Set parameter LicenseID to value 2773890[32m [repeated 7x across cluster][0m
-[36m(ProfiledSubproblemsWrap pid=3718999)[0m Academic license - for non-commercial use only - expires 2027-02-02[32m [repeated 7x across cluster][0m
