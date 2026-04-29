@@ -105,6 +105,8 @@ class RaySubprobCache:
         self._probs: t.Optional[list[ray.actor.ActorProxy[SubproblemsWrap]]] = None
         self._param_idx_r: list[list[int]] = []
         self._param_idx_d: list[list[int]] = []
+        self._sol_idx_r: list[list[VarInfoT]] = []
+        self._sol_idx_d: list[list[VarInfoT]] = []
         self._placement_group: t.Optional[PlacementGroup] = None
 
     def update_cache(self, rho: float, user_num_cpus: t.Optional[int], ray_address: str) -> bool:
@@ -161,11 +163,15 @@ class RaySubprobCache:
         probs: list[ray.actor.ActorProxy[SubproblemsWrap]],
         param_idx_r: list[list[int]],
         param_idx_d: list[list[int]],
+        sol_idx_r: list[list[VarInfoT]],
+        sol_idx_d: list[list[VarInfoT]],
     ) -> None:
         """Stores subproblems in the cache (subproblems, indices of parameters)."""
         self._probs = probs
         self._param_idx_r = param_idx_r
         self._param_idx_d = param_idx_d
+        self._sol_idx_d = sol_idx_d
+        self._sol_idx_r = sol_idx_r
 
     def _invalidate(self):
         self._rho = None
@@ -214,6 +220,18 @@ class RaySubprobCache:
         if not self._param_idx_d:
             raise RuntimeError("param_idx_d is not set")
         return self._param_idx_d
+
+    @property
+    def sol_idx_r(self) -> list[list[VarInfoT]]:
+        if not self._sol_idx_r:
+            raise RuntimeError("sol_idx_r is not set")
+        return self._sol_idx_r
+
+    @property
+    def sol_idx_d(self) -> list[list[VarInfoT]]:
+        if not self._sol_idx_d:
+            raise RuntimeError("sol_idx_d is not set")
+        return self._sol_idx_d
 
     @property
     def placement_group(self) -> PlacementGroup:
@@ -343,9 +361,9 @@ class Problem(CpProblem):
             probs = self.get_subproblems(obj_expr_r, obj_expr_d, self._subprob_cache.num_cpus, rho)
 
             # store parameter index in z solutions for x problems
-            param_idx_r, param_idx_d = self._get_param_idx(probs)
+            param_idx_r, param_idx_d, sol_idx_r, sol_idx_d = self._get_param_idx(probs)
 
-            self._subprob_cache.set_subprobs(probs, param_idx_r, param_idx_d)
+            self._subprob_cache.set_subprobs(probs, param_idx_r, param_idx_d, sol_idx_r, sol_idx_d)
 
             # get demand solution
             self.sol_d = np.hstack(ray.get([prob.get_solution_d.remote() for prob in probs]))
@@ -481,14 +499,8 @@ class Problem(CpProblem):
         """Compute residuals and corresponding primal/dual epsilons."""
         assert self._subprob_cache.probs is not None
 
-        sol_idx_d = ray.get(
-            [prob.get_solution_idx_d.remote() for prob in self._subprob_cache.probs]
-        )
-        sol_idx_r = ray.get(
-            [prob.get_solution_idx_r.remote() for prob in self._subprob_cache.probs]
-        )
-        flat_idx_d = [idx for arr in sol_idx_d for idx in arr]
-        flat_idx_r = [idx for arr in sol_idx_r for idx in arr]
+        flat_idx_d = [idx for arr in self._subprob_cache.sol_idx_d for idx in arr]
+        flat_idx_r = [idx for arr in self._subprob_cache.sol_idx_r for idx in arr]
 
         map_r = {k: float(v) for k, v in zip(flat_idx_r, self.sol_r)}
         map_d = {k: float(v) for k, v in zip(flat_idx_d, self.sol_d)}
@@ -548,14 +560,8 @@ class Problem(CpProblem):
         flat_local_idx = [idx for arr in local_sol_idx for idx in arr]
         flat_local_sol: list[np.float64] = [sol for arr in local_sol for sol in arr]
 
-        sol_idx_d: list[list[VarInfoT]] = ray.get(
-            [prob.get_solution_idx_d.remote() for prob in self._subprob_cache.probs]
-        )
-        sol_idx_r: list[list[VarInfoT]] = ray.get(
-            [prob.get_solution_idx_r.remote() for prob in self._subprob_cache.probs]
-        )
-        flat_idx_d = [idx for arr in sol_idx_d for idx in arr]
-        flat_idx_r = [idx for arr in sol_idx_r for idx in arr]
+        flat_idx_d = [idx for arr in self._subprob_cache.sol_idx_d for idx in arr]
+        flat_idx_r = [idx for arr in self._subprob_cache.sol_idx_r for idx in arr]
 
         for sol_idx, sol in zip(
             [flat_local_idx, flat_idx_d, flat_idx_r], [flat_local_sol, self.sol_d, self.sol_r]
@@ -663,8 +669,11 @@ class Problem(CpProblem):
     @classmethod
     def _get_param_idx(
         cls, probs: list[ray.actor.ActorProxy[SubproblemsWrap]]
-    ) -> tuple[list[list[int]], list[list[int]]]:
-        """Get parameter z index in last solution."""
+    ) -> tuple[list[list[int]], list[list[int]], list[list[VarInfoT]], list[list[VarInfoT]]]:
+        """
+        Get parameter z index in last solution.
+        Also get the solution_idx_r/d for use in solve.
+        """
         # map var_id_pos in the big resource solution list
         sol_idx_r_futures = [prob.get_solution_idx_r.remote() for prob in probs]
         sol_idx_l_futures = [prob.get_solution_idx_d.remote() for prob in probs]
@@ -693,7 +702,7 @@ class Problem(CpProblem):
         param_idx_d = [
             [sol_idx_dict_r[var_id_pos] for var_id_pos in sol_idx] for sol_idx in sol_idx_d
         ]
-        return param_idx_r, param_idx_d
+        return param_idx_r, param_idx_d, sol_idx_r, sol_idx_d
 
     def _get_grouped_objectives(
         self, num_cpus: int
