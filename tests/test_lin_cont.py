@@ -27,7 +27,7 @@ def test_add1():
     result_cvxpy = cvxpy_prob.solve()
     print("CVXPY:", result_cvxpy)
 
-    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=0.1, num_iter=15)
+    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS)
     print("DeDe:", result_dede)
 
     assert check_solution(
@@ -51,7 +51,7 @@ def test_add2():
     result_cvxpy = cvxpy_prob.solve()
     print("CVXPY:", result_cvxpy)
 
-    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=0.1, num_iter=10)
+    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS)
     print("DeDe:", result_dede)
 
     assert check_solution(
@@ -75,7 +75,7 @@ def test_add_zero():
     result_cvxpy = cvxpy_prob.solve()
     print("CVXPY:", result_cvxpy)
 
-    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=1, num_iter=5)
+    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS)
     print("DeDe:", result_dede)
 
     assert check_solution(
@@ -97,7 +97,7 @@ def test_sum1():
     result_cvxpy = cvxpy_prob.solve()
     print("CVXPY:", result_cvxpy)
 
-    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=1, num_iter=20)
+    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS)
     print("DeDe:", result_dede)
 
     assert check_solution(
@@ -119,7 +119,7 @@ def test_sum2():
     result_cvxpy = cvxpy_prob.solve()
     print("CVXPY:", result_cvxpy)
 
-    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=10, num_iter=7)
+    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS)
     print("DeDe:", result_dede)
 
     assert check_solution(
@@ -145,7 +145,7 @@ def test_multiply1():
     result_cvxpy = cvxpy_prob.solve()
     print("CVXPY:", result_cvxpy)
 
-    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=10, num_iter=15)
+    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS)
     print("DeDe:", result_dede)
 
     assert check_solution(
@@ -171,7 +171,7 @@ def test_multiply2():
     result_cvxpy = cvxpy_prob.solve()
     print("CVXPY:", result_cvxpy)
 
-    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=1, num_iter=20)
+    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS)
     print("DeDe:", result_dede)
 
     assert check_solution(
@@ -195,7 +195,7 @@ def test_multiply_zero():
     result_cvxpy = cvxpy_prob.solve()
     print("CVXPY:", result_cvxpy)
 
-    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=1, num_iter=10)
+    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS)
     print("DeDe:", result_dede)
 
     assert check_solution(
@@ -218,7 +218,7 @@ def test_trace():
     result_cvxpy = cvxpy_prob.solve()
     print("CVXPY:", result_cvxpy)
 
-    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS, rho=1, num_iter=20)
+    result_dede = prob.solve(num_cpus=2, solver=dd.ECOS)
     print("DeDe:", result_dede)
 
     assert check_solution(

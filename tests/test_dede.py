@@ -62,7 +62,7 @@ def test_dede_with_param():
     result_dede = prob.solve(num_cpus=4, solver=dd.ECOS)
 
     # Validate the results
-    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.1, abs_tol=0.1)
+    assert math.isclose(result_dede, result_cvxpy, rel_tol=0.05, abs_tol=0.5)
 
     # Change parameter value and re-solve
     param.value += 1

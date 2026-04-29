@@ -29,7 +29,7 @@ BreakIntoVarsOutput = list[t.Union[bool, VarInfoT, "BreakIntoVarsOutput"]]
 
 def expand_expr(expr: cp.Expression) -> list[cp.Expression]:
     """return a list of expanded expression
-    TODO: add norm1, quad_form, convolve, multiply, MulExpression
+    TODO: add quad_form, convolve
     Args:
         expr: expression to expand
     """
@@ -58,8 +58,14 @@ def expand_expr(expr: cp.Expression) -> list[cp.Expression]:
         return [Sum(new_expr) for new_expr in expand_expr(expr.args[0])]
     # (sum_{ij}X^2_{ij})/y
     elif isinstance(expr, quad_over_lin):
+        if len(expr.args[0].shape) == 0:
+            # don't element-wise expand a scalar since that is different semantically
+            return [expr]
         return [quad_over_lin(new_expr, expr.args[1]) for new_expr in expand_expr(expr.args[0])]
     elif isinstance(expr, log):
+        if len(expr.args[0].shape) == 0:
+            # don't element-wise expand a scalar since that is different semantically
+            return [expr]
         return [log(new_expr) for new_expr in expand_expr(expr.args[0])]
     elif isinstance(expr, trace):
         return [expr.args[0][i, i] for i in range(expr.args[0].shape[0])]
@@ -253,6 +259,44 @@ def get_var_id_pos_list_from_cone(expr: cp.Expression, solver: str) -> list[VarI
         var_id_pos_list.append(VarInfoT(var_id, col - start_col))
 
     return var_id_pos_list
+
+
+def get_var_id_pos_list_from_tree(expr: cp.Expression) -> list[VarInfoT]:
+    """Return (var_id, pos) pairs for every variable occurrence in the expression tree.
+
+    Handles any expression (affine or non-affine) by generic recursion into `args`,
+    stopping at Variable or index(Variable, ...) leaves. No canonicalization required.
+    """
+    result: set[VarInfoT] = set()
+
+    def walk(e: t.Any) -> None:
+        if isinstance(e, Variable):
+            if e.shape == ():
+                result.add(VarInfoT(e.id, 0))
+            else:
+                for idx in np.ndindex(e.shape):
+                    pos = int(np.ravel_multi_index(idx[::-1], e.shape[::-1]))
+                    result.add(VarInfoT(e.id, pos))
+            return
+
+        if isinstance(e, index) and isinstance(e.args[0], Variable):
+            var = e.args[0]
+            for idx in get_indices_from_index(e):
+                pos = int(np.ravel_multi_index(idx[::-1], var.shape[::-1]))
+                result.add(VarInfoT(var.id, pos))
+            return
+
+        if isinstance(e, (Constant, Parameter)):
+            return
+
+        if not hasattr(e, "args"):
+            return
+
+        for arg in e.args:
+            walk(arg)
+
+    walk(expr)
+    return sorted(result)
 
 
 class UnionFind:

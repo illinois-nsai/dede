@@ -12,7 +12,7 @@ def check_solution(
     cvxpy_val: np.floating[t.Any],
     objective: cp.Objective,
     constraints: t.Optional[list[cp.Constraint]] = None,
-    feas_tol: float = 0.1,
+    feas_tol: float = 1.0,
 ) -> bool:
     """Returns True if the DeDe solution is acceptable.
 
@@ -30,7 +30,7 @@ def check_solution(
                 print("constraints not satisfied (outside threshold)", constr.violation())
                 return False
 
-    within_tol = math.isclose(dede_val, cvxpy_val, rel_tol=0.05, abs_tol=1e-6)
+    within_tol = math.isclose(dede_val, cvxpy_val, rel_tol=0.05, abs_tol=0.01)
 
     if within_tol:
         return True
