@@ -54,14 +54,12 @@ def test_log(n, num_cpus):
 
 
 if __name__ == "__main__":
-    sum_multiplier = 80
-    weighted_multiplier = 30
-    log_multiplier = 10
-    for multiplier in range(1, 31):
-        for num_cpus in [1, 2, 4, 8, 16, 32, 64, 128]:
-            sum_n = multiplier * sum_multiplier
-            weighted_n = multiplier * weighted_multiplier
-            log_n = multiplier * log_multiplier
+    base = 500
+    for multiplier in range(1, 5):
+        for num_cpus in [1, 2, 4, 8, 16, 32, 64]:
+            sum_n = multiplier * base
+            weighted_n = multiplier * base
+            log_n = multiplier * base
 
             print(f"Testing sum n={sum_n}, num_cpus={num_cpus}")
             try:

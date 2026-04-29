@@ -21,7 +21,10 @@ set -e
 BRANCH="${1:-ianz/cloudlab-experiments}"
 
 MACHINES=(
-    "yianz@clnode280.clemson.cloudlab.us"
+    "yianz@ms1327.utah.cloudlab.us"
+    "yianz@ms1339.utah.cloudlab.us"
+    "yianz@ms1325.utah.cloudlab.us"
+    "yianz@ms1328.utah.cloudlab.us"
 )
 
 LOG_DIR=$(mktemp -d)
@@ -35,17 +38,21 @@ for machine in "${MACHINES[@]}"; do
 # source .venv/bin/activate
 # ray start --address='10.10.1.1:6379'
 
-mkdir work
-cd work
-GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no" git clone git@github.com:illinois-nsai/dede.git
-cd dede
-git checkout $BRANCH
-sudo apt update
-sudo apt install -y python3.10-dev python3.10-venv tmux
-python3 -m venv .venv
-source .venv/bin/activate
-pip3 install -e .[dev]
-pip3 install ray[default]
+# mkdir work
+# cd work
+# GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no" git clone git@github.com:illinois-nsai/dede.git
+# cd dede
+# git checkout $BRANCH
+# sudo apt update
+# sudo apt install -y python3.10-dev python3.10-venv tmux
+# python3 -m venv .venv
+# source .venv/bin/activate
+# pip3 install -e .[dev]
+# pip3 install ray[default]
+
+sudo apt install -y linux-tools-common linux-tools-5.15.0-168-generic linux-cloud-tools-5.15.0-168-generic 
+sudo cpupower frequency-set -u 2.0GHz
+echo 1 | sudo tee /sys/devices/system/cpu/intel_pstate/no_turbo
 # echo 0 | sudo tee /sys/devices/system/cpu/cpufreq/boost || true
 EOF
     pids+=($!)
