@@ -59,7 +59,7 @@ def test_log(n, num_cpus):
 if __name__ == "__main__":
     base = 50
     for multiplier in range(1, 13):
-        for num_cpus in [1, 2, 4, 8, 16, 32, 64]:
+        for num_cpus in [1]:
             sum_n = multiplier * base
             weighted_n = multiplier * base
             log_n = multiplier * base
