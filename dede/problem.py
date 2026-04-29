@@ -58,7 +58,9 @@ def time_all_methods(cls):
 
 
 @contextlib.contextmanager
-def _get_pg(num_cpus: int, timeout: float = 10.0) -> t.Iterator[PlacementGroup]:
+def _get_pg(
+    num_cpus: int, timeout: float = 10.0, strategy: str = "PACK"
+) -> t.Iterator[PlacementGroup]:
     """Returns a placement group that tries to spread
     workers across all available nodes in the ray network.
 
@@ -66,14 +68,14 @@ def _get_pg(num_cpus: int, timeout: float = 10.0) -> t.Iterator[PlacementGroup]:
     the placement group once execution has finished.
 
     Args:
-        max_cpus_per_node (int): how many CPUs to request per node. This is an upper bound on the
-        number of CPUs reserved.
+        max_cpus_per_node (int): how many CPUs to request.
+        strategy: the strategy to use when creating the placement group. Can be "SPREAD" or "PACK".
 
     Returns:
         t.Iterator[PlacementGroup]: the placement group
     """
     bundles = [{"CPU": 1.0}] * num_cpus
-    pg = ray.util.placement_group(bundles)
+    pg = ray.util.placement_group(bundles, strategy=strategy)
     ray.get(pg.ready(), timeout=timeout)
     try:
         yield pg
@@ -711,48 +713,63 @@ class Problem(CpProblem):
         if self._obj_expr_r is not None and self._obj_expr_d is not None:
             return self._obj_expr_r, self._obj_expr_d
 
-        # use a placement group with strategy = SPREAD due to the diminishing returns
-        # observed with larger numbers of CPUs
-        with _get_pg(num_cpus) as pg:
-            var_id_pos_to_idx: dict[VarInfoT, list[tuple[int, int]]] = defaultdict(list)
-            for i, constrs_gps, constr_dict in zip(
-                [0, 1],
-                [self.constrs_gps_r, self.constrs_gps_d],
-                [self.constr_dict_r, self.constr_dict_d],
-            ):
-                for j, constrs in enumerate(constrs_gps):
-                    for constr in constrs:
-                        for var_id_pos in constr_dict[constr.id]:
-                            var_id_pos_to_idx[var_id_pos].append((i, j))
+        var_id_pos_to_idx: dict[VarInfoT, list[tuple[int, int]]] = defaultdict(list)
+        for i, constrs_gps, constr_dict in zip(
+            [0, 1],
+            [self.constrs_gps_r, self.constrs_gps_d],
+            [self.constr_dict_r, self.constr_dict_d],
+        ):
+            for j, constrs in enumerate(constrs_gps):
+                for constr in constrs:
+                    for var_id_pos in constr_dict[constr.id]:
+                        var_id_pos_to_idx[var_id_pos].append((i, j))
 
-            expr_list = expand_expr(self.objective.expr)
+        expr_list = expand_expr(self.objective.expr)
 
-            # put heavy objects in shared memory to avoid serialization overhead
-            expr_ref = ray.put(expr_list)
-            dict_ref = ray.put(dict(var_id_pos_to_idx))
-
-            # chunk the indices to split the work
-            chunks = np.array_split(np.arange(len(expr_list), dtype=np.int64), len(pg.bundle_specs))
-
-            # send the chunks to the remote function for processing
-            futures = [
-                _process_obj_chunk_indices.options(
-                    scheduling_strategy=PlacementGroupSchedulingStrategy(
-                        placement_group=pg,
-                        placement_group_bundle_index=i,
-                    )
-                ).remote(
-                    c,
-                    expr_ref,
-                    dict_ref,
-                    len(self.constrs_gps_r),
-                    len(self.constrs_gps_d),
+        try:
+            # wrap in a 1-element list so downstream `for res in results` matches
+            # the multi-chunk shape returned by the cone/Ray path
+            # do this since it is much faster tha nthe cone version
+            results = [
+                _process_obj_chunk_tree(
+                    expr_list, var_id_pos_to_idx, len(self.constrs_gps_r), len(self.constrs_gps_d)
                 )
-                for i, c in enumerate(chunks)
             ]
+        except Exception as e:
+            print(f"Error in tree-based grouping: {e}. Falling back to cone-based grouping.")
 
-            # block on results
-            results = ray.get(futures)
+            # use a placement group with strategy = SPREAD due to the diminishing returns
+            # observed with larger numbers of CPUs
+            with _get_pg(num_cpus, strategy="SPREAD") as pg:
+                # put heavy objects in shared memory to avoid serialization overhead
+                expr_ref = ray.put(expr_list)
+                dict_ref = ray.put(dict(var_id_pos_to_idx))
+
+                # chunk the indices to split the work
+                chunks = np.array_split(
+                    np.arange(len(expr_list), dtype=np.int64), len(pg.bundle_specs)
+                )
+
+                # send the chunks to the remote function for processing
+                futures = [
+                    _process_obj_chunk_indices_tree.options(
+                        scheduling_strategy=PlacementGroupSchedulingStrategy(
+                            placement_group=pg,
+                            placement_group_bundle_index=i,
+                        )
+                    ).remote(
+                        c,
+                        expr_ref,
+                        self._solver,
+                        dict_ref,
+                        len(self.constrs_gps_r),
+                        len(self.constrs_gps_d),
+                    )
+                    for i, c in enumerate(chunks)
+                ]
+
+                # block on results
+                results = ray.get(futures)
 
         # reconstruct groups
         obj_r: list[cp.Expression] = []
@@ -776,7 +793,7 @@ class Problem(CpProblem):
 
 
 @ray.remote
-def _process_obj_chunk_indices(
+def _process_obj_chunk_indices_tree(
     indices: NDArray[np.int64],
     expr_list_ref: list[cp.Expression],
     var_id_pos_to_idx: dict[VarInfoT, list[tuple[int, int]]],
@@ -784,7 +801,8 @@ def _process_obj_chunk_indices(
     num_d: int,
 ) -> tuple[list[list[int]], list[list[int]]]:
     """
-    Returns only integer indices of the expressions.
+    Returns only integer indices of the expressions. This uses the cone strategy
+    to extract var id positions and is ray-parallelized.
     """
     # Local accumulation of INDICES
     local_r_idx: list[list[int]] = [[] for _ in range(num_r)]
@@ -806,6 +824,46 @@ def _process_obj_chunk_indices(
         id_set = set(var_id_pos_to_idx[var_id_pos_list[0]])
         for var_id_pos in var_id_pos_list[1:]:
             id_set &= set(var_id_pos_to_idx[var_id_pos])
+
+        if not id_set:
+            raise ValueError(f"Objective term at index {idx} is not separable.")
+
+        target: tuple[int, int] = list(id_set)[0]
+        if target[0] == 0:
+            local_r_idx[target[1]].append(idx)
+        else:
+            local_d_idx[target[1]].append(idx)
+
+    return local_r_idx, local_d_idx
+
+
+def _process_obj_chunk_tree(
+    expr_list: list[cp.Expression],
+    var_id_pos_to_idx: dict[VarInfoT, list[tuple[int, int]]],
+    num_r: int,
+    num_d: int,
+) -> tuple[list[list[int]], list[list[int]]]:
+    """Returns only integer indices of the expressions. This uses the tree traversal
+    strategy to extract var id positions and is single-threaded.
+
+    In the vast majority of cases, this should be sufficient.
+    """
+    local_r_idx: list[list[int]] = [[] for _ in range(num_r)]
+    local_d_idx: list[list[int]] = [[] for _ in range(num_d)]
+
+    for idx, obj in enumerate(expr_list):
+        var_id_pos_list = get_var_id_pos_list_from_tree(obj)
+
+        if not var_id_pos_list:
+            if num_r > 0:
+                local_r_idx[0].append(idx)
+            elif num_d > 0:
+                local_d_idx[0].append(idx)
+            continue
+
+        id_set = set(var_id_pos_to_idx.get(var_id_pos_list[0], []))
+        for var_id_pos in var_id_pos_list[1:]:
+            id_set &= set(var_id_pos_to_idx.get(var_id_pos, []))
 
         if not id_set:
             raise ValueError(f"Objective term at index {idx} is not separable.")
