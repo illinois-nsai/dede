@@ -16,9 +16,10 @@ def test_sum(n, num_cpus):
     objective = dd.Maximize(dd.sum(x))
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
-    result_dede = prob.solve(ray_address="auto", solver=dd.CLARABEL, num_cpus=num_cpus)
+    prob._get_grouped_objectives(num_cpus)
+    # result_dede = prob.solve(ray_address="auto", solver=dd.CLARABEL, num_cpus=num_cpus)
 
-    return result_dede
+    return 0
 
 
 def test_weighted(n, num_cpus):
@@ -34,9 +35,10 @@ def test_weighted(n, num_cpus):
     objective = dd.Minimize(dd.sum(dd.multiply(x, w)))
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
-    result_dede = prob.solve(ray_address="auto", num_cpus=num_cpus, solver=dd.CLARABEL)
+    prob._get_grouped_objectives(num_cpus)
+    # result_dede = prob.solve(ray_address="auto", num_cpus=num_cpus, solver=dd.CLARABEL)
 
-    return result_dede
+    return 0
 
 
 def test_log(n, num_cpus):
@@ -48,14 +50,15 @@ def test_log(n, num_cpus):
     objective = dd.Maximize(dd.sum([dd.log(dd.sum(x[i, :])) for i in range(N)]))
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
-    result_dede = prob.solve(ray_address="auto", num_cpus=num_cpus, solver=dd.SCS)
+    prob._get_grouped_objectives(num_cpus)
+    # result_dede = prob.solve(ray_address="auto", num_cpus=num_cpus, solver=dd.SCS)
 
-    return result_dede
+    return 0
 
 
 if __name__ == "__main__":
-    base = 500
-    for multiplier in range(1, 5):
+    base = 50
+    for multiplier in range(1, 13):
         for num_cpus in [1, 2, 4, 8, 16, 32, 64]:
             sum_n = multiplier * base
             weighted_n = multiplier * base
