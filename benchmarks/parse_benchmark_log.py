@@ -7,6 +7,8 @@ test_re = re.compile(r"Testing (\w+) (.+)")
 kwarg_re = re.compile(r"(\w+)=(\S+?)(?:,|$)")
 executed_re = re.compile(r"Executed (\S+) in ([\d.]+)s")
 iter_re = re.compile(r"iter(\d+):")
+dede_solve_time_re = re.compile(r"DeDe Solve Time:\s+([\d.]+)")
+dede_iterations_re = re.compile(r"DeDe Iterations:\s+(\d+)")
 result_re = re.compile(r"Result\s+(\S+)")
 
 BenchmarkKey = tuple[str, tuple[tuple[str, str], ...]]
@@ -15,6 +17,8 @@ BenchmarkKey = tuple[str, tuple[tuple[str, str], ...]]
 class BenchmarkData(TypedDict):
     timings: dict[str, float]
     num_iterations: int
+    dede_solve_time: Optional[float]
+    dede_iterations: Optional[int]
     result: Optional[str]
 
 
@@ -35,7 +39,7 @@ def parse_log(log_path: str) -> dict[BenchmarkKey, BenchmarkData]:
                     (k, v) for k, v in kwarg_re.findall(m.group(2))
                 ))
                 current_key = (test_type, kwargs)
-                current_data = {"timings": {}, "num_iterations": 0, "result": None}
+                current_data = {"timings": {}, "num_iterations": 0, "dede_solve_time": None, "dede_iterations": None, "result": None}
                 continue
 
             if current_key is None:
@@ -54,6 +58,16 @@ def parse_log(log_path: str) -> dict[BenchmarkKey, BenchmarkData]:
                 )
                 continue
 
+            m = dede_solve_time_re.search(line)
+            if m:
+                current_data["dede_solve_time"] = float(m.group(1))
+                continue
+
+            m = dede_iterations_re.search(line)
+            if m:
+                current_data["dede_iterations"] = int(m.group(1))
+                continue
+
             m = result_re.search(line)
             if m:
                 current_data["result"] = m.group(1)
@@ -68,7 +82,7 @@ def parse_log(log_path: str) -> dict[BenchmarkKey, BenchmarkData]:
 def write_csv(results: dict[BenchmarkKey, BenchmarkData], out_path: str) -> None:
     kwarg_keys = sorted({k for _, kwargs in results for k, _ in kwargs})
     timing_keys = sorted({k for data in results.values() for k in data["timings"]})
-    fieldnames = ["test_type"] + kwarg_keys + ["num_iterations"] + timing_keys + ["result"]
+    fieldnames = ["test_type"] + kwarg_keys + ["num_iterations", "dede_solve_time", "dede_iterations"] + timing_keys + ["result"]
 
     with open(out_path, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
@@ -78,6 +92,8 @@ def write_csv(results: dict[BenchmarkKey, BenchmarkData], out_path: str) -> None
                 "test_type": test_type,
                 **dict(kwargs),
                 "num_iterations": data["num_iterations"],
+                "dede_solve_time": data["dede_solve_time"],
+                "dede_iterations": data["dede_iterations"],
                 **data["timings"],
                 "result": data["result"],
             }
