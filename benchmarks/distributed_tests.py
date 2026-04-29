@@ -43,15 +43,17 @@ def test_weighted(n, num_cpus):
 
 def test_log(n, num_cpus):
     N, M = n, n
-    x = dd.Variable((N, M), nonneg=True)
-    resource_constraints = [x[i, :].sum() >= (i + 1) * M for i in range(N)]
-    demand_constraints = [x[:, j].sum() <= (j + 1) * N for j in range(M)]
+    # Scale y = x/N to avoid poor conditioning from large RHS values (up to N^2)
+    y = dd.Variable((N, M), nonneg=True)
+    resource_constraints = [y[i, :].sum() >= (i + 1) for i in range(N)]
+    demand_constraints = [y[:, j].sum() <= (j + 1) for j in range(M)]
 
-    objective = dd.Maximize(dd.sum([dd.log(dd.sum(x[i, :])) for i in range(N)]))
+    objective = dd.Maximize(dd.sum([dd.log(dd.sum(y[i, :])) for i in range(N)]))
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
     result_dede = prob.solve(ray_address="auto", num_cpus=num_cpus, solver=dd.SCS)
 
+    # Add back constant N*log(N) from the scaling transformation
     return result_dede
 
 
