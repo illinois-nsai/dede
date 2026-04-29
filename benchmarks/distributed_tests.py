@@ -6,6 +6,8 @@ import dede as dd
 
 sys.setrecursionlimit(10000)
 
+rng = np.random.default_rng(seed=42)
+
 
 def test_sum(n, num_cpus):
     N, M = n, n
@@ -16,18 +18,17 @@ def test_sum(n, num_cpus):
     objective = dd.Maximize(dd.sum(x))
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
-    prob._get_grouped_objectives(num_cpus)
-    # result_dede = prob.solve(ray_address="auto", solver=dd.CLARABEL, num_cpus=num_cpus)
+    result_dede = prob.solve(ray_address="auto", solver=dd.GUROBI, num_cpus=num_cpus)
 
-    return 0
+    return result_dede
 
 
 def test_weighted(n, num_cpus):
     N, M = n, n
     x = dd.Variable((N, M), nonneg=True)
-    w = 9 * np.random.uniform(0, 1, (N, M)) + 1
-    bn = 9 * np.random.uniform(0, 1, (N,)) + 1
-    bm = 9 * np.random.uniform(0, 1, (M,)) + 1
+    w = 9 * rng.uniform(0, 1, (N, M)) + 1
+    bn = 9 * rng.uniform(0, 1, (N,)) + 1
+    bm = 9 * rng.uniform(0, 1, (M,)) + 1
 
     resource_constraints = [x[i, :].sum() >= bn[i] for i in range(N)]
     demand_constraints = [x[:, j].sum() >= bm[j] for j in range(M)]
@@ -35,10 +36,9 @@ def test_weighted(n, num_cpus):
     objective = dd.Minimize(dd.sum(dd.multiply(x, w)))
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
-    prob._get_grouped_objectives(num_cpus)
-    # result_dede = prob.solve(ray_address="auto", num_cpus=num_cpus, solver=dd.CLARABEL)
+    result_dede = prob.solve(ray_address="auto", num_cpus=num_cpus, solver=dd.GUROBI)
 
-    return 0
+    return result_dede
 
 
 def test_log(n, num_cpus):
@@ -50,16 +50,15 @@ def test_log(n, num_cpus):
     objective = dd.Maximize(dd.sum([dd.log(dd.sum(x[i, :])) for i in range(N)]))
 
     prob = dd.Problem(objective, resource_constraints, demand_constraints)
-    prob._get_grouped_objectives(num_cpus)
-    # result_dede = prob.solve(ray_address="auto", num_cpus=num_cpus, solver=dd.SCS)
+    result_dede = prob.solve(ray_address="auto", num_cpus=num_cpus, solver=dd.SCS)
 
-    return 0
+    return result_dede
 
 
 if __name__ == "__main__":
-    base = 50
-    for multiplier in range(1, 13):
-        for num_cpus in [1]:
+    base = 500
+    for multiplier in range(1, 5):
+        for num_cpus in [64]:
             sum_n = multiplier * base
             weighted_n = multiplier * base
             log_n = multiplier * base
