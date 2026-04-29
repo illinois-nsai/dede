@@ -1,0 +1,1223 @@
+2026-04-02 23:35:42,254	INFO job_manager.py:587 -- Runtime env is setting up.
+Running entrypoint for job raysubmit_wG5NeQphd57kNUFP: python tmp_tests/group_objectives_tests.py
+2026-04-02 23:35:49,154	INFO worker.py:1669 -- Using address 128.110.216.211:6379 set in the environment variable RAY_ADDRESS
+2026-04-02 23:35:49,173	INFO worker.py:1810 -- Connecting to existing Ray cluster at address: 128.110.216.211:6379...
+2026-04-02 23:35:49,273	INFO worker.py:2004 -- Connected to Ray cluster. View the dashboard at 128.110.216.211:8265 
+/users/yianz/work/dede/.venv/lib/python3.10/site-packages/ray/_private/worker.py:2052: FutureWarning: Tip: In future versions of Ray, Ray will no longer override accelerator visible devices env var if num_gpus=0 or num_gpus=None (default). To enable this behavior and turn off this error message, set RAY_ACCEL_ENV_VAR_OVERRIDE_ON_ZERO=0
+  warnings.warn(
+Testing sum n=50, num_cpus=1, strategy=PACK
+Executed __init__ in 0.3053s
+Executed _get_grouped_objectives in 2.9776s
+Testing weighted n=30, num_cpus=1, strategy=PACK
+Executed __init__ in 0.3151s
+Executed _get_grouped_objectives in 0.6239s
+Testing log n=10, num_cpus=1, strategy=PACK
+Executed __init__ in 0.0496s
+Executed _get_grouped_objectives in 2.2901s
+Testing sum n=50, num_cpus=2, strategy=PACK
+Executed __init__ in 0.2932s
+Executed _get_grouped_objectives in 3.3636s
+Testing weighted n=30, num_cpus=2, strategy=PACK
+Executed __init__ in 0.1489s
+Executed _get_grouped_objectives in 2.4698s
+Testing log n=10, num_cpus=2, strategy=PACK
+Executed __init__ in 0.0408s
+Executed _get_grouped_objectives in 1.3412s
+Testing sum n=50, num_cpus=4, strategy=PACK
+Executed __init__ in 0.2891s
+Executed _get_grouped_objectives in 2.7783s
+Testing weighted n=30, num_cpus=4, strategy=PACK
+Executed __init__ in 0.3400s
+Executed _get_grouped_objectives in 2.4590s
+Testing log n=10, num_cpus=4, strategy=PACK
+Executed __init__ in 0.0422s
+Executed _get_grouped_objectives in 0.6553s
+Testing sum n=50, num_cpus=8, strategy=PACK
+Executed __init__ in 0.2805s
+Executed _get_grouped_objectives in 3.3343s
+Testing weighted n=30, num_cpus=8, strategy=PACK
+Executed __init__ in 0.1470s
+Executed _get_grouped_objectives in 2.9721s
+Testing log n=10, num_cpus=8, strategy=PACK
+Executed __init__ in 0.0423s
+Executed _get_grouped_objectives in 0.7117s
+Testing sum n=50, num_cpus=16, strategy=PACK
+Executed __init__ in 0.2810s
+Executed _get_grouped_objectives in 7.1015s
+Testing weighted n=30, num_cpus=16, strategy=PACK
+Executed __init__ in 0.1512s
+Executed _get_grouped_objectives in 6.9567s
+Testing log n=10, num_cpus=16, strategy=PACK
+Executed __init__ in 0.0391s
+Executed _get_grouped_objectives in 6.9830s
+Testing sum n=50, num_cpus=4, strategy=SPREAD
+Executed __init__ in 0.3283s
+Executed _get_grouped_objectives in 5.1180s
+Testing weighted n=30, num_cpus=4, strategy=SPREAD
+Executed __init__ in 0.1555s
+Executed _get_grouped_objectives in 0.2605s
+Testing log n=10, num_cpus=4, strategy=SPREAD
+Executed __init__ in 0.0382s
+Executed _get_grouped_objectives in 0.6415s
+Testing sum n=50, num_cpus=8, strategy=SPREAD
+Executed __init__ in 0.2820s
+Executed _get_grouped_objectives in 2.6403s
+Testing weighted n=30, num_cpus=8, strategy=SPREAD
+Executed __init__ in 0.1624s
+Executed _get_grouped_objectives in 0.3456s
+Testing log n=10, num_cpus=8, strategy=SPREAD
+Executed __init__ in 0.0389s
+Executed _get_grouped_objectives in 0.4098s
+Testing sum n=50, num_cpus=16, strategy=SPREAD
+Executed __init__ in 0.2795s
+Executed _get_grouped_objectives in 0.5870s
+Testing weighted n=30, num_cpus=16, strategy=SPREAD
+Executed __init__ in 0.1441s
+Executed _get_grouped_objectives in 0.3899s
+Testing log n=10, num_cpus=16, strategy=SPREAD
+Executed __init__ in 0.0417s
+Executed _get_grouped_objectives in 2.4455s
+Testing sum n=50, num_cpus=32, strategy=SPREAD
+Executed __init__ in 0.3585s
+Executed _get_grouped_objectives in 7.4864s
+Testing weighted n=30, num_cpus=32, strategy=SPREAD
+Executed __init__ in 0.1609s
+Executed _get_grouped_objectives in 8.2582s
+Testing log n=10, num_cpus=32, strategy=SPREAD
+Executed __init__ in 0.0389s
+Executed _get_grouped_objectives in 7.1781s
+Testing sum n=100, num_cpus=1, strategy=PACK
+Executed __init__ in 0.8889s
+Executed _get_grouped_objectives in 3.6963s
+Testing weighted n=60, num_cpus=1, strategy=PACK
+Executed __init__ in 0.4064s
+Executed _get_grouped_objectives in 1.5843s
+Testing log n=20, num_cpus=1, strategy=PACK
+Executed __init__ in 0.0864s
+Executed _get_grouped_objectives in 9.4074s
+Testing sum n=100, num_cpus=2, strategy=PACK
+Executed __init__ in 1.0045s
+Executed _get_grouped_objectives in 7.2120s
+Testing weighted n=60, num_cpus=2, strategy=PACK
+Executed __init__ in 0.3929s
+Executed _get_grouped_objectives in 0.9914s
+Testing log n=20, num_cpus=2, strategy=PACK
+Executed __init__ in 0.0864s
+Executed _get_grouped_objectives in 5.1820s
+Testing sum n=100, num_cpus=4, strategy=PACK
+Executed __init__ in 1.1153s
+Executed _get_grouped_objectives in 1.7281s
+Testing weighted n=60, num_cpus=4, strategy=PACK
+Executed __init__ in 0.3659s
+Executed _get_grouped_objectives in 0.8178s
+Testing log n=20, num_cpus=4, strategy=PACK
+Executed __init__ in 0.0899s
+Executed _get_grouped_objectives in 2.7233s
+Testing sum n=100, num_cpus=8, strategy=PACK
+Executed __init__ in 0.8137s
+Executed _get_grouped_objectives in 9.6942s
+Testing weighted n=60, num_cpus=8, strategy=PACK
+Executed __init__ in 0.4891s
+Executed _get_grouped_objectives in 8.4915s
+Testing log n=20, num_cpus=8, strategy=PACK
+Executed __init__ in 0.0926s
+Executed _get_grouped_objectives in 4.0687s
+Testing sum n=100, num_cpus=16, strategy=PACK
+Executed __init__ in 1.0727s
+Executed _get_grouped_objectives in 9.3313s
+Testing weighted n=60, num_cpus=16, strategy=PACK
+Executed __init__ in 0.4014s
+Executed _get_grouped_objectives in 7.1168s
+Testing log n=20, num_cpus=16, strategy=PACK
+Executed __init__ in 0.0891s
+Executed _get_grouped_objectives in 7.1448s
+Testing sum n=100, num_cpus=4, strategy=SPREAD
+Executed __init__ in 1.0067s
+Executed _get_grouped_objectives in 6.2431s
+Testing weighted n=60, num_cpus=4, strategy=SPREAD
+Executed __init__ in 0.3841s
+Executed _get_grouped_objectives in 0.9510s
+Testing log n=20, num_cpus=4, strategy=SPREAD
+Executed __init__ in 0.0858s
+Executed _get_grouped_objectives in 2.5965s
+Testing sum n=100, num_cpus=8, strategy=SPREAD
+Executed __init__ in 0.8958s
+Executed _get_grouped_objectives in 3.2900s
+Testing weighted n=60, num_cpus=8, strategy=SPREAD
+Executed __init__ in 0.4123s
+Executed _get_grouped_objectives in 0.6579s
+Testing log n=20, num_cpus=8, strategy=SPREAD
+Executed __init__ in 0.0888s
+Executed _get_grouped_objectives in 1.6175s
+Testing sum n=100, num_cpus=16, strategy=SPREAD
+Executed __init__ in 0.9797s
+Executed _get_grouped_objectives in 1.4777s
+Testing weighted n=60, num_cpus=16, strategy=SPREAD
+Executed __init__ in 0.3784s
+Executed _get_grouped_objectives in 1.2546s
+Testing log n=20, num_cpus=16, strategy=SPREAD
+Executed __init__ in 0.0930s
+Executed _get_grouped_objectives in 3.3614s
+Testing sum n=100, num_cpus=32, strategy=SPREAD
+Executed __init__ in 1.1289s
+Executed _get_grouped_objectives in 8.7636s
+Testing weighted n=60, num_cpus=32, strategy=SPREAD
+Executed __init__ in 0.6243s
+Executed _get_grouped_objectives in 9.5414s
+Testing log n=20, num_cpus=32, strategy=SPREAD
+Executed __init__ in 0.0907s
+Executed _get_grouped_objectives in 7.4649s
+Testing sum n=150, num_cpus=1, strategy=PACK
+Executed __init__ in 1.8161s
+Executed _get_grouped_objectives in 8.0076s
+Testing weighted n=90, num_cpus=1, strategy=PACK
+Executed __init__ in 0.7313s
+Executed _get_grouped_objectives in 2.9256s
+Testing log n=30, num_cpus=1, strategy=PACK
+Executed __init__ in 0.1571s
+Executed _get_grouped_objectives in 21.9905s
+Testing sum n=150, num_cpus=2, strategy=PACK
+Executed __init__ in 1.8084s
+Executed _get_grouped_objectives in 4.8267s
+Testing weighted n=90, num_cpus=2, strategy=PACK
+Executed __init__ in 0.8991s
+Executed _get_grouped_objectives in 1.7616s
+Testing log n=30, num_cpus=2, strategy=PACK
+Executed __init__ in 0.1475s
+Executed _get_grouped_objectives in 11.1384s
+Testing sum n=150, num_cpus=4, strategy=PACK
+Executed __init__ in 1.5109s
+Executed _get_grouped_objectives in 9.4792s
+Testing weighted n=90, num_cpus=4, strategy=PACK
+Executed __init__ in 0.9660s
+Executed _get_grouped_objectives in 1.3130s
+Testing log n=30, num_cpus=4, strategy=PACK
+Executed __init__ in 0.1530s
+Executed _get_grouped_objectives in 6.6783s
+Testing sum n=150, num_cpus=8, strategy=PACK
+Executed __init__ in 1.7615s
+Executed _get_grouped_objectives in 10.0449s
+Testing weighted n=90, num_cpus=8, strategy=PACK
+Executed __init__ in 0.7119s
+Executed _get_grouped_objectives in 8.0777s
+Testing log n=30, num_cpus=8, strategy=PACK
+Executed __init__ in 0.1540s
+Executed _get_grouped_objectives in 8.9689s
+Testing sum n=150, num_cpus=16, strategy=PACK
+Executed __init__ in 1.9483s
+Executed _get_grouped_objectives in 9.7168s
+Testing weighted n=90, num_cpus=16, strategy=PACK
+Executed __init__ in 0.7273s
+Executed _get_grouped_objectives in 7.7795s
+Testing log n=30, num_cpus=16, strategy=PACK
+Executed __init__ in 0.1426s
+Executed _get_grouped_objectives in 2.5724s
+Testing sum n=150, num_cpus=4, strategy=SPREAD
+Executed __init__ in 1.7256s
+Executed _get_grouped_objectives in 3.6498s
+Testing weighted n=90, num_cpus=4, strategy=SPREAD
+Executed __init__ in 0.6590s
+Executed _get_grouped_objectives in 1.3543s
+Testing log n=30, num_cpus=4, strategy=SPREAD
+Executed __init__ in 0.3260s
+Executed _get_grouped_objectives in 5.9677s
+Testing sum n=150, num_cpus=8, strategy=SPREAD
+Executed __init__ in 1.7012s
+Executed _get_grouped_objectives in 3.8476s
+Testing weighted n=90, num_cpus=8, strategy=SPREAD
+Executed __init__ in 0.6905s
+Executed _get_grouped_objectives in 2.9627s
+Testing log n=30, num_cpus=8, strategy=SPREAD
+Executed __init__ in 0.1458s
+Executed _get_grouped_objectives in 3.4566s
+Testing sum n=150, num_cpus=16, strategy=SPREAD
+Executed __init__ in 1.8544s
+Executed _get_grouped_objectives in 4.4184s
+Testing weighted n=90, num_cpus=16, strategy=SPREAD
+Executed __init__ in 0.8665s
+Executed _get_grouped_objectives in 2.7885s
+Testing log n=30, num_cpus=16, strategy=SPREAD
+Executed __init__ in 0.1569s
+Executed _get_grouped_objectives in 2.3419s
+Testing sum n=150, num_cpus=32, strategy=SPREAD
+Executed __init__ in 1.8669s
+Executed _get_grouped_objectives in 10.5521s
+Testing weighted n=90, num_cpus=32, strategy=SPREAD
+Executed __init__ in 1.0176s
+Executed _get_grouped_objectives in 8.9865s
+Testing log n=30, num_cpus=32, strategy=SPREAD
+Executed __init__ in 0.1645s
+Executed _get_grouped_objectives in 8.2630s
+Testing sum n=200, num_cpus=1, strategy=PACK
+Executed __init__ in 2.9579s
+Executed _get_grouped_objectives in 15.0553s
+Testing weighted n=120, num_cpus=1, strategy=PACK
+Executed __init__ in 1.3134s
+Executed _get_grouped_objectives in 5.0068s
+Testing log n=40, num_cpus=1, strategy=PACK
+Executed __init__ in 0.2192s
+Executed _get_grouped_objectives in 39.9609s
+Testing sum n=200, num_cpus=2, strategy=PACK
+Executed __init__ in 2.7369s
+Executed _get_grouped_objectives in 14.6466s
+Testing weighted n=120, num_cpus=2, strategy=PACK
+Executed __init__ in 1.3417s
+Executed _get_grouped_objectives in 3.1491s
+Testing log n=40, num_cpus=2, strategy=PACK
+Executed __init__ in 0.4098s
+Executed _get_grouped_objectives in 22.0504s
+Testing sum n=200, num_cpus=4, strategy=PACK
+Executed __init__ in 2.9101s
+Executed _get_grouped_objectives in 7.0172s
+Testing weighted n=120, num_cpus=4, strategy=PACK
+Executed __init__ in 1.2973s
+Executed _get_grouped_objectives in 2.3633s
+Testing log n=40, num_cpus=4, strategy=PACK
+Executed __init__ in 0.2598s
+Executed _get_grouped_objectives in 11.7554s
+Testing sum n=200, num_cpus=8, strategy=PACK
+Executed __init__ in 3.0354s
+Executed _get_grouped_objectives in 12.4968s
+Testing weighted n=120, num_cpus=8, strategy=PACK
+Executed __init__ in 1.2220s
+Executed _get_grouped_objectives in 9.1623s
+Testing log n=40, num_cpus=8, strategy=PACK
+Executed __init__ in 0.2221s
+Executed _get_grouped_objectives in 13.8158s
+Testing sum n=200, num_cpus=16, strategy=PACK
+Executed __init__ in 2.9473s
+Executed _get_grouped_objectives in 13.2681s
+Testing weighted n=120, num_cpus=16, strategy=PACK
+Executed __init__ in 1.6215s
+Executed _get_grouped_objectives in 9.6687s
+Testing log n=40, num_cpus=16, strategy=PACK
+Executed __init__ in 0.2214s
+Executed _get_grouped_objectives in 12.6918s
+Testing sum n=200, num_cpus=4, strategy=SPREAD
+Executed __init__ in 2.9377s
+Executed _get_grouped_objectives in 11.0235s
+Testing weighted n=120, num_cpus=4, strategy=SPREAD
+Executed __init__ in 1.2735s
+Executed _get_grouped_objectives in 2.1863s
+Testing log n=40, num_cpus=4, strategy=SPREAD
+Executed __init__ in 0.2353s
+Executed _get_grouped_objectives in 11.3406s
+Testing sum n=200, num_cpus=8, strategy=SPREAD
+Executed __init__ in 2.8737s
+Executed _get_grouped_objectives in 6.9478s
+Testing weighted n=120, num_cpus=8, strategy=SPREAD
+Executed __init__ in 1.3769s
+Executed _get_grouped_objectives in 1.7800s
+Testing log n=40, num_cpus=8, strategy=SPREAD
+Executed __init__ in 0.3687s
+Executed _get_grouped_objectives in 6.3275s
+Testing sum n=200, num_cpus=16, strategy=SPREAD
+Executed __init__ in 2.8302s
+Executed _get_grouped_objectives in 6.0403s
+Testing weighted n=120, num_cpus=16, strategy=SPREAD
+Executed __init__ in 1.2763s
+Executed _get_grouped_objectives in 3.9396s
+Testing log n=40, num_cpus=16, strategy=SPREAD
+Executed __init__ in 0.2278s
+Executed _get_grouped_objectives in 3.6404s
+Testing sum n=200, num_cpus=32, strategy=SPREAD
+Executed __init__ in 3.2759s
+Executed _get_grouped_objectives in 12.8497s
+Testing weighted n=120, num_cpus=32, strategy=SPREAD
+Executed __init__ in 1.5921s
+Executed _get_grouped_objectives in 9.8489s
+Testing log n=40, num_cpus=32, strategy=SPREAD
+Executed __init__ in 0.2648s
+Executed _get_grouped_objectives in 10.2009s
+Testing sum n=250, num_cpus=1, strategy=PACK
+Executed __init__ in 4.2667s
+Executed _get_grouped_objectives in 26.7468s
+Testing weighted n=150, num_cpus=1, strategy=PACK
+Executed __init__ in 1.7503s
+Executed _get_grouped_objectives in 8.1529s
+Testing log n=50, num_cpus=1, strategy=PACK
+Executed __init__ in 0.3161s
+Executed _get_grouped_objectives in 68.4768s
+Testing sum n=250, num_cpus=2, strategy=PACK
+Executed __init__ in 4.3723s
+Executed _get_grouped_objectives in 17.9270s
+Testing weighted n=150, num_cpus=2, strategy=PACK
+Executed __init__ in 1.8528s
+Executed _get_grouped_objectives in 5.0622s
+Testing log n=50, num_cpus=2, strategy=PACK
+Executed __init__ in 0.4818s
+Executed _get_grouped_objectives in 33.1290s
+Testing sum n=250, num_cpus=4, strategy=PACK
+Executed __init__ in 4.1223s
+Executed _get_grouped_objectives in 16.4522s
+Testing weighted n=150, num_cpus=4, strategy=PACK
+Executed __init__ in 1.8867s
+Executed _get_grouped_objectives in 3.7825s
+Testing log n=50, num_cpus=4, strategy=PACK
+Executed __init__ in 0.3489s
+Executed _get_grouped_objectives in 17.9065s
+Testing sum n=250, num_cpus=8, strategy=PACK
+Executed __init__ in 4.3560s
+Executed _get_grouped_objectives in 16.5536s
+Testing weighted n=150, num_cpus=8, strategy=PACK
+Executed __init__ in 1.7641s
+Executed _get_grouped_objectives in 9.9717s
+Testing log n=50, num_cpus=8, strategy=PACK
+Executed __init__ in 0.3038s
+Executed _get_grouped_objectives in 19.7897s
+Testing sum n=250, num_cpus=16, strategy=PACK
+Executed __init__ in 4.3148s
+Executed _get_grouped_objectives in 14.4550s
+Testing weighted n=150, num_cpus=16, strategy=PACK
+Executed __init__ in 1.7891s
+Executed _get_grouped_objectives in 9.3432s
+Testing log n=50, num_cpus=16, strategy=PACK
+Executed __init__ in 0.4767s
+Executed _get_grouped_objectives in 13.8956s
+Testing sum n=250, num_cpus=4, strategy=SPREAD
+Executed __init__ in 4.2891s
+Executed _get_grouped_objectives in 10.5786s
+Testing weighted n=150, num_cpus=4, strategy=SPREAD
+Executed __init__ in 1.7549s
+Executed _get_grouped_objectives in 3.6094s
+Testing log n=50, num_cpus=4, strategy=SPREAD
+Executed __init__ in 0.3143s
+Executed _get_grouped_objectives in 17.9033s
+Testing sum n=250, num_cpus=8, strategy=SPREAD
+Executed __init__ in 4.5074s
+Executed _get_grouped_objectives in 8.1881s
+Testing weighted n=150, num_cpus=8, strategy=SPREAD
+Executed __init__ in 1.8904s
+Executed _get_grouped_objectives in 2.9760s
+Testing log n=50, num_cpus=8, strategy=SPREAD
+Executed __init__ in 0.3018s
+Executed _get_grouped_objectives in 9.7993s
+Testing sum n=250, num_cpus=16, strategy=SPREAD
+Executed __init__ in 4.4555s
+Executed _get_grouped_objectives in 7.5301s
+Testing weighted n=150, num_cpus=16, strategy=SPREAD
+Executed __init__ in 1.8920s
+Executed _get_grouped_objectives in 2.3565s
+Testing log n=50, num_cpus=16, strategy=SPREAD
+Executed __init__ in 0.4661s
+Executed _get_grouped_objectives in 5.6697s
+Testing sum n=250, num_cpus=32, strategy=SPREAD
+Executed __init__ in 4.1871s
+Executed _get_grouped_objectives in 14.8497s
+Testing weighted n=150, num_cpus=32, strategy=SPREAD
+Executed __init__ in 2.0130s
+Executed _get_grouped_objectives in 10.7626s
+Testing log n=50, num_cpus=32, strategy=SPREAD
+Executed __init__ in 0.3240s
+Executed _get_grouped_objectives in 13.2742s
+Testing sum n=300, num_cpus=1, strategy=PACK
+Executed __init__ in 6.1402s
+Executed _get_grouped_objectives in 43.3470s
+Testing weighted n=180, num_cpus=1, strategy=PACK
+Executed __init__ in 2.4281s
+Executed _get_grouped_objectives in 12.0046s
+Testing log n=60, num_cpus=1, strategy=PACK
+Executed __init__ in 0.3743s
+Executed _get_grouped_objectives in 99.2340s
+Testing sum n=300, num_cpus=2, strategy=PACK
+Executed __init__ in 6.0844s
+Executed _get_grouped_objectives in 27.2643s
+Testing weighted n=180, num_cpus=2, strategy=PACK
+Executed __init__ in 2.4923s
+Executed _get_grouped_objectives in 7.5262s
+Testing log n=60, num_cpus=2, strategy=PACK
+Executed __init__ in 0.3689s
+Executed _get_grouped_objectives in 50.4026s
+Testing sum n=300, num_cpus=4, strategy=PACK
+Executed __init__ in 6.2409s
+Executed _get_grouped_objectives in 18.3616s
+Testing weighted n=180, num_cpus=4, strategy=PACK
+Executed __init__ in 2.3552s
+Executed _get_grouped_objectives in 5.3968s
+Testing log n=60, num_cpus=4, strategy=PACK
+Executed __init__ in 0.4498s
+Executed _get_grouped_objectives in 29.3971s
+Testing sum n=300, num_cpus=8, strategy=PACK
+Executed __init__ in 6.2313s
+Executed _get_grouped_objectives in 21.7885s
+Testing weighted n=180, num_cpus=8, strategy=PACK
+Executed __init__ in 2.3388s
+Executed _get_grouped_objectives in 11.4699s
+Testing log n=60, num_cpus=8, strategy=PACK
+Executed __init__ in 0.3884s
+Executed _get_grouped_objectives in 26.0728s
+Testing sum n=300, num_cpus=16, strategy=PACK
+Executed __init__ in 6.3237s
+Executed _get_grouped_objectives in 18.9756s
+Testing weighted n=180, num_cpus=16, strategy=PACK
+Executed __init__ in 2.5666s
+Executed _get_grouped_objectives in 10.4925s
+Testing log n=60, num_cpus=16, strategy=PACK
+Executed __init__ in 0.4039s
+Executed _get_grouped_objectives in 17.2506s
+Testing sum n=300, num_cpus=4, strategy=SPREAD
+Executed __init__ in 6.1575s
+Executed _get_grouped_objectives in 16.0898s
+Testing weighted n=180, num_cpus=4, strategy=SPREAD
+Executed __init__ in 2.3198s
+Executed _get_grouped_objectives in 5.0324s
+Testing log n=60, num_cpus=4, strategy=SPREAD
+Executed __init__ in 0.3971s
+Executed _get_grouped_objectives in 27.0471s
+Testing sum n=300, num_cpus=8, strategy=SPREAD
+Executed __init__ in 6.3073s
+Executed _get_grouped_objectives in 12.1422s
+Testing weighted n=180, num_cpus=8, strategy=SPREAD
+Executed __init__ in 2.3251s
+Executed _get_grouped_objectives in 4.1426s
+Testing log n=60, num_cpus=8, strategy=SPREAD
+Executed __init__ in 0.4340s
+Executed _get_grouped_objectives in 15.2077s
+Testing sum n=300, num_cpus=16, strategy=SPREAD
+Executed __init__ in 6.0277s
+Executed _get_grouped_objectives in 15.0135s
+Testing weighted n=180, num_cpus=16, strategy=SPREAD
+Executed __init__ in 2.3842s
+Executed _get_grouped_objectives in 3.5652s
+Testing log n=60, num_cpus=16, strategy=SPREAD
+Executed __init__ in 0.4128s
+Executed _get_grouped_objectives in 8.8706s
+Testing sum n=300, num_cpus=32, strategy=SPREAD
+Executed __init__ in 6.5247s
+Executed _get_grouped_objectives in 18.4704s
+Testing weighted n=180, num_cpus=32, strategy=SPREAD
+Executed __init__ in 2.6690s
+Executed _get_grouped_objectives in 11.8899s
+Testing log n=60, num_cpus=32, strategy=SPREAD
+Executed __init__ in 0.4397s
+Executed _get_grouped_objectives in 15.3339s
+Testing sum n=350, num_cpus=1, strategy=PACK
+Executed __init__ in 8.3426s
+Executed _get_grouped_objectives in 63.8021s
+Testing weighted n=210, num_cpus=1, strategy=PACK
+Executed __init__ in 2.9714s
+Executed _get_grouped_objectives in 16.5060s
+Testing log n=70, num_cpus=1, strategy=PACK
+Executed __init__ in 0.4827s
+Executed _get_grouped_objectives in 141.1465s
+Testing sum n=350, num_cpus=2, strategy=PACK
+Executed __init__ in 7.9821s
+Executed _get_grouped_objectives in 40.3836s
+Testing weighted n=210, num_cpus=2, strategy=PACK
+Executed __init__ in 3.0392s
+Executed _get_grouped_objectives in 10.6905s
+Testing log n=70, num_cpus=2, strategy=PACK
+Executed __init__ in 0.5157s
+Executed _get_grouped_objectives in 72.8152s
+Testing sum n=350, num_cpus=4, strategy=PACK
+Executed __init__ in 8.0232s
+Executed _get_grouped_objectives in 30.2739s
+Testing weighted n=210, num_cpus=4, strategy=PACK
+Executed __init__ in 3.3707s
+Executed _get_grouped_objectives in 7.1699s
+Testing log n=70, num_cpus=4, strategy=PACK
+Executed __init__ in 0.5181s
+Executed _get_grouped_objectives in 41.8182s
+Testing sum n=350, num_cpus=8, strategy=PACK
+Executed __init__ in 8.3628s
+Executed _get_grouped_objectives in 28.3103s
+Testing weighted n=210, num_cpus=8, strategy=PACK
+Executed __init__ in 3.1035s
+Executed _get_grouped_objectives in 13.4290s
+Testing log n=70, num_cpus=8, strategy=PACK
+Executed __init__ in 0.4905s
+Executed _get_grouped_objectives in 34.1219s
+Testing sum n=350, num_cpus=16, strategy=PACK
+Executed __init__ in 8.2213s
+Executed _get_grouped_objectives in 25.9024s
+Testing weighted n=210, num_cpus=16, strategy=PACK
+Executed __init__ in 3.3862s
+Executed _get_grouped_objectives in 14.0964s
+Testing log n=70, num_cpus=16, strategy=PACK
+Executed __init__ in 0.6139s
+Executed _get_grouped_objectives in 26.4415s
+Testing sum n=350, num_cpus=4, strategy=SPREAD
+Executed __init__ in 7.8227s
+Executed _get_grouped_objectives in 27.7597s
+Testing weighted n=210, num_cpus=4, strategy=SPREAD
+Executed __init__ in 3.0387s
+Executed _get_grouped_objectives in 7.1404s
+Testing log n=70, num_cpus=4, strategy=SPREAD
+Executed __init__ in 0.6223s
+Executed _get_grouped_objectives in 38.7456s
+Testing sum n=350, num_cpus=8, strategy=SPREAD
+Executed __init__ in 8.5542s
+Executed _get_grouped_objectives in 21.5044s
+Testing weighted n=210, num_cpus=8, strategy=SPREAD
+Executed __init__ in 3.0935s
+Executed _get_grouped_objectives in 5.4140s
+Testing log n=70, num_cpus=8, strategy=SPREAD
+Executed __init__ in 0.7169s
+Executed _get_grouped_objectives in 20.6753s
+Testing sum n=350, num_cpus=16, strategy=SPREAD
+Executed __init__ in 8.2982s
+Executed _get_grouped_objectives in 19.3846s
+Testing weighted n=210, num_cpus=16, strategy=SPREAD
+Executed __init__ in 3.1015s
+Executed _get_grouped_objectives in 5.2458s
+Testing log n=70, num_cpus=16, strategy=SPREAD
+Executed __init__ in 0.5795s
+Executed _get_grouped_objectives in 12.4927s
+Testing sum n=350, num_cpus=32, strategy=SPREAD
+Executed __init__ in 8.0063s
+Executed _get_grouped_objectives in 22.9062s
+Testing weighted n=210, num_cpus=32, strategy=SPREAD
+Executed __init__ in 3.5198s
+Executed _get_grouped_objectives in 13.4073s
+Testing log n=70, num_cpus=32, strategy=SPREAD
+Executed __init__ in 0.5902s
+Executed _get_grouped_objectives in 18.6821s
+Testing sum n=400, num_cpus=1, strategy=PACK
+Executed __init__ in 10.4390s
+Executed _get_grouped_objectives in 92.7291s
+Testing weighted n=240, num_cpus=1, strategy=PACK
+Executed __init__ in 4.1452s
+Executed _get_grouped_objectives in 23.7549s
+Testing log n=80, num_cpus=1, strategy=PACK
+Executed __init__ in 0.5976s
+Executed _get_grouped_objectives in 196.2498s
+Testing sum n=400, num_cpus=2, strategy=PACK
+Executed __init__ in 10.4231s
+Executed _get_grouped_objectives in 55.3502s
+Testing weighted n=240, num_cpus=2, strategy=PACK
+Executed __init__ in 4.0618s
+Executed _get_grouped_objectives in 15.1426s
+Testing log n=80, num_cpus=2, strategy=PACK
+Executed __init__ in 0.5599s
+Executed _get_grouped_objectives in 105.1573s
+Testing sum n=400, num_cpus=4, strategy=PACK
+Executed __init__ in 10.4467s
+Executed _get_grouped_objectives in 44.4923s
+Testing weighted n=240, num_cpus=4, strategy=PACK
+Executed __init__ in 4.1799s
+Executed _get_grouped_objectives in 10.5976s
+Testing log n=80, num_cpus=4, strategy=PACK
+Executed __init__ in 0.8161s
+Executed _get_grouped_objectives in 58.9325s
+Testing sum n=400, num_cpus=8, strategy=PACK
+Executed __init__ in 10.3431s
+Executed _get_grouped_objectives in 42.2533s
+Testing weighted n=240, num_cpus=8, strategy=PACK
+Executed __init__ in 4.3034s
+Executed _get_grouped_objectives in 18.1797s
+Testing log n=80, num_cpus=8, strategy=PACK
+Executed __init__ in 0.7255s
+Executed _get_grouped_objectives in 52.5913s
+Testing sum n=400, num_cpus=16, strategy=PACK
+Executed __init__ in 10.3911s
+Executed _get_grouped_objectives in 32.1028s
+Testing weighted n=240, num_cpus=16, strategy=PACK
+Executed __init__ in 4.2554s
+Executed _get_grouped_objectives in 15.9257s
+Testing log n=80, num_cpus=16, strategy=PACK
+Executed __init__ in 0.7054s
+Executed _get_grouped_objectives in 32.6724s
+Testing sum n=400, num_cpus=4, strategy=SPREAD
+Executed __init__ in 10.4202s
+Executed _get_grouped_objectives in 37.3538s
+Testing weighted n=240, num_cpus=4, strategy=SPREAD
+Executed __init__ in 3.7552s
+Executed _get_grouped_objectives in 9.8070s
+Testing log n=80, num_cpus=4, strategy=SPREAD
+Executed __init__ in 0.7652s
+Executed _get_grouped_objectives in 53.7964s
+Testing sum n=400, num_cpus=8, strategy=SPREAD
+Executed __init__ in 10.4668s
+Executed _get_grouped_objectives in 26.7434s
+Testing weighted n=240, num_cpus=8, strategy=SPREAD
+Executed __init__ in 3.9274s
+Executed _get_grouped_objectives in 7.4843s
+Testing log n=80, num_cpus=8, strategy=SPREAD
+Executed __init__ in 0.7457s
+Executed _get_grouped_objectives in 28.4069s
+Testing sum n=400, num_cpus=16, strategy=SPREAD
+Executed __init__ in 10.4682s
+Executed _get_grouped_objectives in 24.1028s
+Testing weighted n=240, num_cpus=16, strategy=SPREAD
+Executed __init__ in 3.7960s
+Executed _get_grouped_objectives in 7.3354s
+Testing log n=80, num_cpus=16, strategy=SPREAD
+Executed __init__ in 0.8515s
+Executed _get_grouped_objectives in 16.7447s
+Testing sum n=400, num_cpus=32, strategy=SPREAD
+Executed __init__ in 10.7295s
+Executed _get_grouped_objectives in 27.6015s
+Testing weighted n=240, num_cpus=32, strategy=SPREAD
+Executed __init__ in 4.2924s
+Executed _get_grouped_objectives in 14.7391s
+Testing log n=80, num_cpus=32, strategy=SPREAD
+Executed __init__ in 0.9472s
+Executed _get_grouped_objectives in 22.0901s
+Testing sum n=450, num_cpus=1, strategy=PACK
+Executed __init__ in 13.0921s
+Executed _get_grouped_objectives in 129.6341s
+Testing weighted n=270, num_cpus=1, strategy=PACK
+Executed __init__ in 4.9630s
+Executed _get_grouped_objectives in 32.6430s
+Testing log n=90, num_cpus=1, strategy=PACK
+Executed __init__ in 0.8782s
+Executed _get_grouped_objectives in 277.6896s
+Testing sum n=450, num_cpus=2, strategy=PACK
+Executed __init__ in 13.0403s
+Executed _get_grouped_objectives in 77.1956s
+Testing weighted n=270, num_cpus=2, strategy=PACK
+Executed __init__ in 4.9215s
+Executed _get_grouped_objectives in 19.4020s
+Testing log n=90, num_cpus=2, strategy=PACK
+Executed __init__ in 0.8425s
+Executed _get_grouped_objectives in 135.5412s
+Testing sum n=450, num_cpus=4, strategy=PACK
+Executed __init__ in 13.3313s
+Executed _get_grouped_objectives in 55.7472s
+Testing weighted n=270, num_cpus=4, strategy=PACK
+Executed __init__ in 5.0264s
+Executed _get_grouped_objectives in 13.3181s
+Testing log n=90, num_cpus=4, strategy=PACK
+Executed __init__ in 0.9076s
+Executed _get_grouped_objectives in 77.8486s
+Testing sum n=450, num_cpus=8, strategy=PACK
+Executed __init__ in 13.0708s
+Executed _get_grouped_objectives in 47.4040s
+Testing weighted n=270, num_cpus=8, strategy=PACK
+Executed __init__ in 5.0461s
+Executed _get_grouped_objectives in 19.1865s
+Testing log n=90, num_cpus=8, strategy=PACK
+Executed __init__ in 0.8317s
+Executed _get_grouped_objectives in 57.0891s
+Testing sum n=450, num_cpus=16, strategy=PACK
+Executed __init__ in 13.2111s
+Executed _get_grouped_objectives in 41.1779s
+Testing weighted n=270, num_cpus=16, strategy=PACK
+Executed __init__ in 4.7097s
+Executed _get_grouped_objectives in 18.5577s
+Testing log n=90, num_cpus=16, strategy=PACK
+Executed __init__ in 0.8310s
+Executed _get_grouped_objectives in 40.9436s
+Testing sum n=450, num_cpus=4, strategy=SPREAD
+Executed __init__ in 13.2038s
+Executed _get_grouped_objectives in 48.5746s
+Testing weighted n=270, num_cpus=4, strategy=SPREAD
+Executed __init__ in 5.1854s
+Executed _get_grouped_objectives in 12.5069s
+Testing log n=90, num_cpus=4, strategy=SPREAD
+Executed __init__ in 0.9302s
+Executed _get_grouped_objectives in 71.9486s
+Testing sum n=450, num_cpus=8, strategy=SPREAD
+Executed __init__ in 13.1894s
+Executed _get_grouped_objectives in 33.4399s
+Testing weighted n=270, num_cpus=8, strategy=SPREAD
+Executed __init__ in 5.0786s
+Executed _get_grouped_objectives in 9.7891s
+Testing log n=90, num_cpus=8, strategy=SPREAD
+Executed __init__ in 0.7570s
+Executed _get_grouped_objectives in 40.0303s
+Testing sum n=450, num_cpus=16, strategy=SPREAD
+Executed __init__ in 12.9301s
+Executed _get_grouped_objectives in 31.5645s
+Testing weighted n=270, num_cpus=16, strategy=SPREAD
+Executed __init__ in 4.7908s
+Executed _get_grouped_objectives in 8.6257s
+Testing log n=90, num_cpus=16, strategy=SPREAD
+Executed __init__ in 0.7404s
+Executed _get_grouped_objectives in 22.8440s
+Testing sum n=450, num_cpus=32, strategy=SPREAD
+Executed __init__ in 13.1769s
+Executed _get_grouped_objectives in 35.0161s
+Testing weighted n=270, num_cpus=32, strategy=SPREAD
+Executed __init__ in 4.6240s
+Executed _get_grouped_objectives in 17.8242s
+Testing log n=90, num_cpus=32, strategy=SPREAD
+Executed __init__ in 0.8170s
+Executed _get_grouped_objectives in 26.3340s
+Testing sum n=500, num_cpus=1, strategy=PACK
+Executed __init__ in 16.3027s
+Executed _get_grouped_objectives in 170.1691s
+Testing weighted n=300, num_cpus=1, strategy=PACK
+Executed __init__ in 6.0084s
+Executed _get_grouped_objectives in 40.9706s
+Testing log n=100, num_cpus=1, strategy=PACK
+Executed __init__ in 0.8936s
+Executed _get_grouped_objectives in 350.2712s
+Testing sum n=500, num_cpus=2, strategy=PACK
+Executed __init__ in 16.0387s
+Executed _get_grouped_objectives in 100.8634s
+Testing weighted n=300, num_cpus=2, strategy=PACK
+Executed __init__ in 5.8196s
+Executed _get_grouped_objectives in 26.2911s
+Testing log n=100, num_cpus=2, strategy=PACK
+Executed __init__ in 1.0547s
+Executed _get_grouped_objectives in 187.8261s
+Testing sum n=500, num_cpus=4, strategy=PACK
+Executed __init__ in 15.9475s
+Executed _get_grouped_objectives in 71.3911s
+Testing weighted n=300, num_cpus=4, strategy=PACK
+Executed __init__ in 6.0908s
+Executed _get_grouped_objectives in 17.6258s
+Testing log n=100, num_cpus=4, strategy=PACK
+Executed __init__ in 0.9239s
+Executed _get_grouped_objectives in 102.5384s
+Testing sum n=500, num_cpus=8, strategy=PACK
+Executed __init__ in 16.2475s
+Executed _get_grouped_objectives in 60.8426s
+Testing weighted n=300, num_cpus=8, strategy=PACK
+Executed __init__ in 6.1536s
+Executed _get_grouped_objectives in 21.9685s
+Testing log n=100, num_cpus=8, strategy=PACK
+Executed __init__ in 0.9642s
+Executed _get_grouped_objectives in 74.0172s
+Testing sum n=500, num_cpus=16, strategy=PACK
+Executed __init__ in 16.1644s
+Executed _get_grouped_objectives in 44.0656s
+Testing weighted n=300, num_cpus=16, strategy=PACK
+Executed __init__ in 6.0893s
+Executed _get_grouped_objectives in 18.5710s
+Testing log n=100, num_cpus=16, strategy=PACK
+Executed __init__ in 1.0074s
+Executed _get_grouped_objectives in 42.5792s
+Testing sum n=500, num_cpus=4, strategy=SPREAD
+Executed __init__ in 16.0647s
+Executed _get_grouped_objectives in 59.1110s
+Testing weighted n=300, num_cpus=4, strategy=SPREAD
+Executed __init__ in 6.1428s
+Executed _get_grouped_objectives in 15.9722s
+Testing log n=100, num_cpus=4, strategy=SPREAD
+Executed __init__ in 0.8000s
+Executed _get_grouped_objectives in 94.2220s
+Testing sum n=500, num_cpus=8, strategy=SPREAD
+Executed __init__ in 16.1271s
+Executed _get_grouped_objectives in 42.0267s
+Testing weighted n=300, num_cpus=8, strategy=SPREAD
+Executed __init__ in 6.0604s
+Executed _get_grouped_objectives in 12.4474s
+Testing log n=100, num_cpus=8, strategy=SPREAD
+Executed __init__ in 0.8212s
+Executed _get_grouped_objectives in 50.2587s
+Testing sum n=500, num_cpus=16, strategy=SPREAD
+Executed __init__ in 16.1788s
+Executed _get_grouped_objectives in 39.2899s
+Testing weighted n=300, num_cpus=16, strategy=SPREAD
+Executed __init__ in 5.9869s
+Executed _get_grouped_objectives in 11.5992s
+Testing log n=100, num_cpus=16, strategy=SPREAD
+Executed __init__ in 0.8503s
+Executed _get_grouped_objectives in 29.9635s
+Testing sum n=500, num_cpus=32, strategy=SPREAD
+Executed __init__ in 16.0802s
+Executed _get_grouped_objectives in 40.1938s
+Testing weighted n=300, num_cpus=32, strategy=SPREAD
+Executed __init__ in 6.3695s
+Executed _get_grouped_objectives in 18.6472s
+Testing log n=100, num_cpus=32, strategy=SPREAD
+Executed __init__ in 0.9430s
+Executed _get_grouped_objectives in 33.2651s
+Testing sum n=550, num_cpus=1, strategy=PACK
+Executed __init__ in 19.0068s
+Executed _get_grouped_objectives in 252.0610s
+Testing weighted n=330, num_cpus=1, strategy=PACK
+Executed __init__ in 6.7366s
+Executed _get_grouped_objectives in 53.0878s
+Testing log n=110, num_cpus=1, strategy=PACK
+Executed __init__ in 0.9625s
+Executed _get_grouped_objectives in 452.2058s
+Testing sum n=550, num_cpus=2, strategy=PACK
+Executed __init__ in 19.2861s
+Executed _get_grouped_objectives in 151.9666s
+Testing weighted n=330, num_cpus=2, strategy=PACK
+Executed __init__ in 7.4395s
+Executed _get_grouped_objectives in 32.9948s
+Testing log n=110, num_cpus=2, strategy=PACK
+Executed __init__ in 0.9734s
+Executed _get_grouped_objectives in 246.1967s
+Testing sum n=550, num_cpus=4, strategy=PACK
+Executed __init__ in 19.2034s
+Executed _get_grouped_objectives in 100.0270s
+Testing weighted n=330, num_cpus=4, strategy=PACK
+Executed __init__ in 7.3712s
+Executed _get_grouped_objectives in 22.8141s
+Testing log n=110, num_cpus=4, strategy=PACK
+Executed __init__ in 1.1915s
+Executed _get_grouped_objectives in 134.0257s
+Testing sum n=550, num_cpus=8, strategy=PACK
+Executed __init__ in 19.3863s
+Executed _get_grouped_objectives in 81.6814s
+Testing weighted n=330, num_cpus=8, strategy=PACK
+Executed __init__ in 7.2071s
+Executed _get_grouped_objectives in 26.6093s
+Testing log n=110, num_cpus=8, strategy=PACK
+Executed __init__ in 1.0088s
+Executed _get_grouped_objectives in 92.4321s
+Testing sum n=550, num_cpus=16, strategy=PACK
+Executed __init__ in 19.1598s
+Executed _get_grouped_objectives in 59.3895s
+Testing weighted n=330, num_cpus=16, strategy=PACK
+Executed __init__ in 7.4344s
+Executed _get_grouped_objectives in 21.5583s
+Testing log n=110, num_cpus=16, strategy=PACK
+Executed __init__ in 0.9662s
+Executed _get_grouped_objectives in 53.3873s
+Testing sum n=550, num_cpus=4, strategy=SPREAD
+Executed __init__ in 19.0104s
+Executed _get_grouped_objectives in 87.1359s
+Testing weighted n=330, num_cpus=4, strategy=SPREAD
+Executed __init__ in 7.3545s
+Executed _get_grouped_objectives in 20.4845s
+Testing log n=110, num_cpus=4, strategy=SPREAD
+Executed __init__ in 0.9589s
+Executed _get_grouped_objectives in 122.3937s
+Testing sum n=550, num_cpus=8, strategy=SPREAD
+Executed __init__ in 19.2136s
+Executed _get_grouped_objectives in 58.1463s
+Testing weighted n=330, num_cpus=8, strategy=SPREAD
+Executed __init__ in 7.4944s
+Executed _get_grouped_objectives in 15.1680s
+Testing log n=110, num_cpus=8, strategy=SPREAD
+Executed __init__ in 0.9602s
+Executed _get_grouped_objectives in 66.4088s
+Testing sum n=550, num_cpus=16, strategy=SPREAD
+Executed __init__ in 19.3685s
+Executed _get_grouped_objectives in 48.7151s
+Testing weighted n=330, num_cpus=16, strategy=SPREAD
+Executed __init__ in 7.3564s
+Executed _get_grouped_objectives in 14.1906s
+Testing log n=110, num_cpus=16, strategy=SPREAD
+Executed __init__ in 1.0237s
+Executed _get_grouped_objectives in 38.0603s
+Testing sum n=550, num_cpus=32, strategy=SPREAD
+Executed __init__ in 19.6009s
+Executed _get_grouped_objectives in 52.7214s
+Testing weighted n=330, num_cpus=32, strategy=SPREAD
+Executed __init__ in 7.6514s
+Executed _get_grouped_objectives in 21.1704s
+Testing log n=110, num_cpus=32, strategy=SPREAD
+Executed __init__ in 1.1959s
+Executed _get_grouped_objectives in 39.5273s
+Testing sum n=600, num_cpus=1, strategy=PACK
+Executed __init__ in 22.1969s
+Executed _get_grouped_objectives in 328.1555s
+Testing weighted n=360, num_cpus=1, strategy=PACK
+Executed __init__ in 7.9299s
+Executed _get_grouped_objectives in 67.6503s
+Testing log n=120, num_cpus=1, strategy=PACK
+Executed __init__ in 1.2111s
+Executed _get_grouped_objectives in 581.9323s
+Testing sum n=600, num_cpus=2, strategy=PACK
+Executed __init__ in 22.7768s
+Executed _get_grouped_objectives in 184.3586s
+Testing weighted n=360, num_cpus=2, strategy=PACK
+Executed __init__ in 8.6045s
+Executed _get_grouped_objectives in 40.8077s
+Testing log n=120, num_cpus=2, strategy=PACK
+Executed __init__ in 1.1083s
+Executed _get_grouped_objectives in 298.1849s
+Testing sum n=600, num_cpus=4, strategy=PACK
+Executed __init__ in 22.3126s
+Executed _get_grouped_objectives in 126.8092s
+Testing weighted n=360, num_cpus=4, strategy=PACK
+Executed __init__ in 8.3162s
+Executed _get_grouped_objectives in 28.8029s
+Testing log n=120, num_cpus=4, strategy=PACK
+Executed __init__ in 1.1106s
+Executed _get_grouped_objectives in 171.2887s
+Testing sum n=600, num_cpus=8, strategy=PACK
+Executed __init__ in 22.3565s
+Executed _get_grouped_objectives in 100.6150s
+Testing weighted n=360, num_cpus=8, strategy=PACK
+Executed __init__ in 7.9063s
+Executed _get_grouped_objectives in 30.7156s
+Testing log n=120, num_cpus=8, strategy=PACK
+Executed __init__ in 1.1206s
+Executed _get_grouped_objectives in 117.0072s
+Testing sum n=600, num_cpus=16, strategy=PACK
+Executed __init__ in 22.9766s
+Executed _get_grouped_objectives in 70.1192s
+Testing weighted n=360, num_cpus=16, strategy=PACK
+Executed __init__ in 8.5166s
+Executed _get_grouped_objectives in 30.3271s
+Testing log n=120, num_cpus=16, strategy=PACK
+Executed __init__ in 1.2417s
+Executed _get_grouped_objectives in 66.2517s
+Testing sum n=600, num_cpus=4, strategy=SPREAD
+Executed __init__ in 22.6429s
+Executed _get_grouped_objectives in 108.5334s
+Testing weighted n=360, num_cpus=4, strategy=SPREAD
+Executed __init__ in 8.0821s
+Executed _get_grouped_objectives in 25.0844s
+Testing log n=120, num_cpus=4, strategy=SPREAD
+Executed __init__ in 1.0519s
+Executed _get_grouped_objectives in 156.5846s
+Testing sum n=600, num_cpus=8, strategy=SPREAD
+Executed __init__ in 22.6430s
+Executed _get_grouped_objectives in 73.9260s
+Testing weighted n=360, num_cpus=8, strategy=SPREAD
+Executed __init__ in 8.0235s
+Executed _get_grouped_objectives in 18.2578s
+Testing log n=120, num_cpus=8, strategy=SPREAD
+Executed __init__ in 1.2036s
+Executed _get_grouped_objectives in 84.4782s
+Testing sum n=600, num_cpus=16, strategy=SPREAD
+Executed __init__ in 22.4615s
+Executed _get_grouped_objectives in 63.8646s
+Testing weighted n=360, num_cpus=16, strategy=SPREAD
+Executed __init__ in 8.5817s
+Executed _get_grouped_objectives in 23.5721s
+Testing log n=120, num_cpus=16, strategy=SPREAD
+Executed __init__ in 1.1834s
+Executed _get_grouped_objectives in 56.5184s
+Testing sum n=600, num_cpus=32, strategy=SPREAD
+Executed __init__ in 22.9082s
+Executed _get_grouped_objectives in 61.6490s
+Testing weighted n=360, num_cpus=32, strategy=SPREAD
+Executed __init__ in 7.9541s
+Executed _get_grouped_objectives in 25.7010s
+Testing log n=120, num_cpus=32, strategy=SPREAD
+Executed __init__ in 1.2050s
+Executed _get_grouped_objectives in 46.8228s
+Testing sum n=650, num_cpus=1, strategy=PACK
+Executed __init__ in 26.2044s
+Executed _get_grouped_objectives in 410.4294s
+Testing weighted n=390, num_cpus=1, strategy=PACK
+Executed __init__ in 9.4762s
+Executed _get_grouped_objectives in 84.2055s
+Testing log n=130, num_cpus=1, strategy=PACK
+Executed __init__ in 1.2474s
+Executed _get_grouped_objectives in 735.3885s
+Testing sum n=650, num_cpus=2, strategy=PACK
+Executed __init__ in 26.2323s
+Executed _get_grouped_objectives in 236.0151s
+Testing weighted n=390, num_cpus=2, strategy=PACK
+Executed __init__ in 9.4641s
+Executed _get_grouped_objectives in 50.7882s
+Testing log n=130, num_cpus=2, strategy=PACK
+Executed __init__ in 1.3956s
+Executed _get_grouped_objectives in 374.4664s
+Testing sum n=650, num_cpus=4, strategy=PACK
+Executed __init__ in 26.1020s
+Executed _get_grouped_objectives in 149.4812s
+Testing weighted n=390, num_cpus=4, strategy=PACK
+Executed __init__ in 9.3255s
+Executed _get_grouped_objectives in 34.2678s
+Testing log n=130, num_cpus=4, strategy=PACK
+Executed __init__ in 1.3480s
+Executed _get_grouped_objectives in 212.6858s
+Testing sum n=650, num_cpus=8, strategy=PACK
+Executed __init__ in 26.5221s
+Executed _get_grouped_objectives in 139.9756s
+Testing weighted n=390, num_cpus=8, strategy=PACK
+Executed __init__ in 10.2406s
+Executed _get_grouped_objectives in 39.7133s
+Testing log n=130, num_cpus=8, strategy=PACK
+Executed __init__ in 1.5742s
+Executed _get_grouped_objectives in 176.0656s
+Testing sum n=650, num_cpus=16, strategy=PACK
+Executed __init__ in 26.1144s
+Executed _get_grouped_objectives in 96.5091s
+Testing weighted n=390, num_cpus=16, strategy=PACK
+Executed __init__ in 10.3430s
+Executed _get_grouped_objectives in 31.2992s
+Testing log n=130, num_cpus=16, strategy=PACK
+Executed __init__ in 1.6514s
+Executed _get_grouped_objectives in 97.9020s
+Testing sum n=650, num_cpus=4, strategy=SPREAD
+Executed __init__ in 26.0846s
+Executed _get_grouped_objectives in 136.2853s
+Testing weighted n=390, num_cpus=4, strategy=SPREAD
+Executed __init__ in 9.0150s
+Executed _get_grouped_objectives in 30.5967s
+Testing log n=130, num_cpus=4, strategy=SPREAD
+Executed __init__ in 1.3682s
+Executed _get_grouped_objectives in 197.4039s
+Testing sum n=650, num_cpus=8, strategy=SPREAD
+Executed __init__ in 26.6150s
+Executed _get_grouped_objectives in 89.8109s
+Testing weighted n=390, num_cpus=8, strategy=SPREAD
+Executed __init__ in 10.3317s
+Executed _get_grouped_objectives in 22.3115s
+Testing log n=130, num_cpus=8, strategy=SPREAD
+Executed __init__ in 1.4252s
+Executed _get_grouped_objectives in 104.2300s
+Testing sum n=650, num_cpus=16, strategy=SPREAD
+Executed __init__ in 26.5006s
+Executed _get_grouped_objectives in 69.8298s
+Testing weighted n=390, num_cpus=16, strategy=SPREAD
+Executed __init__ in 9.7857s
+Executed _get_grouped_objectives in 18.9218s
+Testing log n=130, num_cpus=16, strategy=SPREAD
+Executed __init__ in 1.2925s
+Executed _get_grouped_objectives in 59.6656s
+Testing sum n=650, num_cpus=32, strategy=SPREAD
+Executed __init__ in 26.6681s
+Executed _get_grouped_objectives in 74.8738s
+Testing weighted n=390, num_cpus=32, strategy=SPREAD
+Executed __init__ in 9.8901s
+Executed _get_grouped_objectives in 27.7794s
+Testing log n=130, num_cpus=32, strategy=SPREAD
+Executed __init__ in 1.3912s
+Executed _get_grouped_objectives in 58.1225s
+Testing sum n=700, num_cpus=1, strategy=PACK
+Executed __init__ in 31.3128s
+Executed _get_grouped_objectives in 516.9328s
+Testing weighted n=420, num_cpus=1, strategy=PACK
+Executed __init__ in 11.6112s
+Executed _get_grouped_objectives in 103.3366s
+Testing log n=140, num_cpus=1, strategy=PACK
+Executed __init__ in 1.5332s
+Executed _get_grouped_objectives in 896.9527s
+Testing sum n=700, num_cpus=2, strategy=PACK
+Executed __init__ in 30.1549s
+Executed _get_grouped_objectives in 300.0514s
+Testing weighted n=420, num_cpus=2, strategy=PACK
+Executed __init__ in 10.7813s
+Executed _get_grouped_objectives in 63.6678s
+Testing log n=140, num_cpus=2, strategy=PACK
+Executed __init__ in 1.5120s
+Executed _get_grouped_objectives in 473.9522s
+Testing sum n=700, num_cpus=4, strategy=PACK
+Executed __init__ in 30.2248s
+Executed _get_grouped_objectives in 186.8546s
+Testing weighted n=420, num_cpus=4, strategy=PACK
+Executed __init__ in 10.8288s
+Executed _get_grouped_objectives in 41.4657s
+Testing log n=140, num_cpus=4, strategy=PACK
+Executed __init__ in 1.4638s
+Executed _get_grouped_objectives in 260.9108s
+Testing sum n=700, num_cpus=8, strategy=PACK
+Executed __init__ in 31.0257s
+Executed _get_grouped_objectives in 147.1625s
+Testing weighted n=420, num_cpus=8, strategy=PACK
+Executed __init__ in 11.7536s
+Executed _get_grouped_objectives in 41.9697s
+Testing log n=140, num_cpus=8, strategy=PACK
+Executed __init__ in 1.6036s
+Executed _get_grouped_objectives in 180.7352s
+Testing sum n=700, num_cpus=16, strategy=PACK
+Executed __init__ in 30.1156s
+Executed _get_grouped_objectives in 118.2257s
+Testing weighted n=420, num_cpus=16, strategy=PACK
+Executed __init__ in 10.7540s
+Executed _get_grouped_objectives in 36.7415s
+Testing log n=140, num_cpus=16, strategy=PACK
+Executed __init__ in 1.8905s
+Executed _get_grouped_objectives in 118.2648s
+Testing sum n=700, num_cpus=4, strategy=SPREAD
+Executed __init__ in 30.7146s
+Executed _get_grouped_objectives in 165.2819s
+Testing weighted n=420, num_cpus=4, strategy=SPREAD
+Executed __init__ in 12.0066s
+Executed _get_grouped_objectives in 37.1796s
+Testing log n=140, num_cpus=4, strategy=SPREAD
+Executed __init__ in 1.3832s
+Executed _get_grouped_objectives in 242.6826s
+Testing sum n=700, num_cpus=8, strategy=SPREAD
+Executed __init__ in 30.7454s
+Executed _get_grouped_objectives in 108.5844s
+Testing weighted n=420, num_cpus=8, strategy=SPREAD
+Executed __init__ in 10.8799s
+Executed _get_grouped_objectives in 27.2401s
+Testing log n=140, num_cpus=8, strategy=SPREAD
+Executed __init__ in 1.3576s
+Executed _get_grouped_objectives in 131.5395s
+Testing sum n=700, num_cpus=16, strategy=SPREAD
+Executed __init__ in 30.6599s
+Executed _get_grouped_objectives in 85.3659s
+Testing weighted n=420, num_cpus=16, strategy=SPREAD
+Executed __init__ in 10.4723s
+Executed _get_grouped_objectives in 22.5606s
+Testing log n=140, num_cpus=16, strategy=SPREAD
+Executed __init__ in 1.4317s
+Executed _get_grouped_objectives in 77.0950s
+Testing sum n=700, num_cpus=32, strategy=SPREAD
+Executed __init__ in 30.3669s
+Executed _get_grouped_objectives in 85.9934s
+Testing weighted n=420, num_cpus=32, strategy=SPREAD
+Executed __init__ in 10.5767s
+Executed _get_grouped_objectives in 31.2312s
+Testing log n=140, num_cpus=32, strategy=SPREAD
+Executed __init__ in 1.6586s
+Executed _get_grouped_objectives in 69.4399s
+Testing sum n=750, num_cpus=1, strategy=PACK
+Executed __init__ in 34.6017s
+Executed _get_grouped_objectives in 602.6619s
+Testing weighted n=450, num_cpus=1, strategy=PACK
+Executed __init__ in 11.8613s
+Executed _get_grouped_objectives in 126.4830s
+Testing log n=150, num_cpus=1, strategy=PACK
+Executed __init__ in 1.5612s
+Executed _get_grouped_objectives in 1123.0182s
+Testing sum n=750, num_cpus=2, strategy=PACK
+Executed __init__ in 34.2768s
+Executed _get_grouped_objectives in 336.6763s
+Testing weighted n=450, num_cpus=2, strategy=PACK
+Executed __init__ in 12.5941s
+Executed _get_grouped_objectives in 74.1094s
+Testing log n=150, num_cpus=2, strategy=PACK
+Executed __init__ in 1.8047s
+Executed _get_grouped_objectives in 578.5667s
+Testing sum n=750, num_cpus=4, strategy=PACK
+Executed __init__ in 34.4435s
+Executed _get_grouped_objectives in 213.9716s
+Testing weighted n=450, num_cpus=4, strategy=PACK
+Executed __init__ in 12.9654s
+Executed _get_grouped_objectives in 50.0028s
+Testing log n=150, num_cpus=4, strategy=PACK
+Executed __init__ in 1.6328s
+Executed _get_grouped_objectives in 317.1083s
+Testing sum n=750, num_cpus=8, strategy=PACK
+Executed __init__ in 34.3771s
+Executed _get_grouped_objectives in 196.2376s
+Testing weighted n=450, num_cpus=8, strategy=PACK
+Executed __init__ in 12.8234s
+Executed _get_grouped_objectives in 56.1406s
+Testing log n=150, num_cpus=8, strategy=PACK
+Executed __init__ in 1.6347s
+Executed _get_grouped_objectives in 269.6955s
+Testing sum n=750, num_cpus=16, strategy=PACK
+Executed __init__ in 35.1826s
+Executed _get_grouped_objectives in 115.8339s
+Testing weighted n=450, num_cpus=16, strategy=PACK
+Executed __init__ in 13.1471s
+Executed _get_grouped_objectives in 37.2923s
+Testing log n=150, num_cpus=16, strategy=PACK
+Executed __init__ in 1.6624s
+Executed _get_grouped_objectives in 121.2294s
+Testing sum n=750, num_cpus=4, strategy=SPREAD
+Executed __init__ in 34.9294s
+Executed _get_grouped_objectives in 190.2144s
+Testing weighted n=450, num_cpus=4, strategy=SPREAD
+Executed __init__ in 13.2187s
+Executed _get_grouped_objectives in 44.7867s
+Testing log n=150, num_cpus=4, strategy=SPREAD
+Executed __init__ in 1.5454s
+Executed _get_grouped_objectives in 296.7350s
+Testing sum n=750, num_cpus=8, strategy=SPREAD
+Executed __init__ in 34.5519s
+Executed _get_grouped_objectives in 127.0102s
+Testing weighted n=450, num_cpus=8, strategy=SPREAD
+Executed __init__ in 12.4135s
+Executed _get_grouped_objectives in 31.8117s
+Testing log n=150, num_cpus=8, strategy=SPREAD
+Executed __init__ in 1.7155s
+Executed _get_grouped_objectives in 159.4395s
+Testing sum n=750, num_cpus=16, strategy=SPREAD
+Executed __init__ in 34.4668s
+Executed _get_grouped_objectives in 98.3677s
+Testing weighted n=450, num_cpus=16, strategy=SPREAD
+Executed __init__ in 12.2579s
+Executed _get_grouped_objectives in 26.3710s
+Testing log n=150, num_cpus=16, strategy=SPREAD
+Executed __init__ in 1.6115s
+Executed _get_grouped_objectives in 92.0494s
+Testing sum n=750, num_cpus=32, strategy=SPREAD
+Executed __init__ in 35.1517s
+Executed _get_grouped_objectives in 100.1723s
+Testing weighted n=450, num_cpus=32, strategy=SPREAD
+Executed __init__ in 12.9221s
+Executed _get_grouped_objectives in 35.0515s
+Testing log n=150, num_cpus=32, strategy=SPREAD
+Executed __init__ in 1.9489s
+Executed _get_grouped_objectives in 83.6920s
+
