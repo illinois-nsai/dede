@@ -22,8 +22,8 @@ from .utils import (
     UnionFind,
     VarInfoT,
     expand_expr,
-    get_var_id_pos_list_from_cone,
     get_var_id_pos_list_from_linear,
+    get_var_id_pos_list_from_tree,
 )
 
 ObjectiveT = t.Union[cp.Maximize, cp.Minimize]
@@ -787,7 +787,7 @@ def _process_obj_chunk_indices(
         # Access the object from the shared reference
         obj = expr_list_ref[idx]
 
-        var_id_pos_list = get_var_id_pos_list_from_cone(obj)
+        var_id_pos_list = get_var_id_pos_list_from_tree(obj)
 
         if not var_id_pos_list:
             if num_r > 0:
