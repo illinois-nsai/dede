@@ -58,9 +58,7 @@ def time_all_methods(cls):
 
 
 @contextlib.contextmanager
-def _get_distributed_pg(
-    max_cpus_per_node: int, timeout: float = 10.0
-) -> t.Iterator[PlacementGroup]:
+def _get_pg(num_cpus: int, timeout: float = 10.0) -> t.Iterator[PlacementGroup]:
     """Returns a placement group that tries to spread
     workers across all available nodes in the ray network.
 
@@ -74,10 +72,8 @@ def _get_distributed_pg(
     Returns:
         t.Iterator[PlacementGroup]: the placement group
     """
-    nodes = [node for node in ray.nodes() if node["Alive"]]
-
-    bundles = [{"CPU": 1.0}] * min(max_cpus_per_node * len(nodes), _get_ray_cpus())
-    pg = ray.util.placement_group(bundles, strategy="SPREAD")
+    bundles = [{"CPU": 1.0}] * num_cpus
+    pg = ray.util.placement_group(bundles)
     ray.get(pg.ready(), timeout=timeout)
     try:
         yield pg
@@ -338,7 +334,7 @@ class Problem(CpProblem):
         subproblems_invalidated = self._subprob_cache.update_cache(rho, num_cpus, ray_address)
         if subproblems_invalidated:
             # store subproblem in last solution
-            obj_expr_r, obj_expr_d = self._get_grouped_objectives()
+            obj_expr_r, obj_expr_d = self._get_grouped_objectives(self._subprob_cache.num_cpus)
             # reserve the actors needed to create the subproblems
             self._subprob_cache.reserve_placement_group()
             probs = self.get_subproblems(obj_expr_r, obj_expr_d, self._subprob_cache.num_cpus, rho)
@@ -696,7 +692,9 @@ class Problem(CpProblem):
         ]
         return param_idx_r, param_idx_d
 
-    def _get_grouped_objectives(self) -> tuple[list[cp.Expression], list[cp.Expression]]:
+    def _get_grouped_objectives(
+        self, num_cpus: int
+    ) -> tuple[list[cp.Expression], list[cp.Expression]]:
         """Split objective into corresponding constraint groups"""
 
         # See if the grouped objectives are already computed and cached.
@@ -706,7 +704,7 @@ class Problem(CpProblem):
 
         # use a placement group with strategy = SPREAD due to the diminishing returns
         # observed with larger numbers of CPUs
-        with _get_distributed_pg(4) as pg:
+        with _get_pg(num_cpus) as pg:
             var_id_pos_to_idx: dict[VarInfoT, list[tuple[int, int]]] = defaultdict(list)
             for i, constrs_gps, constr_dict in zip(
                 [0, 1],
