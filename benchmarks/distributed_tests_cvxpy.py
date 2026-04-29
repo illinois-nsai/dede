@@ -26,6 +26,7 @@ def test_sum(n):
     start = time.perf_counter()
     result_cvxpy = prob.solve(solver=cp.GUROBI)
     end = time.perf_counter()
+    print(f"Iterations: {prob.solver_stats.num_iters}")
     print(f"Executed solve in {end - start}s")
 
     return result_cvxpy
@@ -47,6 +48,7 @@ def test_weighted(n):
     start = time.perf_counter()
     result_cvxpy = prob.solve(solver=cp.GUROBI)
     end = time.perf_counter()
+    print(f"Iterations: {prob.solver_stats.num_iters}")
     print(f"Executed solve in {end - start}s")
     return result_cvxpy
 
@@ -64,6 +66,7 @@ def test_log(n):
     start = time.perf_counter()
     result_cvxpy = prob.solve(solver=cp.SCS, max_iters=10000, eps=1e-4)
     end = time.perf_counter()
+    print(f"Iterations: {prob.solver_stats.num_iters}")
     print(f"Executed solve in {end - start}s")
     # Add back constant N*log(N) from the scaling transformation
     return result_cvxpy
