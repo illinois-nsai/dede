@@ -77,26 +77,26 @@ def test_log(n):
 if __name__ == "__main__":
     base = 500
 
-    for multiplier in range(1, 2):
+    for multiplier in range(1, 5):
         # num_cpus loop kept for structure, though cvxpy's solve interface
         # doesn't take num_cpus as a direct argument for parallelism.
         sum_n = multiplier * base
         weighted_n = multiplier * base
         log_n = multiplier * base
 
-        # print(f"Testing sum n={sum_n}, num_cpus={NUM_CPUS}")
-        # try:
-        #     result = test_sum(sum_n)
-        #     print(f"Result {result}")
-        # except Exception as e:
-        #     print(f"Error in test_sum with n={sum_n}, num_cpus={NUM_CPUS}: {e}")
+        print(f"Testing sum n={sum_n}, num_cpus={NUM_CPUS}")
+        try:
+            result = test_sum(sum_n)
+            print(f"Result {result}")
+        except Exception as e:
+            print(f"Error in test_sum with n={sum_n}, num_cpus={NUM_CPUS}: {e}")
 
-        # print(f"Testing weighted n={weighted_n}, num_cpus={NUM_CPUS}")
-        # try:
-        #     result = test_weighted(weighted_n)
-        #     print(f"Result {result}")
-        # except Exception as e:
-        #     print(f"Error in test_weighted with n={weighted_n}, num_cpus={NUM_CPUS}: {e}")
+        print(f"Testing weighted n={weighted_n}, num_cpus={NUM_CPUS}")
+        try:
+            result = test_weighted(weighted_n)
+            print(f"Result {result}")
+        except Exception as e:
+            print(f"Error in test_weighted with n={weighted_n}, num_cpus={NUM_CPUS}: {e}")
 
         print(f"Testing log n={log_n}, num_cpus={NUM_CPUS}")
         try:
