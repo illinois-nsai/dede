@@ -1,0 +1,270 @@
+Testing sum n=80, num_cpus=8
+Executed solve in 0.19280616499963799s
+Result 3160.000000014615
+Testing weighted n=30, num_cpus=8
+Executed solve in 0.042311610999604454s
+Result 244.40832184718548
+Testing log n=10, num_cpus=8
+Executed solve in 0.03133264200005215s
+Result 38.130263074123725
+Testing sum n=160, num_cpus=8
+Executed solve in 0.9512242300006619s
+Result 12720.000000039283
+Testing weighted n=60, num_cpus=8
+Executed solve in 0.1213043630013999s
+Result 440.97766561790115
+Testing log n=20, num_cpus=8
+Executed solve in 0.06010739999692305s
+Result 102.25026137142765
+Testing sum n=240, num_cpus=8
+Executed solve in 2.6418004970000766s
+Result 28680.00000018233
+Testing weighted n=90, num_cpus=8
+Executed solve in 0.25993552900035866s
+Result 611.4092260275727
+Testing log n=30, num_cpus=8
+Executed solve in 0.09805795000283979s
+Result 176.6941578309687
+Testing sum n=320, num_cpus=8
+Executed solve in 6.024252508002974s
+Result 51040.000000282
+Testing weighted n=120, num_cpus=8
+Executed solve in 0.48533527399922605s
+Result 779.0794348681326
+Testing log n=40, num_cpus=8
+Executed solve in 0.13658098800078733s
+Result 257.8758157403957
+Testing sum n=400, num_cpus=8
+Executed solve in 17.36229763099982s
+Result 79800.00000106776
+Testing weighted n=150, num_cpus=8
+Executed solve in 0.8559577809974144s
+Result 945.9402142728054
+Testing log n=50, num_cpus=8
+Executed solve in 0.18864292099897284s
+Result 344.07891709197344
+Testing sum n=480, num_cpus=8
+Executed solve in 28.821927781998966s
+Result 114960.00000004758
+Testing weighted n=180, num_cpus=8
+Executed solve in 1.2847477809991688s
+Result 1104.2614400768039
+Testing log n=60, num_cpus=8
+Executed solve in 0.2561175289993116s
+Result 434.28884715823534
+Testing sum n=560, num_cpus=8
+Executed solve in 43.48855925600219s
+Result 156520.00000015384
+Testing weighted n=210, num_cpus=8
+Executed solve in 1.9096620490017813s
+Result 1260.1100443442003
+Testing log n=70, num_cpus=8
+Executed solve in 0.3678065029998834s
+Result 527.8337105122667
+Testing sum n=640, num_cpus=8
+Executed solve in 65.70175805500185s
+Result 204480.00000030396
+Testing weighted n=240, num_cpus=8
+Executed solve in 2.6901293209994037s
+Result 1431.6264562878557
+Testing log n=80, num_cpus=8
+Executed solve in 0.44135773699963465s
+Result 624.2352550666076
+Testing sum n=720, num_cpus=8
+Executed solve in 83.6437825920002s
+Result 258840.00000030667
+Testing weighted n=270, num_cpus=8
+Executed solve in 4.024500071998773s
+Result 1627.803806223218
+Testing log n=90, num_cpus=8
+Executed solve in 0.5581209060001129s
+Result 723.1355099579935
+Testing sum n=800, num_cpus=8
+Executed solve in 111.44913077300225s
+Result 319600.0000003257
+Testing weighted n=300, num_cpus=8
+Executed solve in 5.238442203997693s
+Result 1789.1692499185672
+Testing log n=100, num_cpus=8
+Executed solve in 0.6585359609998704s
+Result 824.2563941712019
+Testing sum n=880, num_cpus=8
+Executed solve in 143.51716595199832s
+Result 386760.0000003397
+Testing weighted n=330, num_cpus=8
+Executed solve in 6.8831608459986455s
+Result 1957.0832255105372
+Testing log n=110, num_cpus=8
+Executed solve in 0.7932410449975578s
+Result 927.3756162550208
+Testing sum n=960, num_cpus=8
+Executed solve in 182.7991304370007s
+Result 460320.0000003073
+Testing weighted n=360, num_cpus=8
+Executed solve in 8.820246668998152s
+Result 2100.180014205892
+Testing log n=120, num_cpus=8
+Executed solve in 0.9833043910002743s
+Result 1032.311396984403
+Testing sum n=1040, num_cpus=8
+Executed solve in 228.38466448100007s
+Result 540280.0000004856
+Testing weighted n=390, num_cpus=8
+Executed solve in 21.926722160998906s
+Result 2339.9345658983575
+Testing log n=130, num_cpus=8
+Executed solve in 1.1521388270011812s
+Result 1138.9123039312417
+Testing sum n=1120, num_cpus=8
+Executed solve in 286.81837189s
+Result 626640.0000019305
+Testing weighted n=420, num_cpus=8
+Executed solve in 26.503115460000117s
+Result 2429.462637194145
+Testing log n=140, num_cpus=8
+Executed solve in 1.3355446599998686s
+Result 1247.050233315041
+Testing sum n=1200, num_cpus=8
+Executed solve in 345.01618244899873s
+Result 719400.0000040333
+Testing weighted n=450, num_cpus=8
+Executed solve in 32.28411194399814s
+Result 2607.33439483949
+Testing log n=150, num_cpus=8
+Executed solve in 1.5506034509999154s
+Result 1356.6153998461546
+Testing sum n=1280, num_cpus=8
+Executed solve in 423.58158101200024s
+Result 818560.0000064061
+Testing weighted n=480, num_cpus=8
+Executed solve in 38.58054772899777s
+Result 2758.0249066612705
+Testing log n=160, num_cpus=8
+Executed solve in 1.9713684759990429s
+Result 1467.512667122473
+Testing sum n=1360, num_cpus=8
+Executed solve in 492.7727218860018s
+Result 924120.0000076123
+Testing weighted n=510, num_cpus=8
+Executed solve in 46.43574580299901s
+Result 2891.8350012463575
+Testing log n=170, num_cpus=8
+Executed solve in 2.198382081998716s
+Result 1579.6587964569917
+Testing sum n=1440, num_cpus=8
+Executed solve in 593.3987758200019s
+Result 1036080.0000001654
+Testing weighted n=540, num_cpus=8
+Executed solve in 53.60843078800099s
+Result 3085.9184715595957
+Testing log n=180, num_cpus=8
+Executed solve in 2.4775522160016408s
+Result 1692.9803462754082
+Testing sum n=1520, num_cpus=8
+Executed solve in 705.2067202879989s
+Result 1154440.000000224
+Testing weighted n=570, num_cpus=8
+Executed solve in 61.90528649499902s
+Result 3190.7802499681834
+Testing log n=190, num_cpus=8
+Executed solve in 3.053056912001921s
+Result 1807.4120365096278
+Testing sum n=1600, num_cpus=8
+Executed solve in 824.6864318120024s
+Result 1279200.0000002717
+Testing weighted n=600, num_cpus=8
+Executed solve in 67.60818718099836s
+Result 3545.4815656549126
+Testing log n=200, num_cpus=8
+Executed solve in 3.7091890860028798s
+Result 1922.8954604717705
+Testing sum n=1680, num_cpus=8
+Executed solve in 959.6324184810001s
+Result 1410360.0000004598
+Testing weighted n=630, num_cpus=8
+Executed solve in 80.31063950300086s
+Result 3638.5326038152666
+Testing log n=210, num_cpus=8
+Executed solve in 4.1899646849997225s
+Result 2039.3780519858844
+Testing sum n=1760, num_cpus=8
+Executed solve in 1113.8101355109975s
+Result 1547920.0000007057
+Testing weighted n=660, num_cpus=8
+Executed solve in 92.79000931200062s
+Result 3723.2850996368966
+Testing log n=220, num_cpus=8
+Executed solve in 4.928381040001113s
+Result 2156.8122514807674
+Testing sum n=1840, num_cpus=8
+Executed solve in 1260.1008135759985s
+Result 1691880.0000003455
+Testing weighted n=690, num_cpus=8
+Executed solve in 95.7082320369991s
+Result 3964.4621956424744
+Testing log n=230, num_cpus=8
+Executed solve in 5.50068937299875s
+Result 2275.1548227061403
+Testing sum n=1920, num_cpus=8
+Executed solve in 1490.7297444630021s
+Result 1842240.0000020717
+Testing weighted n=720, num_cpus=8
+Executed solve in 115.12662373000057s
+Result 4058.8395893060933
+Testing log n=240, num_cpus=8
+Executed solve in 5.9945391889996245s
+Result 2394.366288161967
+Testing sum n=2000, num_cpus=8
+Executed solve in 1655.5870777460004s
+Result 1999000.0000040939
+Testing weighted n=750, num_cpus=8
+Executed solve in 130.1341627619986s
+Result 4200.515045489719
+Testing log n=250, num_cpus=8
+Executed solve in 7.2593467900005635s
+Result 2514.410461254295
+Testing sum n=2080, num_cpus=8
+Executed solve in 1989.3639497330005s
+Result 2162160.0000059046
+Testing weighted n=780, num_cpus=8
+Executed solve in 133.20131251499697s
+Result 4537.871918543444
+Testing log n=260, num_cpus=8
+Executed solve in 8.040967109998746s
+Result 2635.254047989333
+Testing sum n=2160, num_cpus=8
+Executed solve in 2276.7745603239964s
+Result 2331720.000007387
+Testing weighted n=810, num_cpus=8
+Executed solve in 148.32820772800187s
+Result 4611.602436163745
+Testing log n=270, num_cpus=8
+Executed solve in 9.535768974004895s
+Result 2756.8663157608617
+Testing sum n=2240, num_cpus=8
+Executed solve in 2594.2440235320028s
+Result 2507680.000010101
+Testing weighted n=840, num_cpus=8
+Executed solve in 168.9525400489947s
+Result 4712.405862948527
+Testing log n=280, num_cpus=8
+Executed solve in 10.60860273399885s
+Result 2879.2188087254317
+Testing sum n=2320, num_cpus=8
+Executed solve in 2954.534571567994s
+Result 2690040.00001241
+Testing weighted n=870, num_cpus=8
+Executed solve in 183.6720422849976s
+Result 4949.4441958272555
+Testing log n=290, num_cpus=8
+Executed solve in 12.03272491399548s
+Result 3002.2851016829914
+Testing sum n=2400, num_cpus=8
+Executed solve in 3397.64624894s
+Result 2878799.999999772
+Testing weighted n=900, num_cpus=8
+Executed solve in 209.49041759999818s
+Result 5017.400705467494
+Testing log n=300, num_cpus=8
+Executed solve in 13.143798689001414s
+Result 3126.0405923141516
