@@ -11,7 +11,9 @@
 #         StrictHostKeyChecking no
 #
 # DO NOT expose the dashboard host to the public, see the ShadowRay attack
-# If on cloudlab, make sure to only use the local subnet (use ip addr show), then use iptables to block all
+# If on cloudlab, make sure to only use the local subnet (use ip addr show), then use iptables to block all non-subnet trafific to 6379
+# sudo iptables -A INPUT -p tcp --dport 6379 -s 10.10.1.0/24 -j ACCEPT
+# sudo iptables -A INPUT -p tcp --dport 6379 -j DROP
 # head node: ray start --head --port=6379 --node-ip-address <local ip> --dashboard-host=127.0.0.1 --dashboard-port=8265
 # worker node: ray start --address='<HEAD_NODE_IP>:6379'
 # forward the port to the local machine by running ssh -L 5000:localhost:8265 user@host
@@ -21,7 +23,7 @@ set -e
 BRANCH="${1:-ianz/cloudlab-experiments}"
 
 MACHINES=(
-    "yianz@ms1327.utah.cloudlab.us"
+    # "yianz@ms1327.utah.cloudlab.us"
     "yianz@ms1339.utah.cloudlab.us"
     "yianz@ms1325.utah.cloudlab.us"
     "yianz@ms1328.utah.cloudlab.us"
@@ -34,9 +36,9 @@ pids=()
 for machine in "${MACHINES[@]}"; do
     echo "=== Launching $machine ==="
     ssh "$machine" bash -s >"$LOG_DIR/$machine.log" 2>&1 <<EOF &
-# cd work/dede
-# source .venv/bin/activate
-# ray start --address='10.10.1.1:6379'
+cd work/dede
+source .venv/bin/activate
+ray start --address='10.10.1.1:6379'
 
 # mkdir work
 # cd work
@@ -50,9 +52,9 @@ for machine in "${MACHINES[@]}"; do
 # pip3 install -e .[dev]
 # pip3 install ray[default]
 
-sudo apt install -y linux-tools-common linux-tools-5.15.0-168-generic linux-cloud-tools-5.15.0-168-generic 
-sudo cpupower frequency-set -u 2.0GHz
-echo 1 | sudo tee /sys/devices/system/cpu/intel_pstate/no_turbo
+# sudo apt install -y linux-tools-common linux-tools-5.15.0-168-generic linux-cloud-tools-5.15.0-168-generic 
+# sudo cpupower frequency-set -u 2.0GHz
+# echo 1 | sudo tee /sys/devices/system/cpu/intel_pstate/no_turbo
 # echo 0 | sudo tee /sys/devices/system/cpu/cpufreq/boost || true
 EOF
     pids+=($!)
