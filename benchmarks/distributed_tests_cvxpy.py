@@ -38,11 +38,6 @@ def test_weighted(n):
     bn = 9 * rng.uniform(0, 1, (N,)) + 1
     bm = 9 * rng.uniform(0, 1, (M,)) + 1
 
-    print("randomness:")
-    print(w[0][10:])
-    print(bn[10:])
-    print(bm[10:])
-
     resource_constraints = [cp.sum(x[i, :]) >= bn[i] for i in range(N)]
     demand_constraints = [cp.sum(x[:, j]) >= bm[j] for j in range(M)]
 

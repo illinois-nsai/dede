@@ -484,6 +484,7 @@ class Problem(CpProblem):
 
         end = time.time()
         print("DeDe Solve Time:", end - start)
+        print("DeDe Iterations:", i)
 
         self.populate_vars_with_solution()
         coeff = 1 if self._problem_type == Minimize else -1
