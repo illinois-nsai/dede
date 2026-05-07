@@ -626,15 +626,25 @@ class Problem(CpProblem):
         for var_id_pos in self.constr_dict_d.values():
             var_id_pos_set_d.update(var_id_pos)
 
-        # serialize expensive objects exactly once
-        obj_expr_r_ref = ray.put(obj_expr_r)
-        obj_expr_d_ref = ray.put(obj_expr_d)
-        constrs_r_ref = ray.put(self.constrs_gps_r)
-        constrs_d_ref = ray.put(self.constrs_gps_d)
-        constr_dict_r_ref = ray.put(self.constr_dict_r)
-        constr_dict_d_ref = ray.put(self.constr_dict_d)
-        var_id_pos_set_r_ref = ray.put(var_id_pos_set_r)
-        var_id_pos_set_d_ref = ray.put(var_id_pos_set_d)
+        # these lists define for each constraint group, the constraints in them, and the variables
+        # that are present in the constraints
+        # see _pack_var_id_pos_gps for a more complete definition
+        var_id_to_pos_gps_r = [
+            [self.constr_dict_r[constr.id] for constr in constrs] for constrs in self.constrs_gps_r
+        ]
+        var_id_to_pos_gps_d = [
+            [self.constr_dict_d[constr.id] for constr in constrs] for constrs in self.constrs_gps_d
+        ]
+
+        # serialize set of varinfot objects as a n x 2 numpy array
+        # according to https://docs.ray.io/en/latest/ray-core/objects/serialization.html#numpy-arrays
+        # ray is optimized for (zero-copy) serialization of numpy arrays
+        var_id_pos_arr_r_ref = ray.put(
+            np.array(list(var_id_pos_set_r), dtype=np.int64).reshape(-1, 2)
+        )
+        var_id_pos_arr_d_ref = ray.put(
+            np.array(list(var_id_pos_set_d), dtype=np.int64).reshape(-1, 2)
+        )
 
         # build actors with subproblems
         probs: list[ray.actor.ActorProxy[SubproblemsWrap]] = []
@@ -650,18 +660,28 @@ class Problem(CpProblem):
                     placement_group_bundle_index=cpu,
                 )
             )
+            cur_obj_expr_r = [obj_expr_r[t.cast(int, i)] for i in idx_r]
+            cur_obj_expr_d = [obj_expr_d[t.cast(int, i)] for i in idx_d]
+            cur_constrs_gps_r = [self.constrs_gps_r[t.cast(int, i)] for i in idx_r]
+            cur_constrs_gps_d = [self.constrs_gps_d[t.cast(int, i)] for i in idx_d]
+            cur_pos_gps_r = _pack_var_id_pos_gps(
+                [var_id_to_pos_gps_r[t.cast(int, i)] for i in idx_r]
+            )
+            cur_pos_gps_d = _pack_var_id_pos_gps(
+                [var_id_to_pos_gps_d[t.cast(int, i)] for i in idx_d]
+            )
             probs.append(
                 actor.remote(
                     idx_r,
                     idx_d,
-                    obj_expr_r_ref,
-                    obj_expr_d_ref,
-                    constrs_r_ref,
-                    constrs_d_ref,
-                    constr_dict_r_ref,
-                    constr_dict_d_ref,
-                    var_id_pos_set_r_ref,
-                    var_id_pos_set_d_ref,
+                    cur_obj_expr_r,
+                    cur_obj_expr_d,
+                    cur_constrs_gps_r,
+                    cur_constrs_gps_d,
+                    cur_pos_gps_r,
+                    cur_pos_gps_d,
+                    var_id_pos_arr_r_ref,
+                    var_id_pos_arr_d_ref,
                     rho,
                 )
             )
@@ -878,3 +898,62 @@ def _process_obj_tree(
             local_d_idx[target[1]].append(idx)
 
     return local_r_idx, local_d_idx
+
+
+def _pack_var_id_pos_gps(
+    gps: list[list[list[VarInfoT]]],
+) -> tuple[NDArray[np.int64], NDArray[np.int64], NDArray[np.int64]]:
+    """Pack list[list[list[VarInfoT]]] into 3 int64 numpy arrays for fast Ray serialization.
+
+    The input triply nested lists are assumed to be of this form (var_id_pos_gps):
+
+    constraint groups indexes the outer list
+    constraint indices (as defined by constrs_gps_r) within a group index the middle list
+    indexing a constraint gives you a list of VarInfoTs that
+    tells you what variables are present in it
+
+    This function flattens the array while preserving the metadata needed
+    to recover the nested structure (like CSR sparse matrix encoding).
+
+    Example:
+    group 0, constraint 0: [VarInfoT(1,0), VarInfoT(1,1)]
+    group 0, constraint 1: [VarInfoT(1,2), VarInfoT(1,3)]
+    group 1, constraint 0: [VarInfoT(2,0)]
+    group 1, constraint 1: [VarInfoT(2,1), VarInfoT(2,2)]
+
+    pairs        = [[1,0],[1,1],[1,2],[1,3],[2,0],[2,1],[2,2]]
+    constr_offsets = [0, 2, 4, 5, 7]
+    group_offsets = [0, 2, 4]
+
+    constr_offsets defines the range of indices that are relevant to each constraint
+    constraint i (the index comes from "flattening" the outer list of gps) contains the
+    following varinfots: [pairs[j] for j in range(constr_offsets[i], constr_offsets[i + 1] + 1)]
+
+    group_offsets define the ranges of indices in constr_offsets that are relevant to each group
+    group i has contains the following constraints:
+        range(group_offsets[i], group_offsets[i] + 1)
+        where the indices are as defined above
+
+
+    Returns (pairs, constr_offsets, group_offsets) where:
+      pairs[constr_offsets[c]:constr_offsets[c+1]] gives the VarInfoT list for constraint c,
+      constraint indices for group g span constr_offsets[group_offsets[g]:group_offsets[g+1]+1].
+    """
+    all_pairs: list[VarInfoT] = []
+    constr_offsets = [0]
+    group_offsets = [0]
+    for group in gps:
+        for var_info_list in group:
+            all_pairs.extend(var_info_list)
+            constr_offsets.append(len(all_pairs))
+        group_offsets.append(len(constr_offsets) - 1)
+    pairs_arr = (
+        np.array(all_pairs, dtype=np.int64).reshape(-1, 2)
+        if all_pairs
+        else np.empty((0, 2), dtype=np.int64)
+    )
+    return (
+        pairs_arr,
+        np.array(constr_offsets, dtype=np.int64),
+        np.array(group_offsets, dtype=np.int64),
+    )

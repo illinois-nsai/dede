@@ -17,26 +17,23 @@ class SubproblemsWrap:
         self,
         idx_r: NDArray[np.signedinteger],
         idx_d: NDArray[np.signedinteger],
-        obj_gps_r_full: t.Sequence[cp.Expression],
-        obj_gps_d_full: t.Sequence[cp.Expression],
-        constrs_gps_r_full: list[list[cp.Constraint]],
-        constrs_gps_d_full: list[list[cp.Constraint]],
-        constr_dict_r: dict[int, list[VarInfoT]],
-        constr_dict_d: dict[int, list[VarInfoT]],
-        var_id_pos_set_r: set[VarInfoT],
-        var_id_pos_set_d: set[VarInfoT],
+        obj_gps_r: t.Sequence[cp.Expression],
+        obj_gps_d: t.Sequence[cp.Expression],
+        constrs_gps_r: list[list[cp.Constraint]],
+        constrs_gps_d: list[list[cp.Constraint]],
+        var_id_to_pos_gps_r: tuple[NDArray[np.int64], NDArray[np.int64], NDArray[np.int64]],
+        var_id_to_pos_gps_d: tuple[NDArray[np.int64], NDArray[np.int64], NDArray[np.int64]],
+        var_id_pos_set_r: NDArray[np.int64],
+        var_id_pos_set_d: NDArray[np.int64],
         rho: float,
     ):
-        obj_gps_r: list[cp.Expression] = [obj_gps_r_full[i] for i in idx_r]
-        obj_gps_d: list[cp.Expression] = [obj_gps_d_full[i] for i in idx_d]
-        constrs_gps_r: list[list[cp.Constraint]] = [constrs_gps_r_full[i] for i in idx_r]
-        constrs_gps_d: list[list[cp.Constraint]] = [constrs_gps_d_full[i] for i in idx_d]
-        var_id_to_pos_gps_r = [
-            [constr_dict_r[constr.id] for constr in constrs] for constrs in constrs_gps_r
-        ]
-        var_id_to_pos_gps_d = [
-            [constr_dict_d[constr.id] for constr in constrs] for constrs in constrs_gps_d
-        ]
+        # recover var info t structure locally from the numpy serialization
+        var_id_pos_set_r_py = {VarInfoT(int(r[0]), int(r[1])) for r in var_id_pos_set_r}
+        var_id_pos_set_d_py = {VarInfoT(int(r[0]), int(r[1])) for r in var_id_pos_set_d}
+
+        # unpack the components of the var_id_to_pos_gps triply nested varinfoT lists
+        pairs_r, constr_offsets_r, group_offsets_r = var_id_to_pos_gps_r
+        pairs_d, constr_offsets_d, group_offsets_d = var_id_to_pos_gps_d
 
         # sort subproblem for better data locality
         self.probs_r: list[Subproblem] = []
@@ -45,18 +42,37 @@ class SubproblemsWrap:
             # build resource problems
             idx, constrs_gp = idx_r[i], constrs_gps_r[i]
             obj_r = obj_gps_r[i]
-            var_id_to_pos_gp = var_id_to_pos_gps_r[i]
+
+            # see _pack_var_id_pos_gps in problem.py to understand how this
+            # deserialization works
+            c_start, c_end = int(group_offsets_r[i]), int(group_offsets_r[i + 1])
+            var_id_to_pos_gp = [
+                [
+                    VarInfoT(int(pairs_r[k, 0]), int(pairs_r[k, 1]))
+                    for k in range(int(constr_offsets_r[c]), int(constr_offsets_r[c + 1]))
+                ]
+                for c in range(c_start, c_end)
+            ]
             self.probs_r.append(
-                Subproblem((0, idx), obj_r, constrs_gp, var_id_to_pos_gp, var_id_pos_set_d, rho)
+                Subproblem((0, idx), obj_r, constrs_gp, var_id_to_pos_gp, var_id_pos_set_d_py, rho)
             )
         self.probs_d: list[Subproblem] = []
         for i in np.argsort(idx_d):
             # build demand problems
             idx, constrs_gp = idx_d[i], constrs_gps_d[i]
             obj_d = obj_gps_d[i]
-            var_id_to_pos_gp = var_id_to_pos_gps_d[i]
+
+            # same logic to deserialize as before
+            c_start, c_end = int(group_offsets_d[i]), int(group_offsets_d[i + 1])
+            var_id_to_pos_gp = [
+                [
+                    VarInfoT(int(pairs_d[k, 0]), int(pairs_d[k, 1]))
+                    for k in range(int(constr_offsets_d[c]), int(constr_offsets_d[c + 1]))
+                ]
+                for c in range(c_start, c_end)
+            ]
             self.probs_d.append(
-                Subproblem((1, idx), obj_d, constrs_gp, var_id_to_pos_gp, var_id_pos_set_r, rho)
+                Subproblem((1, idx), obj_d, constrs_gp, var_id_to_pos_gp, var_id_pos_set_r_py, rho)
             )
 
         # maintain the parameter copy in the current thread
