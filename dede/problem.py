@@ -732,7 +732,7 @@ class Problem(CpProblem):
             # the multi-chunk shape returned by the cone/Ray path
             # do this since it is much faster tha nthe cone version
             results = [
-                _process_obj_chunk_tree(
+                _process_obj_tree(
                     expr_list, var_id_pos_to_idx, len(self.constrs_gps_r), len(self.constrs_gps_d)
                 )
             ]
@@ -753,7 +753,7 @@ class Problem(CpProblem):
 
                 # send the chunks to the remote function for processing
                 futures = [
-                    _process_obj_chunk_indices_tree.options(
+                    _process_obj_chunk_indices_cone.options(
                         scheduling_strategy=PlacementGroupSchedulingStrategy(
                             placement_group=pg,
                             placement_group_bundle_index=i,
@@ -794,7 +794,7 @@ class Problem(CpProblem):
 
 
 @ray.remote
-def _process_obj_chunk_indices_tree(
+def _process_obj_chunk_indices_cone(
     indices: NDArray[np.int64],
     expr_list_ref: list[cp.Expression],
     var_id_pos_to_idx: dict[VarInfoT, list[tuple[int, int]]],
@@ -838,7 +838,7 @@ def _process_obj_chunk_indices_tree(
     return local_r_idx, local_d_idx
 
 
-def _process_obj_chunk_tree(
+def _process_obj_tree(
     expr_list: list[cp.Expression],
     var_id_pos_to_idx: dict[VarInfoT, list[tuple[int, int]]],
     num_r: int,
