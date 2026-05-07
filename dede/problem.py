@@ -396,7 +396,7 @@ class Problem(CpProblem):
         self.sol_d_old = self.sol_d.copy()
         self.scaled_dual: dict[VarInfoT, float] = {}
 
-        start = time.time()
+        start = time.perf_counter()
         terminate_flag = False
         while (num_iter is not None and i < num_iter) or (num_iter is None and i < 10000):
             if i > 0 and i % balance_iterations == 0:
@@ -482,7 +482,7 @@ class Problem(CpProblem):
                 ray.get([prob.get_solution_d.remote() for prob in self._subprob_cache.probs])
             )
 
-        end = time.time()
+        end = time.perf_counter()
         print("DeDe Solve Time:", end - start)
         print("DeDe Iterations:", i)
 
@@ -626,10 +626,6 @@ class Problem(CpProblem):
             var_id_pos_set_d.update(var_id_pos)
 
         # serialize expensive objects exactly once
-        obj_expr_r_ref = ray.put(obj_expr_r)
-        obj_expr_d_ref = ray.put(obj_expr_d)
-        constrs_r_ref = ray.put(self.constrs_gps_r)
-        constrs_d_ref = ray.put(self.constrs_gps_d)
         constr_dict_r_ref = ray.put(self.constr_dict_r)
         constr_dict_d_ref = ray.put(self.constr_dict_d)
         var_id_pos_set_r_ref = ray.put(var_id_pos_set_r)
@@ -653,10 +649,10 @@ class Problem(CpProblem):
                 actor.remote(
                     idx_r,
                     idx_d,
-                    obj_expr_r_ref,
-                    obj_expr_d_ref,
-                    constrs_r_ref,
-                    constrs_d_ref,
+                    [obj_expr_r[i] for i in idx_r],
+                    [obj_expr_d[i] for i in idx_d],
+                    [self.constrs_gps_r[i] for i in idx_r],
+                    [self.constrs_gps_d[i] for i in idx_d],
                     constr_dict_r_ref,
                     constr_dict_d_ref,
                     var_id_pos_set_r_ref,
