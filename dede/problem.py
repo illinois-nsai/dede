@@ -632,9 +632,9 @@ class Problem(CpProblem):
             [self.constr_dict_d[constr.id] for constr in constrs] for constrs in self.constrs_gps_d
         ]
 
-        # serialize expensive objects exactly once
-        var_id_pos_set_r_ref = ray.put(var_id_pos_set_r)
-        var_id_pos_set_d_ref = ray.put(var_id_pos_set_d)
+        # serialize as numpy for near-zero-copy Ray serialization (Arrow path, not pickle)
+        var_id_pos_arr_r_ref = ray.put(np.array(list(var_id_pos_set_r), dtype=np.int64).reshape(-1, 2))
+        var_id_pos_arr_d_ref = ray.put(np.array(list(var_id_pos_set_d), dtype=np.int64).reshape(-1, 2))
 
         # build actors with subproblems
         probs: list[ray.actor.ActorProxy[SubproblemsWrap]] = []
@@ -654,8 +654,8 @@ class Problem(CpProblem):
             cur_obj_expr_d = [obj_expr_d[t.cast(int, i)] for i in idx_d]
             cur_constrs_gps_r = [self.constrs_gps_r[t.cast(int, i)] for i in idx_r]
             cur_constrs_gps_d = [self.constrs_gps_d[t.cast(int, i)] for i in idx_d]
-            cur_pos_gps_r = [var_id_to_pos_gps_r[t.cast(int, i)] for i in idx_r]
-            cur_pos_gps_d = [var_id_to_pos_gps_d[t.cast(int, i)] for i in idx_d]
+            cur_pos_gps_r = _pack_var_id_pos_gps([var_id_to_pos_gps_r[t.cast(int, i)] for i in idx_r])
+            cur_pos_gps_d = _pack_var_id_pos_gps([var_id_to_pos_gps_d[t.cast(int, i)] for i in idx_d])
             probs.append(
                 actor.remote(
                     idx_r,
@@ -666,8 +666,8 @@ class Problem(CpProblem):
                     cur_constrs_gps_d,
                     cur_pos_gps_r,
                     cur_pos_gps_d,
-                    var_id_pos_set_r_ref,
-                    var_id_pos_set_d_ref,
+                    var_id_pos_arr_r_ref,
+                    var_id_pos_arr_d_ref,
                     rho,
                 )
             )
@@ -798,6 +798,27 @@ class Problem(CpProblem):
         self._obj_expr_r, self._obj_expr_d = obj_r, obj_d
 
         return self._obj_expr_r, self._obj_expr_d
+
+
+def _pack_var_id_pos_gps(
+    gps: list[list[list[VarInfoT]]],
+) -> tuple[NDArray[np.int64], NDArray[np.int64], NDArray[np.int64]]:
+    """Pack list[list[list[VarInfoT]]] into 3 int64 numpy arrays for fast Ray serialization.
+
+    Returns (pairs, pair_offsets, group_offsets) where:
+      pairs[pair_offsets[c]:pair_offsets[c+1]] gives the VarInfoT list for constraint c,
+      constraint indices for group g span pair_offsets[group_offsets[g]:group_offsets[g+1]+1].
+    """
+    all_pairs: list[VarInfoT] = []
+    pair_offsets = [0]
+    group_offsets = [0]
+    for group in gps:
+        for var_info_list in group:
+            all_pairs.extend(var_info_list)
+            pair_offsets.append(len(all_pairs))
+        group_offsets.append(len(pair_offsets) - 1)
+    pairs_arr = np.array(all_pairs, dtype=np.int64).reshape(-1, 2) if all_pairs else np.empty((0, 2), dtype=np.int64)
+    return pairs_arr, np.array(pair_offsets, dtype=np.int64), np.array(group_offsets, dtype=np.int64)
 
 
 @ray.remote
