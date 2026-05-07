@@ -625,6 +625,13 @@ class Problem(CpProblem):
         for var_id_pos in self.constr_dict_d.values():
             var_id_pos_set_d.update(var_id_pos)
 
+        var_id_to_pos_gps_r = [
+            [self.constr_dict_r[constr.id] for constr in constrs] for constrs in self.constrs_gps_r
+        ]
+        var_id_to_pos_gps_d = [
+            [self.constr_dict_d[constr.id] for constr in constrs] for constrs in self.constrs_gps_d
+        ]
+
         # serialize expensive objects exactly once
         var_id_pos_set_r_ref = ray.put(var_id_pos_set_r)
         var_id_pos_set_d_ref = ray.put(var_id_pos_set_d)
@@ -643,22 +650,22 @@ class Problem(CpProblem):
                     placement_group_bundle_index=cpu,
                 )
             )
+            cur_obj_expr_r = [obj_expr_r[t.cast(int, i)] for i in idx_r]
+            cur_obj_expr_d = [obj_expr_d[t.cast(int, i)] for i in idx_d]
+            cur_constrs_gps_r = [self.constrs_gps_r[t.cast(int, i)] for i in idx_r]
+            cur_constrs_gps_d = [self.constrs_gps_d[t.cast(int, i)] for i in idx_d]
+            cur_pos_gps_r = [var_id_to_pos_gps_r[t.cast(int, i)] for i in idx_r]
+            cur_pos_gps_d = [var_id_to_pos_gps_d[t.cast(int, i)] for i in idx_d]
             probs.append(
                 actor.remote(
                     idx_r,
                     idx_d,
-                    [obj_expr_r[i] for i in idx_r],
-                    [obj_expr_d[i] for i in idx_d],
-                    [self.constrs_gps_r[i] for i in idx_r],
-                    [self.constrs_gps_d[i] for i in idx_d],
-                    [
-                        [self.constr_dict_r[constr.id] for constr in self.constrs_gps_r[i]]
-                        for i in idx_r
-                    ],
-                    [
-                        [self.constr_dict_d[constr.id] for constr in self.constrs_gps_d[i]]
-                        for i in idx_d
-                    ],
+                    cur_obj_expr_r,
+                    cur_obj_expr_d,
+                    cur_constrs_gps_r,
+                    cur_constrs_gps_d,
+                    cur_pos_gps_r,
+                    cur_pos_gps_d,
                     var_id_pos_set_r_ref,
                     var_id_pos_set_d_ref,
                     rho,
