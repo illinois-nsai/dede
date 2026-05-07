@@ -342,9 +342,9 @@ class Problem(CpProblem):
         """
         # solve the original problem
         if not enable_dede:
-            start = time.time()
+            start = time.perf_counter()
             super(Problem, self).solve(*args, **kwargs)
-            end = time.time()
+            end = time.perf_counter()
             self._total_time = end - start
 
             coeff = 1 if self._problem_type == Minimize else -1
@@ -397,7 +397,7 @@ class Problem(CpProblem):
         self.sol_d_old = self.sol_d.copy()
         self.scaled_dual: dict[VarInfoT, float] = {}
 
-        start = time.time()
+        start = time.perf_counter()
         terminate_flag = False
         while (num_iter is not None and i < num_iter) or (num_iter is None and i < 10000):
             if i > 0 and i % balance_iterations == 0:
@@ -483,7 +483,7 @@ class Problem(CpProblem):
                 ray.get([prob.get_solution_d.remote() for prob in self._subprob_cache.probs])
             )
 
-        end = time.time()
+        end = time.perf_counter()
         print("DeDe Solve Time:", end - start)
 
         self.populate_vars_with_solution()
@@ -732,7 +732,7 @@ class Problem(CpProblem):
             # the multi-chunk shape returned by the cone/Ray path
             # do this since it is much faster tha nthe cone version
             results = [
-                _process_obj_chunk_tree(
+                _process_obj_tree(
                     expr_list, var_id_pos_to_idx, len(self.constrs_gps_r), len(self.constrs_gps_d)
                 )
             ]
@@ -753,7 +753,7 @@ class Problem(CpProblem):
 
                 # send the chunks to the remote function for processing
                 futures = [
-                    _process_obj_chunk_indices_tree.options(
+                    _process_obj_chunk_indices_cone.options(
                         scheduling_strategy=PlacementGroupSchedulingStrategy(
                             placement_group=pg,
                             placement_group_bundle_index=i,
@@ -794,7 +794,7 @@ class Problem(CpProblem):
 
 
 @ray.remote
-def _process_obj_chunk_indices_tree(
+def _process_obj_chunk_indices_cone(
     indices: NDArray[np.int64],
     expr_list_ref: list[cp.Expression],
     solver: str,
@@ -839,7 +839,7 @@ def _process_obj_chunk_indices_tree(
     return local_r_idx, local_d_idx
 
 
-def _process_obj_chunk_tree(
+def _process_obj_tree(
     expr_list: list[cp.Expression],
     var_id_pos_to_idx: dict[VarInfoT, list[tuple[int, int]]],
     num_r: int,
