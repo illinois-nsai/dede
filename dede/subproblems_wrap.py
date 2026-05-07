@@ -27,12 +27,13 @@ class SubproblemsWrap:
         var_id_pos_set_d: NDArray[np.int64],
         rho: float,
     ):
-        # reconstruct Python sets locally — fast in-process, no serialization cost
+        # recover var info t structure locally from the numpy serialization
         var_id_pos_set_r_py = {VarInfoT(int(r[0]), int(r[1])) for r in var_id_pos_set_r}
         var_id_pos_set_d_py = {VarInfoT(int(r[0]), int(r[1])) for r in var_id_pos_set_d}
 
-        pairs_r, pair_offsets_r, group_offsets_r = var_id_to_pos_gps_r
-        pairs_d, pair_offsets_d, group_offsets_d = var_id_to_pos_gps_d
+        # unpack the components of the var_id_to_pos_gps triply nested varinfoT lists
+        pairs_r, constr_offsets_r, group_offsets_r = var_id_to_pos_gps_r
+        pairs_d, constr_offsets_d, group_offsets_d = var_id_to_pos_gps_d
 
         # sort subproblem for better data locality
         self.probs_r: list[Subproblem] = []
@@ -41,10 +42,15 @@ class SubproblemsWrap:
             # build resource problems
             idx, constrs_gp = idx_r[i], constrs_gps_r[i]
             obj_r = obj_gps_r[i]
+
+            # see _pack_var_id_pos_gps in problem.py to understand how this
+            # deserialization works
             c_start, c_end = int(group_offsets_r[i]), int(group_offsets_r[i + 1])
             var_id_to_pos_gp = [
-                [VarInfoT(int(pairs_r[k, 0]), int(pairs_r[k, 1]))
-                 for k in range(int(pair_offsets_r[c]), int(pair_offsets_r[c + 1]))]
+                [
+                    VarInfoT(int(pairs_r[k, 0]), int(pairs_r[k, 1]))
+                    for k in range(int(constr_offsets_r[c]), int(constr_offsets_r[c + 1]))
+                ]
                 for c in range(c_start, c_end)
             ]
             self.probs_r.append(
@@ -55,10 +61,14 @@ class SubproblemsWrap:
             # build demand problems
             idx, constrs_gp = idx_d[i], constrs_gps_d[i]
             obj_d = obj_gps_d[i]
+
+            # same logic to deserialize as before
             c_start, c_end = int(group_offsets_d[i]), int(group_offsets_d[i + 1])
             var_id_to_pos_gp = [
-                [VarInfoT(int(pairs_d[k, 0]), int(pairs_d[k, 1]))
-                 for k in range(int(pair_offsets_d[c]), int(pair_offsets_d[c + 1]))]
+                [
+                    VarInfoT(int(pairs_d[k, 0]), int(pairs_d[k, 1]))
+                    for k in range(int(constr_offsets_d[c]), int(constr_offsets_d[c + 1]))
+                ]
                 for c in range(c_start, c_end)
             ]
             self.probs_d.append(
