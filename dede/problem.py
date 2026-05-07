@@ -652,12 +652,12 @@ class Problem(CpProblem):
                     [self.constrs_gps_r[i] for i in idx_r],
                     [self.constrs_gps_d[i] for i in idx_d],
                     [
-                        [self.constr_dict_r[constr.id] for constr in constrs]
-                        for constrs in self.constrs_gps_r
+                        [self.constr_dict_r[constr.id] for constr in self.constrs_gps_r[i]]
+                        for i in idx_r
                     ],
                     [
-                        [self.constr_dict_d[constr.id] for constr in constrs]
-                        for constrs in self.constrs_gps_d
+                        [self.constr_dict_d[constr.id] for constr in self.constrs_gps_d[i]]
+                        for i in idx_d
                     ],
                     var_id_pos_set_r_ref,
                     var_id_pos_set_d_ref,
