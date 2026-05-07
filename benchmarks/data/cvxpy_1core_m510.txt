@@ -1,3 +1,4 @@
+# This cvxpy test ran on 1 m510 node with 1 core on the week of 5/4
 Testing sum n=500, num_cpus=1
 Set parameter WLSAccessID
 Set parameter WLSSecret

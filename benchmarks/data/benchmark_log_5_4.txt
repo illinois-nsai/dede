@@ -1,4 +1,5 @@
 2026-05-04 21:59:21,136	INFO job_manager.py:587 -- Runtime env is setting up.
+# NOTE: this benchmark ran on the 4/27 codebase on 4 m510 nodes
 Running entrypoint for job raysubmit_uMiVNYFgPpGgvD48: python3 distributed_tests.py
 Testing sum n=500, num_cpus=64
 Executed __init__ in 5.6690s

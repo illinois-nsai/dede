@@ -1,3 +1,4 @@
+# NOTE this ran on 1 r650 node
 Testing sum n=80, num_cpus=1
 Executed solve in 0.19191320201207418s
 Result 3160.000000014615

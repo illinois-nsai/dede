@@ -1,0 +1,1036 @@
+2026-05-07 00:15:22,027	INFO job_manager.py:587 -- Runtime env is setting up.
+# NOTE: this benchmark ran on the 5/4 codebase (with the get subproblems optimization) on 4 m510 nodes
+Running entrypoint for job raysubmit_PCHGDDi3NZkXujW3: python3 distributed_tests.py
+Testing sum n=500, num_cpus=64
+Executed __init__ in 4.9470s
+2026-05-07 00:15:30,127	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 00:15:30,135	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 00:15:30,180	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+/users/yianz/work/dede/.venv/lib/python3.10/site-packages/ray/_private/worker.py:2051: FutureWarning: Tip: In future versions of Ray, Ray will no longer override accelerator visible devices env var if num_gpus=0 or num_gpus=None (default). To enable this behavior and turn off this error message, set RAY_ACCEL_ENV_VAR_OVERRIDE_ON_ZERO=0
+  warnings.warn(
+Executed _get_grouped_objectives in 2.5049s
+Executed get_subproblems in 7.5446s
+(SubproblemsWrap pid=193078, ip=10.10.1.4) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=193078, ip=10.10.1.4) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=193078, ip=10.10.1.4)   warnings.warn(DPP_ERROR_MSG)
+(SubproblemsWrap pid=1095235) Set parameter WLSAccessID
+(SubproblemsWrap pid=1095235) Set parameter WLSSecret
+(SubproblemsWrap pid=1095235) Set parameter LicenseID to value 2783400
+(SubproblemsWrap pid=193085, ip=10.10.1.4) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu
+Executed get_relative_residuals_and_epsilon in 1.3981s
+iter 10: primal 3.150e-03/1.259e-02, dual 3.661e-01/2.415e+00, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 1.2298s
+DeDe Solve Time: 49.77884610599722
+DeDe Iterations: 20
+Executed populate_vars_with_solution in 1.8997s
+Executed solve in 68.3182s
+Result 124749.97202972359
+Testing weighted n=500, num_cpus=64
+Executed __init__ in 4.8516s
+(SubproblemsWrap pid=138686, ip=10.10.1.2) Set parameter WLSAccessID [repeated 63x across cluster] (Ray deduplicates logs by default. Set RAY_DEDUP_LOGS=0 to disable log deduplication, or see https://docs.ray.io/en/master/ray-observability/user-guides/configure-logging.html#log-deduplication for more options.)
+(SubproblemsWrap pid=138686, ip=10.10.1.2) Set parameter WLSSecret [repeated 63x across cluster]
+(SubproblemsWrap pid=138686, ip=10.10.1.2) Set parameter LicenseID to value 2783400 [repeated 63x across cluster]
+(SubproblemsWrap pid=119661, ip=10.10.1.3) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu [repeated 63x across cluster]
+(SubproblemsWrap pid=138686, ip=10.10.1.2) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 63x across cluster]
+(SubproblemsWrap pid=138686, ip=10.10.1.2) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 63x across cluster]
+(SubproblemsWrap pid=138686, ip=10.10.1.2)   warnings.warn(DPP_ERROR_MSG) [repeated 63x across cluster]
+2026-05-07 00:16:43,741	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 00:16:43,743	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 00:16:43,768	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 2.7449s
+Executed get_subproblems in 5.6884s
+(SubproblemsWrap pid=120623, ip=10.10.1.3) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=120623, ip=10.10.1.3) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=120623, ip=10.10.1.3)   warnings.warn(DPP_ERROR_MSG)
+(SubproblemsWrap pid=139634, ip=10.10.1.2) Set parameter WLSAccessID
+(SubproblemsWrap pid=139634, ip=10.10.1.2) Set parameter WLSSecret
+(SubproblemsWrap pid=139634, ip=10.10.1.2) Set parameter LicenseID to value 2783400
+(SubproblemsWrap pid=139634, ip=10.10.1.2) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu
+Executed get_relative_residuals_and_epsilon in 1.3581s
+iter 10: primal 3.171e-02/5.303e-02, dual 1.686e+00/1.519e+00, rho 1.000e+00, update hold, terminate_flag=False
+Executed get_relative_residuals_and_epsilon in 1.3667s
+iter 20: primal 1.716e-02/4.506e-02, dual 7.472e-01/9.812e-01, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 1.3562s
+DeDe Solve Time: 70.24481028498849
+DeDe Iterations: 30
+Executed populate_vars_with_solution in 2.0571s
+Executed solve in 87.9572s
+Result 2787.70633540076
+Testing log n=500, num_cpus=64
+Executed __init__ in 4.7877s
+(SubproblemsWrap pid=1096914) Set parameter WLSAccessID [repeated 63x across cluster]
+(SubproblemsWrap pid=1096914) Set parameter WLSSecret [repeated 63x across cluster]
+(SubproblemsWrap pid=1096914) Set parameter LicenseID to value 2783400 [repeated 63x across cluster]
+(SubproblemsWrap pid=1096914) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu [repeated 63x across cluster]
+(SubproblemsWrap pid=194133, ip=10.10.1.4) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 63x across cluster]
+(SubproblemsWrap pid=194133, ip=10.10.1.4) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 63x across cluster]
+(SubproblemsWrap pid=194133, ip=10.10.1.4)   warnings.warn(DPP_ERROR_MSG) [repeated 63x across cluster]
+2026-05-07 00:18:17,095	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 00:18:17,097	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 00:18:17,122	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 2.7361s
+Executed get_subproblems in 5.5352s
+(SubproblemsWrap pid=121675, ip=10.10.1.3) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=121675, ip=10.10.1.3) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=121675, ip=10.10.1.3)   warnings.warn(DPP_ERROR_MSG)
+Executed get_relative_residuals_and_epsilon in 1.4067s
+iter 10: primal 1.713e-02/1.245e-02, dual 2.849e-01/4.402e-01, rho 1.000e+00, update hold, terminate_flag=False
+Executed get_relative_residuals_and_epsilon in 1.3043s
+iter 20: primal 6.210e-03/1.247e-02, dual 5.412e-02/3.720e-01, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 1.3862s
+DeDe Solve Time: 46.81923855000059
+DeDe Iterations: 30
+Executed populate_vars_with_solution in 1.9276s
+Executed solve in 63.9479s
+Result 2612.8250243854163
+Testing sum n=500, num_cpus=32
+Executed __init__ in 4.9544s
+(SubproblemsWrap pid=1098167) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 63x across cluster]
+(SubproblemsWrap pid=1098167) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 63x across cluster]
+(SubproblemsWrap pid=1098167)   warnings.warn(DPP_ERROR_MSG) [repeated 63x across cluster]
+2026-05-07 00:19:26,527	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 00:19:26,529	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 00:19:26,553	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 2.5766s
+Executed get_subproblems in 5.4608s
+(SubproblemsWrap pid=141686, ip=10.10.1.2) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=141686, ip=10.10.1.2) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=141686, ip=10.10.1.2)   warnings.warn(DPP_ERROR_MSG)
+(SubproblemsWrap pid=1099253) Set parameter WLSAccessID
+(SubproblemsWrap pid=1099253) Set parameter WLSSecret
+(SubproblemsWrap pid=1099253) Set parameter LicenseID to value 2783400
+(SubproblemsWrap pid=1099253) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu
+Executed get_relative_residuals_and_epsilon in 1.3904s
+iter 10: primal 3.150e-03/1.259e-02, dual 3.661e-01/2.415e+00, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 1.3842s
+DeDe Solve Time: 81.28846053799498
+DeDe Iterations: 20
+Executed populate_vars_with_solution in 1.8844s
+Executed solve in 98.2663s
+Result 124749.97202972356
+Testing weighted n=500, num_cpus=32
+Executed __init__ in 4.8820s
+(SubproblemsWrap pid=1099492) Set parameter WLSAccessID [repeated 31x across cluster]
+(SubproblemsWrap pid=1099492) Set parameter WLSSecret [repeated 31x across cluster]
+(SubproblemsWrap pid=1099492) Set parameter LicenseID to value 2783400 [repeated 31x across cluster]
+(SubproblemsWrap pid=1099492) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu [repeated 31x across cluster]
+(SubproblemsWrap pid=1099492) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 31x across cluster]
+(SubproblemsWrap pid=1099492) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 31x across cluster]
+(SubproblemsWrap pid=1099492)   warnings.warn(DPP_ERROR_MSG) [repeated 31x across cluster]
+2026-05-07 00:21:10,440	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 00:21:10,443	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 00:21:10,471	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 2.6097s
+Executed get_subproblems in 5.3275s
+(SubproblemsWrap pid=142766, ip=10.10.1.2) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=142766, ip=10.10.1.2) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=142766, ip=10.10.1.2)   warnings.warn(DPP_ERROR_MSG)
+(SubproblemsWrap pid=142768, ip=10.10.1.2) Set parameter WLSAccessID
+(SubproblemsWrap pid=142768, ip=10.10.1.2) Set parameter WLSSecret
+(SubproblemsWrap pid=142768, ip=10.10.1.2) Set parameter LicenseID to value 2783400
+(SubproblemsWrap pid=142766, ip=10.10.1.2) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu
+Executed get_relative_residuals_and_epsilon in 1.4382s
+iter 10: primal 3.120e-02/5.228e-02, dual 1.744e+00/1.521e+00, rho 1.000e+00, update hold, terminate_flag=False
+Executed get_relative_residuals_and_epsilon in 1.3837s
+iter 20: primal 1.669e-02/4.426e-02, dual 7.645e-01/9.880e-01, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 1.3935s
+DeDe Solve Time: 124.2690330070036
+DeDe Iterations: 30
+Executed populate_vars_with_solution in 1.9528s
+Executed solve in 141.9671s
+Result 2880.5501363958333
+Testing log n=500, num_cpus=32
+Executed __init__ in 4.8223s
+(SubproblemsWrap pid=1100905) Set parameter WLSAccessID [repeated 31x across cluster]
+(SubproblemsWrap pid=1100905) Set parameter WLSSecret [repeated 31x across cluster]
+(SubproblemsWrap pid=1100905) Set parameter LicenseID to value 2783400 [repeated 31x across cluster]
+(SubproblemsWrap pid=1100905) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu [repeated 31x across cluster]
+(SubproblemsWrap pid=1100905) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 31x across cluster]
+(SubproblemsWrap pid=1100905) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 31x across cluster]
+(SubproblemsWrap pid=1100905)   warnings.warn(DPP_ERROR_MSG) [repeated 31x across cluster]
+2026-05-07 00:23:37,903	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 00:23:37,907	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 00:23:37,949	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 2.4576s
+Executed get_subproblems in 6.4590s
+(SubproblemsWrap pid=1102270) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=1102270) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=1102270)   warnings.warn(DPP_ERROR_MSG)
+Executed get_relative_residuals_and_epsilon in 1.4047s
+iter 10: primal 1.713e-02/1.245e-02, dual 2.849e-01/4.402e-01, rho 1.000e+00, update hold, terminate_flag=False
+Executed get_relative_residuals_and_epsilon in 1.3659s
+iter 20: primal 6.210e-03/1.247e-02, dual 5.412e-02/3.720e-01, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 1.3229s
+DeDe Solve Time: 77.72686258298927
+DeDe Iterations: 30
+Executed populate_vars_with_solution in 1.8782s
+Executed solve in 95.6886s
+Result 2612.8250243854163
+Testing sum n=500, num_cpus=16
+Executed __init__ in 4.7427s
+(SubproblemsWrap pid=196664, ip=10.10.1.4) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 31x across cluster]
+(SubproblemsWrap pid=196664, ip=10.10.1.4) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 31x across cluster]
+(SubproblemsWrap pid=196664, ip=10.10.1.4)   warnings.warn(DPP_ERROR_MSG) [repeated 31x across cluster]
+2026-05-07 00:25:18,643	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 00:25:18,645	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 00:25:18,670	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 2.7806s
+Executed get_subproblems in 4.5778s
+(SubproblemsWrap pid=197310, ip=10.10.1.4) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=197310, ip=10.10.1.4) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=197310, ip=10.10.1.4)   warnings.warn(DPP_ERROR_MSG)
+(SubproblemsWrap pid=197311, ip=10.10.1.4) Set parameter WLSAccessID
+(SubproblemsWrap pid=197311, ip=10.10.1.4) Set parameter WLSSecret
+(SubproblemsWrap pid=197311, ip=10.10.1.4) Set parameter LicenseID to value 2783400
+(SubproblemsWrap pid=197312, ip=10.10.1.4) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu
+Executed get_relative_residuals_and_epsilon in 1.4286s
+iter 10: primal 3.150e-03/1.259e-02, dual 3.661e-01/2.415e+00, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 1.3813s
+DeDe Solve Time: 150.3552415459999
+DeDe Iterations: 20
+Executed populate_vars_with_solution in 1.8881s
+Executed solve in 166.7624s
+Result 124749.97202972358
+Testing weighted n=500, num_cpus=16
+Executed __init__ in 5.1462s
+(SubproblemsWrap pid=197590, ip=10.10.1.4) Set parameter WLSAccessID [repeated 15x across cluster]
+(SubproblemsWrap pid=197590, ip=10.10.1.4) Set parameter WLSSecret [repeated 15x across cluster]
+(SubproblemsWrap pid=197590, ip=10.10.1.4) Set parameter LicenseID to value 2783400 [repeated 15x across cluster]
+(SubproblemsWrap pid=197590, ip=10.10.1.4) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu [repeated 15x across cluster]
+(SubproblemsWrap pid=197590, ip=10.10.1.4) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 15x across cluster]
+(SubproblemsWrap pid=197590, ip=10.10.1.4) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 15x across cluster]
+(SubproblemsWrap pid=197590, ip=10.10.1.4)   warnings.warn(DPP_ERROR_MSG) [repeated 15x across cluster]
+2026-05-07 00:28:10,898	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 00:28:10,900	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 00:28:10,924	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 2.5969s
+Executed get_subproblems in 5.2904s
+(SubproblemsWrap pid=1104058) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=1104058) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=1104058)   warnings.warn(DPP_ERROR_MSG)
+(SubproblemsWrap pid=1104065) Set parameter WLSAccessID
+(SubproblemsWrap pid=1104065) Set parameter WLSSecret
+(SubproblemsWrap pid=1104065) Set parameter LicenseID to value 2783400
+(SubproblemsWrap pid=1104065) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu
+Executed get_relative_residuals_and_epsilon in 1.5261s
+iter 10: primal 2.886e-02/5.159e-02, dual 1.858e+00/1.619e+00, rho 1.000e+00, update hold, terminate_flag=False
+Executed get_relative_residuals_and_epsilon in 1.4324s
+iter 20: primal 1.652e-02/4.406e-02, dual 7.769e-01/1.026e+00, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 1.3148s
+DeDe Solve Time: 230.59538883401547
+DeDe Iterations: 30
+Executed populate_vars_with_solution in 2.0307s
+Executed solve in 247.6439s
+Result 2919.974451644713
+Testing log n=500, num_cpus=16
+Executed __init__ in 4.7546s
+(SubproblemsWrap pid=1104528) Set parameter WLSAccessID [repeated 15x across cluster]
+(SubproblemsWrap pid=1104528) Set parameter WLSSecret [repeated 15x across cluster]
+(SubproblemsWrap pid=1104528) Set parameter LicenseID to value 2783400 [repeated 15x across cluster]
+(SubproblemsWrap pid=1104111) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu [repeated 15x across cluster]
+(SubproblemsWrap pid=1104528) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 15x across cluster]
+(SubproblemsWrap pid=1104528) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 15x across cluster]
+(SubproblemsWrap pid=1104528)   warnings.warn(DPP_ERROR_MSG) [repeated 15x across cluster]
+2026-05-07 00:32:23,981	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 00:32:23,984	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 00:32:24,013	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 2.6837s
+Executed get_subproblems in 4.6005s
+(SubproblemsWrap pid=144008, ip=10.10.1.2) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=144008, ip=10.10.1.2) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=144008, ip=10.10.1.2)   warnings.warn(DPP_ERROR_MSG)
+Executed get_relative_residuals_and_epsilon in 1.4125s
+iter 10: primal 1.713e-02/1.245e-02, dual 2.849e-01/4.402e-01, rho 1.000e+00, update hold, terminate_flag=False
+Executed get_relative_residuals_and_epsilon in 1.3652s
+iter 20: primal 6.210e-03/1.247e-02, dual 5.412e-02/3.720e-01, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 1.3977s
+DeDe Solve Time: 141.65824519100715
+DeDe Iterations: 30
+Executed populate_vars_with_solution in 1.8161s
+Executed solve in 158.3984s
+Result 2612.825024385417
+Testing sum n=500, num_cpus=8
+Executed __init__ in 4.6409s
+(SubproblemsWrap pid=144281, ip=10.10.1.2) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 15x across cluster]
+(SubproblemsWrap pid=144281, ip=10.10.1.2) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 15x across cluster]
+(SubproblemsWrap pid=144281, ip=10.10.1.2)   warnings.warn(DPP_ERROR_MSG) [repeated 15x across cluster]
+2026-05-07 00:35:07,591	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 00:35:07,594	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 00:35:07,643	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 2.5951s
+Executed get_subproblems in 4.8134s
+(SubproblemsWrap pid=1106614) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=1106614) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=1106614)   warnings.warn(DPP_ERROR_MSG)
+(SubproblemsWrap pid=1106614) Set parameter WLSAccessID
+(SubproblemsWrap pid=1106614) Set parameter WLSSecret
+(SubproblemsWrap pid=1106614) Set parameter LicenseID to value 2783400
+(SubproblemsWrap pid=1106831) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu
+Executed get_relative_residuals_and_epsilon in 1.4991s
+iter 10: primal 3.150e-03/1.259e-02, dual 3.661e-01/2.415e+00, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 1.3760s
+DeDe Solve Time: 170.42841427199892
+DeDe Iterations: 20
+Executed populate_vars_with_solution in 1.9453s
+Executed solve in 186.1973s
+Result 124749.97202972356
+Testing weighted n=500, num_cpus=8
+Executed __init__ in 4.9601s
+(SubproblemsWrap pid=1106831) Set parameter WLSAccessID [repeated 7x across cluster]
+(SubproblemsWrap pid=1106831) Set parameter WLSSecret [repeated 7x across cluster]
+(SubproblemsWrap pid=1106831) Set parameter LicenseID to value 2783400 [repeated 7x across cluster]
+(SubproblemsWrap pid=1106681) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu [repeated 7x across cluster]
+(SubproblemsWrap pid=1106831) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 7x across cluster]
+(SubproblemsWrap pid=1106831) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 7x across cluster]
+(SubproblemsWrap pid=1106831)   warnings.warn(DPP_ERROR_MSG) [repeated 7x across cluster]
+2026-05-07 00:38:19,105	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 00:38:19,110	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 00:38:19,164	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 2.8100s
+Executed get_subproblems in 4.2941s
+(SubproblemsWrap pid=145190, ip=10.10.1.2) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=145190, ip=10.10.1.2) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=145190, ip=10.10.1.2)   warnings.warn(DPP_ERROR_MSG)
+(SubproblemsWrap pid=145190, ip=10.10.1.2) Set parameter WLSAccessID
+(SubproblemsWrap pid=145190, ip=10.10.1.2) Set parameter WLSSecret
+(SubproblemsWrap pid=145190, ip=10.10.1.2) Set parameter LicenseID to value 2783400
+(SubproblemsWrap pid=145190, ip=10.10.1.2) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu
+Executed get_relative_residuals_and_epsilon in 1.4550s
+iter 10: primal 3.019e-02/5.172e-02, dual 1.776e+00/1.553e+00, rho 1.000e+00, update hold, terminate_flag=False
+Executed get_relative_residuals_and_epsilon in 1.3759s
+iter 20: primal 1.711e-02/4.410e-02, dual 7.495e-01/9.870e-01, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 1.4136s
+DeDe Solve Time: 257.9772607850027
+DeDe Iterations: 30
+Executed populate_vars_with_solution in 1.8148s
+Executed solve in 273.2860s
+Result 2900.706909109473
+Testing log n=500, num_cpus=8
+Executed __init__ in 5.0490s
+(SubproblemsWrap pid=145353, ip=10.10.1.2) Set parameter WLSAccessID [repeated 7x across cluster]
+(SubproblemsWrap pid=145353, ip=10.10.1.2) Set parameter WLSSecret [repeated 7x across cluster]
+(SubproblemsWrap pid=145353, ip=10.10.1.2) Set parameter LicenseID to value 2783400 [repeated 7x across cluster]
+(SubproblemsWrap pid=145353, ip=10.10.1.2) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu [repeated 7x across cluster]
+(SubproblemsWrap pid=145353, ip=10.10.1.2) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 7x across cluster]
+(SubproblemsWrap pid=145353, ip=10.10.1.2) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 7x across cluster]
+(SubproblemsWrap pid=145353, ip=10.10.1.2)   warnings.warn(DPP_ERROR_MSG) [repeated 7x across cluster]
+2026-05-07 00:42:57,539	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 00:42:57,541	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 00:42:57,565	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 2.5851s
+Executed get_subproblems in 4.3850s
+(SubproblemsWrap pid=122858, ip=10.10.1.3) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=122858, ip=10.10.1.3) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=122858, ip=10.10.1.3)   warnings.warn(DPP_ERROR_MSG)
+Executed get_relative_residuals_and_epsilon in 1.5289s
+iter 10: primal 1.713e-02/1.245e-02, dual 2.849e-01/4.402e-01, rho 1.000e+00, update hold, terminate_flag=False
+Executed get_relative_residuals_and_epsilon in 1.4085s
+iter 20: primal 6.210e-03/1.247e-02, dual 5.412e-02/3.720e-01, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 1.4433s
+DeDe Solve Time: 162.07345352697303
+DeDe Iterations: 30
+Executed populate_vars_with_solution in 1.8422s
+Executed solve in 177.2423s
+Result 2612.8250243854172
+Testing sum n=1000, num_cpus=64
+Executed __init__ in 17.8322s
+(SubproblemsWrap pid=123021, ip=10.10.1.3) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 7x across cluster]
+(SubproblemsWrap pid=123021, ip=10.10.1.3) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 7x across cluster]
+(SubproblemsWrap pid=123021, ip=10.10.1.3)   warnings.warn(DPP_ERROR_MSG) [repeated 7x across cluster]
+2026-05-07 00:46:13,119	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 00:46:13,121	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 00:46:13,144	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 10.3632s
+Executed get_subproblems in 20.8329s
+(SubproblemsWrap pid=145930, ip=10.10.1.2) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=145930, ip=10.10.1.2) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=145930, ip=10.10.1.2)   warnings.warn(DPP_ERROR_MSG)
+(SubproblemsWrap pid=123465, ip=10.10.1.3) Set parameter WLSAccessID
+(SubproblemsWrap pid=123465, ip=10.10.1.3) Set parameter WLSSecret
+(SubproblemsWrap pid=123465, ip=10.10.1.3) Set parameter LicenseID to value 2783400
+(SubproblemsWrap pid=145932, ip=10.10.1.2) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu
+Executed get_relative_residuals_and_epsilon in 6.4795s
+iter 10: primal 3.152e-03/1.259e-02, dual 3.663e-01/2.412e+00, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 6.4168s
+DeDe Solve Time: 199.74756035101018
+DeDe Iterations: 20
+Executed populate_vars_with_solution in 7.2344s
+Executed solve in 255.0054s
+Result 499499.93963304
+Testing weighted n=1000, num_cpus=64
+Executed __init__ in 17.3081s
+(SubproblemsWrap pid=199089, ip=10.10.1.4) Set parameter WLSAccessID [repeated 63x across cluster]
+(SubproblemsWrap pid=199089, ip=10.10.1.4) Set parameter WLSSecret [repeated 63x across cluster]
+(SubproblemsWrap pid=199089, ip=10.10.1.4) Set parameter LicenseID to value 2783400 [repeated 63x across cluster]
+(SubproblemsWrap pid=198815, ip=10.10.1.4) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu [repeated 63x across cluster]
+(SubproblemsWrap pid=199089, ip=10.10.1.4) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 63x across cluster]
+(SubproblemsWrap pid=199089, ip=10.10.1.4) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 63x across cluster]
+(SubproblemsWrap pid=199089, ip=10.10.1.4)   warnings.warn(DPP_ERROR_MSG) [repeated 63x across cluster]
+2026-05-07 00:50:46,655	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 00:50:46,657	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 00:50:46,681	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 10.3903s
+Executed get_subproblems in 19.3193s
+(SubproblemsWrap pid=124792, ip=10.10.1.3) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=124792, ip=10.10.1.3) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=124792, ip=10.10.1.3)   warnings.warn(DPP_ERROR_MSG)
+(SubproblemsWrap pid=124792, ip=10.10.1.3) Set parameter WLSAccessID
+(SubproblemsWrap pid=124792, ip=10.10.1.3) Set parameter WLSSecret
+(SubproblemsWrap pid=124792, ip=10.10.1.3) Set parameter LicenseID to value 2783400
+(SubproblemsWrap pid=124792, ip=10.10.1.3) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu
+Executed get_relative_residuals_and_epsilon in 6.4194s
+iter 10: primal 2.566e-02/8.425e-02, dual 2.064e+00/3.093e+00, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 6.3699s
+DeDe Solve Time: 199.91452657498303
+DeDe Iterations: 20
+Executed populate_vars_with_solution in 7.1346s
+Executed solve in 254.2502s
+Result 5679.15402838401
+Testing log n=1000, num_cpus=64
+Executed __init__ in 17.6163s
+(SubproblemsWrap pid=1111904) Set parameter WLSAccessID [repeated 63x across cluster]
+(SubproblemsWrap pid=1111904) Set parameter WLSSecret [repeated 63x across cluster]
+(SubproblemsWrap pid=1111904) Set parameter LicenseID to value 2783400 [repeated 63x across cluster]
+(SubproblemsWrap pid=1111904) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu [repeated 63x across cluster]
+(SubproblemsWrap pid=1112298) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 63x across cluster]
+(SubproblemsWrap pid=1112298) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 63x across cluster]
+(SubproblemsWrap pid=1112298)   warnings.warn(DPP_ERROR_MSG) [repeated 63x across cluster]
+2026-05-07 00:55:19,902	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 00:55:19,904	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 00:55:19,929	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 10.5261s
+Executed get_subproblems in 23.4116s
+(SubproblemsWrap pid=201301, ip=10.10.1.4) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=201301, ip=10.10.1.4) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=201301, ip=10.10.1.4)   warnings.warn(DPP_ERROR_MSG)
+Executed get_relative_residuals_and_epsilon in 6.4748s
+iter 10: primal 1.724e-02/1.246e-02, dual 2.881e-01/4.373e-01, rho 1.000e+00, update hold, terminate_flag=False
+Executed get_relative_residuals_and_epsilon in 6.3616s
+iter 20: primal 6.289e-03/1.247e-02, dual 6.412e-02/3.695e-01, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 6.4184s
+DeDe Solve Time: 233.3812088110135
+DeDe Iterations: 30
+Executed populate_vars_with_solution in 7.2944s
+Executed solve in 289.9862s
+Result 5914.710004697318
+Testing sum n=1000, num_cpus=32
+Executed __init__ in 18.0164s
+(SubproblemsWrap pid=149083, ip=10.10.1.2) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 63x across cluster]
+(SubproblemsWrap pid=149083, ip=10.10.1.2) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 63x across cluster]
+(SubproblemsWrap pid=149083, ip=10.10.1.2)   warnings.warn(DPP_ERROR_MSG) [repeated 63x across cluster]
+2026-05-07 01:00:29,290	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 01:00:29,293	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 01:00:29,341	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 10.3770s
+Executed get_subproblems in 17.0218s
+(SubproblemsWrap pid=149945, ip=10.10.1.2) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=149945, ip=10.10.1.2) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=149945, ip=10.10.1.2)   warnings.warn(DPP_ERROR_MSG)
+(SubproblemsWrap pid=149945, ip=10.10.1.2) Set parameter WLSAccessID
+(SubproblemsWrap pid=149945, ip=10.10.1.2) Set parameter WLSSecret
+(SubproblemsWrap pid=149945, ip=10.10.1.2) Set parameter LicenseID to value 2783400
+(SubproblemsWrap pid=149945, ip=10.10.1.2) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu
+Executed get_relative_residuals_and_epsilon in 6.4582s
+iter 10: primal 3.152e-03/1.259e-02, dual 3.663e-01/2.412e+00, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 6.3964s
+DeDe Solve Time: 360.2468756160233
+DeDe Iterations: 20
+Executed populate_vars_with_solution in 7.0262s
+Executed solve in 412.3619s
+Result 499499.93963304017
+Testing weighted n=1000, num_cpus=32
+Executed __init__ in 18.0070s
+(SubproblemsWrap pid=127866, ip=10.10.1.3) Set parameter WLSAccessID [repeated 31x across cluster]
+(SubproblemsWrap pid=127866, ip=10.10.1.3) Set parameter WLSSecret [repeated 31x across cluster]
+(SubproblemsWrap pid=127866, ip=10.10.1.3) Set parameter LicenseID to value 2783400 [repeated 31x across cluster]
+(SubproblemsWrap pid=127866, ip=10.10.1.3) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu [repeated 31x across cluster]
+(SubproblemsWrap pid=127866, ip=10.10.1.3) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 31x across cluster]
+(SubproblemsWrap pid=127866, ip=10.10.1.3) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 31x across cluster]
+(SubproblemsWrap pid=127866, ip=10.10.1.3)   warnings.warn(DPP_ERROR_MSG) [repeated 31x across cluster]
+2026-05-07 01:07:40,472	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 01:07:40,475	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 01:07:40,510	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 10.7181s
+Executed get_subproblems in 17.1307s
+(SubproblemsWrap pid=151551, ip=10.10.1.2) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=151551, ip=10.10.1.2) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=151551, ip=10.10.1.2)   warnings.warn(DPP_ERROR_MSG)
+(SubproblemsWrap pid=151551, ip=10.10.1.2) Set parameter WLSAccessID
+(SubproblemsWrap pid=151551, ip=10.10.1.2) Set parameter WLSSecret
+(SubproblemsWrap pid=151551, ip=10.10.1.2) Set parameter LicenseID to value 2783400
+(SubproblemsWrap pid=151551, ip=10.10.1.2) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu
+Executed get_relative_residuals_and_epsilon in 6.4488s
+iter 10: primal 2.704e-02/8.450e-02, dual 1.953e+00/2.946e+00, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 6.3803s
+DeDe Solve Time: 362.35516581698903
+DeDe Iterations: 20
+Executed populate_vars_with_solution in 6.9983s
+Executed solve in 415.3869s
+Result 5620.925017572493
+Testing log n=1000, num_cpus=32
+Executed __init__ in 17.0864s
+(SubproblemsWrap pid=129590, ip=10.10.1.3) Set parameter WLSAccessID [repeated 31x across cluster]
+(SubproblemsWrap pid=129590, ip=10.10.1.3) Set parameter WLSSecret [repeated 31x across cluster]
+(SubproblemsWrap pid=129590, ip=10.10.1.3) Set parameter LicenseID to value 2783400 [repeated 31x across cluster]
+(SubproblemsWrap pid=129590, ip=10.10.1.3) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu [repeated 31x across cluster]
+(SubproblemsWrap pid=129590, ip=10.10.1.3) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 31x across cluster]
+(SubproblemsWrap pid=129590, ip=10.10.1.3) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 31x across cluster]
+(SubproblemsWrap pid=129590, ip=10.10.1.3)   warnings.warn(DPP_ERROR_MSG) [repeated 31x across cluster]
+2026-05-07 01:14:53,581	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 01:14:53,584	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 01:14:53,608	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 10.2357s
+Executed get_subproblems in 17.7512s
+(SubproblemsWrap pid=202762, ip=10.10.1.4) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=202762, ip=10.10.1.4) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=202762, ip=10.10.1.4)   warnings.warn(DPP_ERROR_MSG)
+Executed get_relative_residuals_and_epsilon in 6.5259s
+iter 10: primal 1.724e-02/1.246e-02, dual 2.881e-01/4.373e-01, rho 1.000e+00, update hold, terminate_flag=False
+Executed get_relative_residuals_and_epsilon in 6.3805s
+iter 20: primal 6.289e-03/1.247e-02, dual 6.412e-02/3.695e-01, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 6.2847s
+DeDe Solve Time: 392.37700456401217
+DeDe Iterations: 30
+Executed populate_vars_with_solution in 7.0953s
+Executed solve in 444.4142s
+Result 5914.710004697316
+Testing sum n=1000, num_cpus=16
+Executed __init__ in 17.9080s
+(SubproblemsWrap pid=153637, ip=10.10.1.2) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 31x across cluster]
+(SubproblemsWrap pid=153637, ip=10.10.1.2) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 31x across cluster]
+(SubproblemsWrap pid=153637, ip=10.10.1.2)   warnings.warn(DPP_ERROR_MSG) [repeated 31x across cluster]
+2026-05-07 01:22:36,749	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 01:22:36,751	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 01:22:36,776	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 10.4600s
+Executed get_subproblems in 17.2087s
+(SubproblemsWrap pid=130747, ip=10.10.1.3) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=130747, ip=10.10.1.3) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=130747, ip=10.10.1.3)   warnings.warn(DPP_ERROR_MSG)
+(SubproblemsWrap pid=130747, ip=10.10.1.3) Set parameter WLSAccessID
+(SubproblemsWrap pid=130747, ip=10.10.1.3) Set parameter WLSSecret
+(SubproblemsWrap pid=130747, ip=10.10.1.3) Set parameter LicenseID to value 2783400
+(SubproblemsWrap pid=130747, ip=10.10.1.3) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu
+Executed get_relative_residuals_and_epsilon in 6.5001s
+iter 10: primal 3.152e-03/1.259e-02, dual 3.663e-01/2.412e+00, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 6.4479s
+DeDe Solve Time: 682.6708088990126
+DeDe Iterations: 20
+Executed populate_vars_with_solution in 7.1013s
+Executed solve in 735.3790s
+Result 499499.93963304
+Testing weighted n=1000, num_cpus=16
+Executed __init__ in 18.1994s
+(SubproblemsWrap pid=131387, ip=10.10.1.3) Set parameter WLSAccessID [repeated 15x across cluster]
+(SubproblemsWrap pid=131387, ip=10.10.1.3) Set parameter WLSSecret [repeated 15x across cluster]
+(SubproblemsWrap pid=131387, ip=10.10.1.3) Set parameter LicenseID to value 2783400 [repeated 15x across cluster]
+(SubproblemsWrap pid=131229, ip=10.10.1.3) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu [repeated 15x across cluster]
+(SubproblemsWrap pid=131387, ip=10.10.1.3) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 15x across cluster]
+(SubproblemsWrap pid=131387, ip=10.10.1.3) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 15x across cluster]
+(SubproblemsWrap pid=131387, ip=10.10.1.3)   warnings.warn(DPP_ERROR_MSG) [repeated 15x across cluster]
+2026-05-07 01:35:11,121	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 01:35:11,123	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 01:35:11,151	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 10.5285s
+Executed get_subproblems in 16.6661s
+(SubproblemsWrap pid=132951, ip=10.10.1.3) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=132951, ip=10.10.1.3) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=132951, ip=10.10.1.3)   warnings.warn(DPP_ERROR_MSG)
+(SubproblemsWrap pid=132951, ip=10.10.1.3) Set parameter WLSAccessID
+(SubproblemsWrap pid=132951, ip=10.10.1.3) Set parameter WLSSecret
+(SubproblemsWrap pid=132951, ip=10.10.1.3) Set parameter LicenseID to value 2783400
+(SubproblemsWrap pid=132951, ip=10.10.1.3) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu
+Executed get_relative_residuals_and_epsilon in 6.5565s
+iter 10: primal 2.551e-02/8.466e-02, dual 2.069e+00/3.128e+00, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 6.4390s
+DeDe Solve Time: 686.9237091079995
+DeDe Iterations: 20
+Executed populate_vars_with_solution in 7.0822s
+Executed solve in 739.3791s
+Result 5667.485338202374
+Testing log n=1000, num_cpus=16
+Executed __init__ in 17.2221s
+(SubproblemsWrap pid=133572, ip=10.10.1.3) Set parameter WLSAccessID [repeated 15x across cluster]
+(SubproblemsWrap pid=133572, ip=10.10.1.3) Set parameter WLSSecret [repeated 15x across cluster]
+(SubproblemsWrap pid=133572, ip=10.10.1.3) Set parameter LicenseID to value 2783400 [repeated 15x across cluster]
+(SubproblemsWrap pid=133572, ip=10.10.1.3) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu [repeated 15x across cluster]
+(SubproblemsWrap pid=133572, ip=10.10.1.3) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 15x across cluster]
+(SubproblemsWrap pid=133572, ip=10.10.1.3) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 15x across cluster]
+(SubproblemsWrap pid=133572, ip=10.10.1.3)   warnings.warn(DPP_ERROR_MSG) [repeated 15x across cluster]
+2026-05-07 01:47:48,914	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 01:47:48,920	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 01:47:48,973	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 10.4828s
+Executed get_subproblems in 17.3902s
+(SubproblemsWrap pid=135133, ip=10.10.1.3) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=135133, ip=10.10.1.3) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=135133, ip=10.10.1.3)   warnings.warn(DPP_ERROR_MSG)
+Executed get_relative_residuals_and_epsilon in 6.4703s
+iter 10: primal 1.724e-02/1.246e-02, dual 2.881e-01/4.373e-01, rho 1.000e+00, update hold, terminate_flag=False
+Executed get_relative_residuals_and_epsilon in 6.4343s
+iter 20: primal 6.289e-03/1.247e-02, dual 6.412e-02/3.695e-01, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 6.3654s
+DeDe Solve Time: 738.0583048580156
+DeDe Iterations: 30
+Executed populate_vars_with_solution in 7.1278s
+Executed solve in 790.1643s
+Result 5914.710004697316
+Testing sum n=1000, num_cpus=8
+Executed __init__ in 18.0531s
+(SubproblemsWrap pid=135810, ip=10.10.1.3) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 15x across cluster]
+(SubproblemsWrap pid=135810, ip=10.10.1.3) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 15x across cluster]
+(SubproblemsWrap pid=135810, ip=10.10.1.3)   warnings.warn(DPP_ERROR_MSG) [repeated 15x across cluster]
+2026-05-07 02:01:17,657	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 02:01:17,661	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 02:01:17,713	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 9.8229s
+Executed get_subproblems in 17.1473s
+(SubproblemsWrap pid=1130436) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=1130436) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=1130436)   warnings.warn(DPP_ERROR_MSG)
+(SubproblemsWrap pid=1130436) Set parameter WLSAccessID
+(SubproblemsWrap pid=1130436) Set parameter WLSSecret
+(SubproblemsWrap pid=1130436) Set parameter LicenseID to value 2783400
+(SubproblemsWrap pid=1130436) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu
+Executed get_relative_residuals_and_epsilon in 6.4333s
+iter 10: primal 3.152e-03/1.259e-02, dual 3.663e-01/2.412e+00, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 6.4241s
+DeDe Solve Time: 761.6940967380069
+DeDe Iterations: 20
+Executed populate_vars_with_solution in 7.0945s
+Executed solve in 812.1473s
+Result 499499.93963304017
+Testing weighted n=1000, num_cpus=8
+Executed __init__ in 18.0977s
+(SubproblemsWrap pid=1130844) Set parameter WLSAccessID [repeated 7x across cluster]
+(SubproblemsWrap pid=1130844) Set parameter WLSSecret [repeated 7x across cluster]
+(SubproblemsWrap pid=1130844) Set parameter LicenseID to value 2783400 [repeated 7x across cluster]
+(SubproblemsWrap pid=1130844) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu [repeated 7x across cluster]
+(SubproblemsWrap pid=1130844) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 7x across cluster]
+(SubproblemsWrap pid=1130844) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 7x across cluster]
+(SubproblemsWrap pid=1130844)   warnings.warn(DPP_ERROR_MSG) [repeated 7x across cluster]
+2026-05-07 02:15:08,772	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 02:15:08,774	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 02:15:08,798	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 10.7878s
+Executed get_subproblems in 16.9273s
+(SubproblemsWrap pid=1134994) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=1134994) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=1134994)   warnings.warn(DPP_ERROR_MSG)
+(SubproblemsWrap pid=1134994) Set parameter WLSAccessID
+(SubproblemsWrap pid=1134994) Set parameter WLSSecret
+(SubproblemsWrap pid=1134994) Set parameter LicenseID to value 2783400
+(SubproblemsWrap pid=1134994) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu
+Executed get_relative_residuals_and_epsilon in 6.4757s
+iter 10: primal 2.599e-02/8.378e-02, dual 2.033e+00/3.036e+00, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 6.3437s
+DeDe Solve Time: 766.0395673980238
+DeDe Iterations: 20
+Executed populate_vars_with_solution in 7.1314s
+Executed solve in 817.4926s
+Result 5714.362907364398
+Testing log n=1000, num_cpus=8
+Executed __init__ in 17.5165s
+(SubproblemsWrap pid=1135445) Set parameter WLSAccessID [repeated 7x across cluster]
+(SubproblemsWrap pid=1135445) Set parameter WLSSecret [repeated 7x across cluster]
+(SubproblemsWrap pid=1135445) Set parameter LicenseID to value 2783400 [repeated 7x across cluster]
+(SubproblemsWrap pid=1135445) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu [repeated 7x across cluster]
+(SubproblemsWrap pid=1135445) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 7x across cluster]
+(SubproblemsWrap pid=1135445) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 7x across cluster]
+(SubproblemsWrap pid=1135445)   warnings.warn(DPP_ERROR_MSG) [repeated 7x across cluster]
+2026-05-07 02:29:04,891	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 02:29:04,893	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 02:29:04,918	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 10.1569s
+Executed get_subproblems in 17.2406s
+(SubproblemsWrap pid=204945, ip=10.10.1.4) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=204945, ip=10.10.1.4) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=204945, ip=10.10.1.4)   warnings.warn(DPP_ERROR_MSG)
+Executed get_relative_residuals_and_epsilon in 6.6114s
+iter 10: primal 1.724e-02/1.246e-02, dual 2.881e-01/4.373e-01, rho 1.000e+00, update hold, terminate_flag=False
+Executed get_relative_residuals_and_epsilon in 6.4636s
+iter 20: primal 6.289e-03/1.247e-02, dual 6.412e-02/3.695e-01, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 6.4388s
+DeDe Solve Time: 793.874191156996
+DeDe Iterations: 30
+Executed populate_vars_with_solution in 6.9928s
+Executed solve in 844.9873s
+Result 5914.7100046973155
+Testing sum n=1500, num_cpus=64
+Executed __init__ in 39.3434s
+(SubproblemsWrap pid=205258, ip=10.10.1.4) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 7x across cluster]
+(SubproblemsWrap pid=205258, ip=10.10.1.4) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 7x across cluster]
+(SubproblemsWrap pid=205258, ip=10.10.1.4)   warnings.warn(DPP_ERROR_MSG) [repeated 7x across cluster]
+2026-05-07 02:43:50,401	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 02:43:50,404	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 02:43:50,445	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 23.8262s
+Executed get_subproblems in 39.7890s
+(SubproblemsWrap pid=155433, ip=10.10.1.2) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=155433, ip=10.10.1.2) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=155433, ip=10.10.1.2)   warnings.warn(DPP_ERROR_MSG)
+(SubproblemsWrap pid=137766, ip=10.10.1.3) Set parameter WLSAccessID
+(SubproblemsWrap pid=137766, ip=10.10.1.3) Set parameter WLSSecret
+(SubproblemsWrap pid=137766, ip=10.10.1.3) Set parameter LicenseID to value 2783400
+(SubproblemsWrap pid=137766, ip=10.10.1.3) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu
+Executed get_relative_residuals_and_epsilon in 15.8709s
+iter 10: primal 3.158e-03/1.259e-02, dual 3.641e-01/2.407e+00, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 15.5447s
+DeDe Solve Time: 554.4437024789804
+DeDe Iterations: 20
+Executed populate_vars_with_solution in 15.9232s
+Executed solve in 669.0536s
+Result 1124249.910115947
+Testing weighted n=1500, num_cpus=64
+Executed __init__ in 40.8407s
+(SubproblemsWrap pid=1144344) Set parameter WLSAccessID [repeated 63x across cluster]
+(SubproblemsWrap pid=1144344) Set parameter WLSSecret [repeated 63x across cluster]
+(SubproblemsWrap pid=1144344) Set parameter LicenseID to value 2783400 [repeated 63x across cluster]
+(SubproblemsWrap pid=1144344) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu [repeated 63x across cluster]
+(SubproblemsWrap pid=1144344) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 63x across cluster]
+(SubproblemsWrap pid=1144344) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 63x across cluster]
+(SubproblemsWrap pid=1144344)   warnings.warn(DPP_ERROR_MSG) [repeated 63x across cluster]
+2026-05-07 02:55:42,432	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 02:55:42,437	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 02:55:42,488	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 24.1912s
+Executed get_subproblems in 50.6543s
+(SubproblemsWrap pid=1148698) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=1148698) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=1148698)   warnings.warn(DPP_ERROR_MSG)
+(SubproblemsWrap pid=1148698) Set parameter WLSAccessID
+(SubproblemsWrap pid=1148698) Set parameter WLSSecret
+(SubproblemsWrap pid=1148698) Set parameter LicenseID to value 2783400
+(SubproblemsWrap pid=1148698) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu
+Executed get_relative_residuals_and_epsilon in 16.0146s
+iter 10: primal 2.391e-02/1.127e-01, dual 2.189e+00/4.510e+00, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 15.6094s
+DeDe Solve Time: 565.3452388200094
+DeDe Iterations: 20
+Executed populate_vars_with_solution in 16.3427s
+Executed solve in 688.7847s
+Result 8415.141799707048
+Testing log n=1500, num_cpus=64
+Executed __init__ in 40.1047s
+(SubproblemsWrap pid=158156, ip=10.10.1.2) Set parameter WLSAccessID [repeated 63x across cluster]
+(SubproblemsWrap pid=158156, ip=10.10.1.2) Set parameter WLSSecret [repeated 63x across cluster]
+(SubproblemsWrap pid=158156, ip=10.10.1.2) Set parameter LicenseID to value 2783400 [repeated 63x across cluster]
+(SubproblemsWrap pid=158156, ip=10.10.1.2) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu [repeated 63x across cluster]
+(SubproblemsWrap pid=158156, ip=10.10.1.2) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 63x across cluster]
+(SubproblemsWrap pid=158156, ip=10.10.1.2) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 63x across cluster]
+(SubproblemsWrap pid=158156, ip=10.10.1.2)   warnings.warn(DPP_ERROR_MSG) [repeated 63x across cluster]
+2026-05-07 03:07:53,461	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 03:07:53,464	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 03:07:53,490	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 23.7352s
+Executed get_subproblems in 49.8720s
+(SubproblemsWrap pid=210247, ip=10.10.1.4) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=210247, ip=10.10.1.4) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=210247, ip=10.10.1.4)   warnings.warn(DPP_ERROR_MSG)
+Executed get_relative_residuals_and_epsilon in 15.7835s
+iter 10: primal 1.728e-02/1.246e-02, dual 2.882e-01/4.365e-01, rho 1.000e+00, update hold, terminate_flag=False
+Executed get_relative_residuals_and_epsilon in 15.5910s
+iter 20: primal 6.292e-03/1.247e-02, dual 6.105e-02/3.689e-01, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 15.7300s
+DeDe Solve Time: 698.5675678050029
+DeDe Iterations: 30
+Executed populate_vars_with_solution in 15.8974s
+Executed solve in 821.5063s
+Result 9477.830021485532
+Testing sum n=1500, num_cpus=32
+Executed __init__ in 39.9281s
+(SubproblemsWrap pid=160124, ip=10.10.1.2) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 63x across cluster]
+(SubproblemsWrap pid=160124, ip=10.10.1.2) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 63x across cluster]
+(SubproblemsWrap pid=160124, ip=10.10.1.2)   warnings.warn(DPP_ERROR_MSG) [repeated 63x across cluster]
+2026-05-07 03:22:16,979	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 03:22:16,985	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 03:22:17,026	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 23.2853s
+Executed get_subproblems in 48.3067s
+(SubproblemsWrap pid=1160331) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=1160331) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=1160331)   warnings.warn(DPP_ERROR_MSG)
+(SubproblemsWrap pid=1160331) Set parameter WLSAccessID
+(SubproblemsWrap pid=1160331) Set parameter WLSSecret
+(SubproblemsWrap pid=1160331) Set parameter LicenseID to value 2783400
+(SubproblemsWrap pid=1160331) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu
+Executed get_relative_residuals_and_epsilon in 16.0263s
+iter 10: primal 3.158e-03/1.259e-02, dual 3.641e-01/2.407e+00, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 15.9096s
+DeDe Solve Time: 1048.4366301260015
+DeDe Iterations: 20
+Executed populate_vars_with_solution in 16.2489s
+Executed solve in 1169.5594s
+Result 1124249.9101159475
+Testing weighted n=1500, num_cpus=32
+Executed __init__ in 38.8681s
+(SubproblemsWrap pid=213094, ip=10.10.1.4) Set parameter WLSAccessID [repeated 31x across cluster]
+(SubproblemsWrap pid=213094, ip=10.10.1.4) Set parameter WLSSecret [repeated 31x across cluster]
+(SubproblemsWrap pid=213094, ip=10.10.1.4) Set parameter LicenseID to value 2783400 [repeated 31x across cluster]
+(SubproblemsWrap pid=213039, ip=10.10.1.4) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu [repeated 31x across cluster]
+(SubproblemsWrap pid=213094, ip=10.10.1.4) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 31x across cluster]
+(SubproblemsWrap pid=213094, ip=10.10.1.4) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 31x across cluster]
+(SubproblemsWrap pid=213094, ip=10.10.1.4)   warnings.warn(DPP_ERROR_MSG) [repeated 31x across cluster]
+2026-05-07 03:42:27,525	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 03:42:27,528	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 03:42:27,556	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 24.8014s
+Executed get_subproblems in 48.5939s
+(SubproblemsWrap pid=1169042) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=1169042) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=1169042)   warnings.warn(DPP_ERROR_MSG)
+(SubproblemsWrap pid=1169042) Set parameter WLSAccessID
+(SubproblemsWrap pid=1169042) Set parameter WLSSecret
+(SubproblemsWrap pid=1169042) Set parameter LicenseID to value 2783400
+(SubproblemsWrap pid=1169064) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu
+Executed get_relative_residuals_and_epsilon in 15.8086s
+iter 10: primal 2.388e-02/1.127e-01, dual 2.197e+00/4.514e+00, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 15.7159s
+DeDe Solve Time: 1051.296226520004
+DeDe Iterations: 20
+Executed populate_vars_with_solution in 16.1851s
+Executed solve in 1173.4276s
+Result 8461.592749776913
+Testing log n=1500, num_cpus=32
+Executed __init__ in 40.1070s
+(SubproblemsWrap pid=216094, ip=10.10.1.4) Set parameter WLSAccessID [repeated 31x across cluster]
+(SubproblemsWrap pid=216094, ip=10.10.1.4) Set parameter WLSSecret [repeated 31x across cluster]
+(SubproblemsWrap pid=216094, ip=10.10.1.4) Set parameter LicenseID to value 2783400 [repeated 31x across cluster]
+(SubproblemsWrap pid=215888, ip=10.10.1.4) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu [repeated 31x across cluster]
+(SubproblemsWrap pid=216094, ip=10.10.1.4) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 31x across cluster]
+(SubproblemsWrap pid=216094, ip=10.10.1.4) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 31x across cluster]
+(SubproblemsWrap pid=216094, ip=10.10.1.4)   warnings.warn(DPP_ERROR_MSG) [repeated 31x across cluster]
+2026-05-07 04:02:43,786	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 04:02:43,789	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 04:02:43,826	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 23.3319s
+Executed get_subproblems in 38.1317s
+(SubproblemsWrap pid=161993, ip=10.10.1.2) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=161993, ip=10.10.1.2) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=161993, ip=10.10.1.2)   warnings.warn(DPP_ERROR_MSG)
+Executed get_relative_residuals_and_epsilon in 15.7306s
+iter 10: primal 1.728e-02/1.246e-02, dual 2.882e-01/4.365e-01, rho 1.000e+00, update hold, terminate_flag=False
+Executed get_relative_residuals_and_epsilon in 15.5581s
+iter 20: primal 6.292e-03/1.247e-02, dual 6.105e-02/3.689e-01, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 15.6448s
+DeDe Solve Time: 1210.1673774280061
+DeDe Iterations: 30
+Executed populate_vars_with_solution in 15.8701s
+Executed solve in 1323.1045s
+Result 9477.83002148553
+Testing sum n=1500, num_cpus=16
+Executed __init__ in 37.4553s
+(SubproblemsWrap pid=145014, ip=10.10.1.3) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 31x across cluster]
+(SubproblemsWrap pid=145014, ip=10.10.1.3) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 31x across cluster]
+(SubproblemsWrap pid=145014, ip=10.10.1.3)   warnings.warn(DPP_ERROR_MSG) [repeated 31x across cluster]
+2026-05-07 04:25:25,530	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 04:25:25,535	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 04:25:25,576	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 24.2753s
+Executed get_subproblems in 37.0255s
+(SubproblemsWrap pid=147559, ip=10.10.1.3) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=147559, ip=10.10.1.3) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=147559, ip=10.10.1.3)   warnings.warn(DPP_ERROR_MSG)
+(SubproblemsWrap pid=147610, ip=10.10.1.3) Set parameter WLSAccessID
+(SubproblemsWrap pid=147610, ip=10.10.1.3) Set parameter WLSSecret
+(SubproblemsWrap pid=147610, ip=10.10.1.3) Set parameter LicenseID to value 2783400
+(SubproblemsWrap pid=147610, ip=10.10.1.3) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu
+Executed get_relative_residuals_and_epsilon in 15.7769s
+iter 10: primal 3.158e-03/1.259e-02, dual 3.641e-01/2.407e+00, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 15.6591s
+DeDe Solve Time: 2004.4665748149855
+DeDe Iterations: 20
+Executed populate_vars_with_solution in 16.2363s
+Executed solve in 2117.8257s
+Result 1124249.9101159475
+Testing weighted n=1500, num_cpus=16
+Executed __init__ in 38.0556s
+(SubproblemsWrap pid=148315, ip=10.10.1.3) Set parameter WLSAccessID [repeated 15x across cluster]
+(SubproblemsWrap pid=148315, ip=10.10.1.3) Set parameter WLSSecret [repeated 15x across cluster]
+(SubproblemsWrap pid=148315, ip=10.10.1.3) Set parameter LicenseID to value 2783400 [repeated 15x across cluster]
+(SubproblemsWrap pid=148083, ip=10.10.1.3) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu [repeated 15x across cluster]
+(SubproblemsWrap pid=148315, ip=10.10.1.3) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 15x across cluster]
+(SubproblemsWrap pid=148315, ip=10.10.1.3) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 15x across cluster]
+(SubproblemsWrap pid=148315, ip=10.10.1.3)   warnings.warn(DPP_ERROR_MSG) [repeated 15x across cluster]
+2026-05-07 05:01:23,002	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 05:01:23,005	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 05:01:23,038	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 23.9433s
+Executed get_subproblems in 43.8643s
+(SubproblemsWrap pid=1199576) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=1199576) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=1199576)   warnings.warn(DPP_ERROR_MSG)
+(SubproblemsWrap pid=1199576) Set parameter WLSAccessID
+(SubproblemsWrap pid=1199576) Set parameter WLSSecret
+(SubproblemsWrap pid=1199576) Set parameter LicenseID to value 2783400
+(SubproblemsWrap pid=1199576) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu
+Executed get_relative_residuals_and_epsilon in 16.0773s
+iter 10: primal 2.446e-02/1.140e-01, dual 2.146e+00/4.461e+00, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 15.9290s
+DeDe Solve Time: 2031.5008616319974
+DeDe Iterations: 20
+Executed populate_vars_with_solution in 16.5857s
+Executed solve in 2149.8238s
+Result 8232.55725344268
+Testing log n=1500, num_cpus=16
+Executed __init__ in 38.8152s
+(SubproblemsWrap pid=1200732) Set parameter WLSAccessID [repeated 15x across cluster]
+(SubproblemsWrap pid=1200732) Set parameter WLSSecret [repeated 15x across cluster]
+(SubproblemsWrap pid=1200732) Set parameter LicenseID to value 2783400 [repeated 15x across cluster]
+(SubproblemsWrap pid=1200732) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu [repeated 15x across cluster]
+(SubproblemsWrap pid=1200732) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 15x across cluster]
+(SubproblemsWrap pid=1200732) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 15x across cluster]
+(SubproblemsWrap pid=1200732)   warnings.warn(DPP_ERROR_MSG) [repeated 15x across cluster]
+2026-05-07 05:37:54,346	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 05:37:54,350	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 05:37:54,390	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 23.1570s
+Executed get_subproblems in 38.3433s
+(SubproblemsWrap pid=165726, ip=10.10.1.2) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=165726, ip=10.10.1.2) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=165726, ip=10.10.1.2)   warnings.warn(DPP_ERROR_MSG)
+Executed get_relative_residuals_and_epsilon in 15.8438s
+iter 10: primal 1.728e-02/1.246e-02, dual 2.882e-01/4.365e-01, rho 1.000e+00, update hold, terminate_flag=False
+Executed get_relative_residuals_and_epsilon in 15.8326s
+iter 20: primal 6.292e-03/1.247e-02, dual 6.105e-02/3.689e-01, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 15.7929s
+DeDe Solve Time: 2317.3888232269965
+DeDe Iterations: 30
+Executed populate_vars_with_solution in 16.0761s
+Executed solve in 2431.5632s
+Result 9477.830021485528
+Testing sum n=1500, num_cpus=8
+Executed __init__ in 37.2269s
+(SubproblemsWrap pid=166435, ip=10.10.1.2) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 15x across cluster]
+(SubproblemsWrap pid=166435, ip=10.10.1.2) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 15x across cluster]
+(SubproblemsWrap pid=166435, ip=10.10.1.2)   warnings.warn(DPP_ERROR_MSG) [repeated 15x across cluster]
+2026-05-07 06:19:04,560	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 06:19:04,566	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 06:19:04,619	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 24.3139s
+Executed get_subproblems in 36.4101s
+(SubproblemsWrap pid=156828, ip=10.10.1.3) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=156828, ip=10.10.1.3) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=156828, ip=10.10.1.3)   warnings.warn(DPP_ERROR_MSG)
+(SubproblemsWrap pid=156828, ip=10.10.1.3) Set parameter WLSAccessID
+(SubproblemsWrap pid=156828, ip=10.10.1.3) Set parameter WLSSecret
+(SubproblemsWrap pid=156828, ip=10.10.1.3) Set parameter LicenseID to value 2783400
+(SubproblemsWrap pid=156828, ip=10.10.1.3) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu
+Executed get_relative_residuals_and_epsilon in 15.9148s
+iter 10: primal 3.158e-03/1.259e-02, dual 3.641e-01/2.407e+00, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 15.6157s
+DeDe Solve Time: 2309.960310229013
+DeDe Iterations: 20
+Executed populate_vars_with_solution in 16.6009s
+Executed solve in 2421.1361s
+Result 1124249.9101159477
+Testing weighted n=1500, num_cpus=8
+Executed __init__ in 38.0629s
+(SubproblemsWrap pid=157204, ip=10.10.1.3) Set parameter WLSAccessID [repeated 7x across cluster]
+(SubproblemsWrap pid=157204, ip=10.10.1.3) Set parameter WLSSecret [repeated 7x across cluster]
+(SubproblemsWrap pid=157204, ip=10.10.1.3) Set parameter LicenseID to value 2783400 [repeated 7x across cluster]
+(SubproblemsWrap pid=157149, ip=10.10.1.3) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu [repeated 7x across cluster]
+(SubproblemsWrap pid=157204, ip=10.10.1.3) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 7x across cluster]
+(SubproblemsWrap pid=157204, ip=10.10.1.3) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 7x across cluster]
+(SubproblemsWrap pid=157204, ip=10.10.1.3)   warnings.warn(DPP_ERROR_MSG) [repeated 7x across cluster]
+2026-05-07 07:00:05,596	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 07:00:05,600	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 07:00:05,629	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 23.7583s
+Executed get_subproblems in 37.4332s
+(SubproblemsWrap pid=161652, ip=10.10.1.3) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=161652, ip=10.10.1.3) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=161652, ip=10.10.1.3)   warnings.warn(DPP_ERROR_MSG)
+(SubproblemsWrap pid=161652, ip=10.10.1.3) Set parameter WLSAccessID
+(SubproblemsWrap pid=161652, ip=10.10.1.3) Set parameter WLSSecret
+(SubproblemsWrap pid=161652, ip=10.10.1.3) Set parameter LicenseID to value 2783400
+(SubproblemsWrap pid=161652, ip=10.10.1.3) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu
+Executed get_relative_residuals_and_epsilon in 15.9082s
+iter 10: primal 2.479e-02/1.118e-01, dual 2.102e+00/4.312e+00, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 15.5592s
+DeDe Solve Time: 2327.6251181940024
+DeDe Iterations: 20
+Executed populate_vars_with_solution in 16.0063s
+Executed solve in 2438.2228s
+Result 8518.735966942622
+Testing log n=1500, num_cpus=8
+Executed __init__ in 38.5834s
+(SubproblemsWrap pid=162029, ip=10.10.1.3) Set parameter WLSAccessID [repeated 7x across cluster]
+(SubproblemsWrap pid=162029, ip=10.10.1.3) Set parameter WLSSecret [repeated 7x across cluster]
+(SubproblemsWrap pid=162029, ip=10.10.1.3) Set parameter LicenseID to value 2783400 [repeated 7x across cluster]
+(SubproblemsWrap pid=162029, ip=10.10.1.3) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu [repeated 7x across cluster]
+(SubproblemsWrap pid=162029, ip=10.10.1.3) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 7x across cluster]
+(SubproblemsWrap pid=162029, ip=10.10.1.3) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 7x across cluster]
+(SubproblemsWrap pid=162029, ip=10.10.1.3)   warnings.warn(DPP_ERROR_MSG) [repeated 7x across cluster]
+2026-05-07 07:41:23,765	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 07:41:23,769	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 07:41:23,811	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 23.6819s
+Executed get_subproblems in 38.2369s
+(SubproblemsWrap pid=1271380) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=1271380) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=1271380)   warnings.warn(DPP_ERROR_MSG)
+Executed get_relative_residuals_and_epsilon in 15.8117s
+iter 10: primal 1.728e-02/1.246e-02, dual 2.882e-01/4.365e-01, rho 1.000e+00, update hold, terminate_flag=False
+Executed get_relative_residuals_and_epsilon in 15.7438s
+iter 20: primal 6.292e-03/1.247e-02, dual 6.105e-02/3.689e-01, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 15.9163s
+DeDe Solve Time: 2630.7172366279992
+DeDe Iterations: 30
+Executed populate_vars_with_solution in 16.0056s
+Executed solve in 2742.1582s
+Result 9477.830021485532
+Testing sum n=2000, num_cpus=64
+Executed __init__ in 69.6246s
+(SubproblemsWrap pid=1271933) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 7x across cluster]
+(SubproblemsWrap pid=1271933) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 7x across cluster]
+(SubproblemsWrap pid=1271933)   warnings.warn(DPP_ERROR_MSG) [repeated 7x across cluster]
+2026-05-07 08:28:17,538	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 08:28:17,543	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 08:28:17,569	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 41.6721s
+Executed get_subproblems in 75.8737s
+(SubproblemsWrap pid=166844, ip=10.10.1.3) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=166844, ip=10.10.1.3) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=166844, ip=10.10.1.3)   warnings.warn(DPP_ERROR_MSG)
+(SubproblemsWrap pid=166844, ip=10.10.1.3) Set parameter WLSAccessID
+(SubproblemsWrap pid=166844, ip=10.10.1.3) Set parameter WLSSecret
+(SubproblemsWrap pid=166844, ip=10.10.1.3) Set parameter LicenseID to value 2783400
+(SubproblemsWrap pid=166844, ip=10.10.1.3) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu
+Executed get_relative_residuals_and_epsilon in 37.7308s
+iter 10: primal 3.164e-03/1.259e-02, dual 3.634e-01/2.402e+00, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 32.6248s
+DeDe Solve Time: 1169.286017890001
+DeDe Iterations: 20
+Executed populate_vars_with_solution in 27.6435s
+Executed solve in 1373.4996s
+Result 1998999.8748930946
+Testing weighted n=2000, num_cpus=64
+Executed __init__ in 68.4682s
+(SubproblemsWrap pid=1296241) Set parameter WLSAccessID [repeated 63x across cluster]
+(SubproblemsWrap pid=1296241) Set parameter WLSSecret [repeated 63x across cluster]
+(SubproblemsWrap pid=1296241) Set parameter LicenseID to value 2783400 [repeated 63x across cluster]
+(SubproblemsWrap pid=221190, ip=10.10.1.4) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu [repeated 63x across cluster]
+(SubproblemsWrap pid=1296241) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at [repeated 63x across cluster]
+(SubproblemsWrap pid=1296241) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming [repeated 63x across cluster]
+(SubproblemsWrap pid=1296241)   warnings.warn(DPP_ERROR_MSG) [repeated 63x across cluster]
+2026-05-07 08:52:22,568	INFO worker.py:1672 -- Using address 10.10.1.1:6379 set in the environment variable RAY_ADDRESS
+2026-05-07 08:52:22,571	INFO worker.py:1814 -- Connecting to existing Ray cluster at address: 10.10.1.1:6379...
+2026-05-07 08:52:22,595	INFO worker.py:2003 -- Connected to Ray cluster. View the dashboard at 127.0.0.1:8265 
+Executed _get_grouped_objectives in 43.3007s
+Executed get_subproblems in 71.7765s
+(SubproblemsWrap pid=181187, ip=10.10.1.2) /users/yianz/work/dede/.venv/lib/python3.10/site-packages/cvxpy/reductions/solvers/solving_chain.py:226: UserWarning: You are solving a parameterized problem that is not DPP. Because the problem is not DPP, subsequent solves will not be faster than the first one. For more information, see the documentation on Discplined Parametrized Programming, at
+(SubproblemsWrap pid=181187, ip=10.10.1.2) 	https://www.cvxpy.org/tutorial/advanced/index.html#disciplined-parametrized-programming
+(SubproblemsWrap pid=181187, ip=10.10.1.2)   warnings.warn(DPP_ERROR_MSG)
+(SubproblemsWrap pid=170090, ip=10.10.1.3) Set parameter WLSAccessID
+(SubproblemsWrap pid=170090, ip=10.10.1.3) Set parameter WLSSecret
+(SubproblemsWrap pid=170090, ip=10.10.1.3) Set parameter LicenseID to value 2783400
+(SubproblemsWrap pid=181187, ip=10.10.1.2) Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu
+Executed get_relative_residuals_and_epsilon in 33.0303s
+iter 10: primal 2.189e-02/1.382e-01, dual 2.395e+00/6.089e+00, rho 1.000e+00, update hold, terminate_flag=True
+Executed get_relative_residuals_and_epsilon in 32.9267s
+DeDe Solve Time: 1171.555642419
+DeDe Iterations: 20
+Executed populate_vars_with_solution in 28.2937s
+Executed solve in 1373.5417s
+Result 11233.751479974484
