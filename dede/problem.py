@@ -626,8 +626,6 @@ class Problem(CpProblem):
             var_id_pos_set_d.update(var_id_pos)
 
         # serialize expensive objects exactly once
-        constr_dict_r_ref = ray.put(self.constr_dict_r)
-        constr_dict_d_ref = ray.put(self.constr_dict_d)
         var_id_pos_set_r_ref = ray.put(var_id_pos_set_r)
         var_id_pos_set_d_ref = ray.put(var_id_pos_set_d)
 
@@ -653,8 +651,14 @@ class Problem(CpProblem):
                     [obj_expr_d[i] for i in idx_d],
                     [self.constrs_gps_r[i] for i in idx_r],
                     [self.constrs_gps_d[i] for i in idx_d],
-                    constr_dict_r_ref,
-                    constr_dict_d_ref,
+                    [
+                        [self.constr_dict_r[constr.id] for constr in constrs]
+                        for constrs in self.constrs_gps_r
+                    ],
+                    [
+                        [self.constr_dict_d[constr.id] for constr in constrs]
+                        for constrs in self.constrs_gps_d
+                    ],
                     var_id_pos_set_r_ref,
                     var_id_pos_set_d_ref,
                     rho,
