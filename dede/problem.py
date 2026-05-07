@@ -636,7 +636,9 @@ class Problem(CpProblem):
             [self.constr_dict_d[constr.id] for constr in constrs] for constrs in self.constrs_gps_d
         ]
 
-        # serialize as numpy for near-zero-copy Ray serialization (Arrow path, not pickle)
+        # serialize set of varinfot objects as a n x 2 numpy array
+        # according to https://docs.ray.io/en/latest/ray-core/objects/serialization.html#numpy-arrays
+        # ray is optimized for (zero-copy) serialization of numpy arrays
         var_id_pos_arr_r_ref = ray.put(
             np.array(list(var_id_pos_set_r), dtype=np.int64).reshape(-1, 2)
         )
