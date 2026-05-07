@@ -2,7 +2,7 @@ import os
 import sys
 import time
 
-NUM_CPUS = "1"
+NUM_CPUS = "16"
 os.environ["OMP_NUM_THREADS"] = NUM_CPUS
 os.environ["OPENBLAS_NUM_THREADS"] = NUM_CPUS
 os.environ["RAYON_NUM_THREADS"] = NUM_CPUS
@@ -24,7 +24,7 @@ def test_sum(n):
 
     prob = cp.Problem(objective, resource_constraints + demand_constraints)
     start = time.perf_counter()
-    result_cvxpy = prob.solve(solver=cp.GUROBI)
+    result_cvxpy = prob.solve(solver=cp.GUROBI, Threads=0)
     end = time.perf_counter()
     print(f"Iterations: {prob.solver_stats.num_iters}")
     print(f"Executed solve in {end - start}s")
@@ -46,7 +46,7 @@ def test_weighted(n):
 
     prob = cp.Problem(objective, resource_constraints + demand_constraints)
     start = time.perf_counter()
-    result_cvxpy = prob.solve(solver=cp.GUROBI)
+    result_cvxpy = prob.solve(solver=cp.GUROBI, Threads=0)
     end = time.perf_counter()
     print(f"Iterations: {prob.solver_stats.num_iters}")
     print(f"Executed solve in {end - start}s")
