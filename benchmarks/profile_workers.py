@@ -119,7 +119,7 @@ def print_stats(driver_stats: str, worker_stats: list[str]) -> None:
 # ---------------------------------------------------------------------------
 
 
-def profile_sum(n, num_cpus, num_iter=20):
+def profile_sum(n, num_cpus):
     N, M = n, n
     x = dd.Variable((N, M), nonneg=True)
     prob = dd.Problem(
@@ -128,13 +128,13 @@ def profile_sum(n, num_cpus, num_iter=20):
         [x[:, j].sum() <= j for j in range(M)],
     )
     driver_stats, worker_stats = run_with_line_profile(
-        prob, ray_address="auto", solver=dd.GUROBI, num_cpus=num_cpus, num_iter=num_iter
+        prob, ray_address="auto", solver=dd.GUROBI, num_cpus=num_cpus
     )
-    print(f"\n[profile_sum n={n}, num_cpus={num_cpus}, num_iter={num_iter}]")
+    print(f"\n[profile_sum n={n}, num_cpus={num_cpus}]")
     print_stats(driver_stats, worker_stats)
 
 
-def profile_weighted(n, num_cpus, num_iter=20):
+def profile_weighted(n, num_cpus):
     N, M = n, n
     x = dd.Variable((N, M), nonneg=True)
     w = 9 * np.random.uniform(0, 1, (N, M)) + 1
@@ -146,11 +146,11 @@ def profile_weighted(n, num_cpus, num_iter=20):
         [x[:, j].sum() >= bm[j] for j in range(M)],
     )
     driver_stats, worker_stats = run_with_line_profile(
-        prob, ray_address="auto", solver=dd.GUROBI, num_cpus=num_cpus, num_iter=num_iter
+        prob, ray_address="auto", solver=dd.GUROBI, num_cpus=num_cpus
     )
-    print(f"\n[profile_weighted n={n}, num_cpus={num_cpus}, num_iter={num_iter}]")
+    print(f"\n[profile_weighted n={n}, num_cpus={num_cpus}]")
     print_stats(driver_stats, worker_stats)
 
 
 if __name__ == "__main__":
-    profile_sum(n=400, num_cpus=8, num_iter=20)
+    profile_sum(n=1000, num_cpus=64)
