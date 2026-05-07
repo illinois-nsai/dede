@@ -632,15 +632,9 @@ class Problem(CpProblem):
             [self.constr_dict_d[constr.id] for constr in constrs] for constrs in self.constrs_gps_d
         ]
 
-        # pack once and serialize as numpy for near-zero-copy Ray serialization
-        var_id_pos_arr_r_ref = ray.put(
-            np.array(list(var_id_pos_set_r), dtype=np.int64).reshape(-1, 2)
-        )
-        var_id_pos_arr_d_ref = ray.put(
-            np.array(list(var_id_pos_set_d), dtype=np.int64).reshape(-1, 2)
-        )
-        packed_r = _pack_var_id_pos_gps(var_id_to_pos_gps_r)
-        packed_d = _pack_var_id_pos_gps(var_id_to_pos_gps_d)
+        # serialize as numpy for near-zero-copy Ray serialization (Arrow path, not pickle)
+        var_id_pos_arr_r_ref = ray.put(np.array(list(var_id_pos_set_r), dtype=np.int64).reshape(-1, 2))
+        var_id_pos_arr_d_ref = ray.put(np.array(list(var_id_pos_set_d), dtype=np.int64).reshape(-1, 2))
 
         # build actors with subproblems
         probs: list[ray.actor.ActorProxy[SubproblemsWrap]] = []
@@ -660,8 +654,8 @@ class Problem(CpProblem):
             cur_obj_expr_d = [obj_expr_d[t.cast(int, i)] for i in idx_d]
             cur_constrs_gps_r = [self.constrs_gps_r[t.cast(int, i)] for i in idx_r]
             cur_constrs_gps_d = [self.constrs_gps_d[t.cast(int, i)] for i in idx_d]
-            cur_pos_gps_r = _slice_packed_gps(*packed_r, idx_r)
-            cur_pos_gps_d = _slice_packed_gps(*packed_d, idx_d)
+            cur_pos_gps_r = _pack_var_id_pos_gps([var_id_to_pos_gps_r[t.cast(int, i)] for i in idx_r])
+            cur_pos_gps_d = _pack_var_id_pos_gps([var_id_to_pos_gps_d[t.cast(int, i)] for i in idx_d])
             probs.append(
                 actor.remote(
                     idx_r,
@@ -823,41 +817,8 @@ def _pack_var_id_pos_gps(
             all_pairs.extend(var_info_list)
             pair_offsets.append(len(all_pairs))
         group_offsets.append(len(pair_offsets) - 1)
-    pairs_arr = (
-        np.array(all_pairs, dtype=np.int64).reshape(-1, 2)
-        if all_pairs
-        else np.empty((0, 2), dtype=np.int64)
-    )
-    return (
-        pairs_arr,
-        np.array(pair_offsets, dtype=np.int64),
-        np.array(group_offsets, dtype=np.int64),
-    )
-
-
-def _slice_packed_gps(
-    pairs: NDArray[np.int64],
-    pair_offsets: NDArray[np.int64],
-    group_offsets: NDArray[np.int64],
-    idx: NDArray[np.signedinteger],
-) -> tuple[NDArray[np.int64], NDArray[np.int64], NDArray[np.int64]]:
-    """Slice a packed representation to only the groups in idx, producing a new packed triple."""
-    new_pair_offsets = [0]
-    new_group_offsets = [0]
-    slices: list[NDArray[np.int64]] = []
-    for i in idx:
-        c_start = int(group_offsets[i])
-        c_end = int(group_offsets[i + 1])
-        for c in range(c_start, c_end):
-            slices.append(pairs[int(pair_offsets[c]) : int(pair_offsets[c + 1])])
-            new_pair_offsets.append(new_pair_offsets[-1] + len(slices[-1]))
-        new_group_offsets.append(len(new_pair_offsets) - 1)
-    new_pairs = np.vstack(slices) if slices else np.empty((0, 2), dtype=np.int64)
-    return (
-        new_pairs,
-        np.array(new_pair_offsets, dtype=np.int64),
-        np.array(new_group_offsets, dtype=np.int64),
-    )
+    pairs_arr = np.array(all_pairs, dtype=np.int64).reshape(-1, 2) if all_pairs else np.empty((0, 2), dtype=np.int64)
+    return pairs_arr, np.array(pair_offsets, dtype=np.int64), np.array(group_offsets, dtype=np.int64)
 
 
 @ray.remote
