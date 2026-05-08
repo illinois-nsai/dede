@@ -1,0 +1,25 @@
+Testing sum n=2500, num_cpus=1
+Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2783400
+Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu
+Iterations: 11601.0
+Executed solve in 4854.298774502007s
+Result 3123750.0
+Testing weighted n=2500, num_cpus=1
+Iterations: 42808.0
+Executed solve in 2994.4519876340055s
+Result 13982.797663578385
+Testing log n=2500, num_cpus=1
+Iterations: 1350
+Executed solve in 6182.0434720990015s
+Result 17064.637918568995
+Testing sum n=3000, num_cpus=1
+Iterations: 14291.0
+Executed solve in 6137.766316035995s
+Result 4498500.0
+Testing weighted n=3000, num_cpus=1
+Iterations: 26151.0
+Executed solve in 5893.270703704009s
+Result 16634.00746751611
+Testing log n=3000, num_cpus=1
