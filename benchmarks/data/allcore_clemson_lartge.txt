@@ -1,0 +1,102 @@
+Testing sum n=500, num_cpus=64
+Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2783400
+Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu
+Iterations: 1662.0
+Executed solve in 42.86538609099807s
+Result 124750.0
+Testing weighted n=500, num_cpus=64
+Iterations: 8465.0
+Executed solve in 32.962360619043466s
+Result 2826.7131772923176
+Testing log n=500, num_cpus=64
+Iterations: 325
+Executed solve in 56.089118235046044s
+Result 2611.2617192661983
+Testing sum n=1000, num_cpus=64
+Iterations: 3875.0
+Executed solve in 244.58075301599456s
+Result 499500.0
+Testing weighted n=1000, num_cpus=64
+Iterations: 17391.0
+Executed solve in 220.57755747798365s
+Result 5698.88111260928
+Testing log n=1000, num_cpus=64
+Iterations: 800
+Executed solve in 486.8051324519911s
+Result 5912.01776669935
+Testing sum n=1500, num_cpus=64
+Iterations: 6103.0
+Executed solve in 796.3496353219962s
+Result 1124250.0
+Testing weighted n=1500, num_cpus=64
+Iterations: 31743.0
+Executed solve in 714.6958237079671s
+Result 8510.953870789343
+Testing log n=1500, num_cpus=64
+Iterations: 1075
+Executed solve in 1593.8508242800017s
+Result 9474.240426914399
+Testing sum n=2000, num_cpus=64
+Iterations: 8220.0
+Executed solve in 2055.4337155490066s
+Result 1999000.0
+Testing weighted n=2000, num_cpus=64
+Iterations: 20874.0
+Executed solve in 1669.1078591360128s
+Result 11177.511099122448
+Testing log n=2000, num_cpus=64
+Iterations: 1225
+Executed solve in 3634.5461636389955s
+Result 13206.289623713565
+Testing sum n=3000, num_cpus=64
+Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2783400
+Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu
+Iterations: 14291.0
+Executed solve in 14009.256191944005s
+Result 4498500.0
+Testing weighted n=3000, num_cpus=64
+Iterations: 47541.0
+Executed solve in 11745.158675023995s
+Result 16676.075315483395
+Testing log n=3000, num_cpus=64
+Testing log n=3000, num_cpus=64
+Iterations: 1425
+Executed solve in 26478.066119039024s
+Result 21023.626263225153
+Testing sum n=3500, num_cpus=64
+Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2783400
+Academic license 2783400 - for non-commercial use only - registered to ia___@illinois.edu
+Iterations: 16352.0
+Executed solve in 15624.716421740944s
+Result 6123250.0
+Testing weighted n=3500, num_cpus=64
+Iterations: 25540.0
+Executed solve in 15560.112679082085s
+Result 19447.661792490275
+Testing log n=3500, num_cpus=64
+Iterations: 1450
+Executed solve in 29836.158449130948s
+Result 25066.28827588827
+Testing sum n=4000, num_cpus=64
+Iterations: 24209.0
+Executed solve in 29297.783320284914s
+Result 7998000.0
+Testing weighted n=4000, num_cpus=64
+Iterations: 34774.0
+Executed solve in 24925.671909897937s
+Result 22289.334090956203
+Testing log n=4000, num_cpus=64
+Iterations: 1400
+Executed solve in 50542.286884639994s
+Result 29180.55985664297
+Testing sum n=4500, num_cpus=64
+Iterations: 24376.0
+Executed solve in 36418.925201662s
+Result 10122750.0
+Testing weighted n=4500, num_cpus=64
