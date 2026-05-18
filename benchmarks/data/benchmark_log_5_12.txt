@@ -1,4 +1,4 @@
-
+# NOTE: this was run on 2 32-core c220g1 nodes
 Running entrypoint for job raysubmit_RxeTdZZkUvbZVqi1: python distributed_tests.py
 Testing sum n=500, num_cpus=64
 Executed __init__ in 5.2056s

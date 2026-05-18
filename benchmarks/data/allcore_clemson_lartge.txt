@@ -1,3 +1,4 @@
+# NOTE: this was run on 1 c6420 machine on 64 cores using gurobi/scs (this is two results concatted, whihc is why  n=2500 is missing)
 Testing sum n=500, num_cpus=64
 Set parameter WLSAccessID
 Set parameter WLSSecret
